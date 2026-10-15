@@ -90,6 +90,40 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Vercel Blob Connectivity Status Check
+app.get('/api/blob/status', async (req, res) => {
+  const token = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!token) {
+    return res.json({
+      connected: false,
+      tokenConfigured: false,
+      message: 'BLOB_READ_WRITE_TOKEN is not yet set in backend/.env. Follow instructions to paste it.'
+    });
+  }
+
+  try {
+    const { list } = await import('@vercel/blob');
+    const blobList = await list({ token });
+    return res.json({
+      connected: true,
+      tokenConfigured: true,
+      totalBlobs: blobList.blobs.length,
+      blobs: blobList.blobs.map(b => ({
+        pathname: b.pathname,
+        url: b.url,
+        size: b.size,
+        uploadedAt: b.uploadedAt
+      }))
+    });
+  } catch (err) {
+    return res.status(500).json({
+      connected: false,
+      tokenConfigured: true,
+      error: err.message
+    });
+  }
+});
+
 // Root welcome
 app.get('/', (req, res) => {
   res.json({
