@@ -19,7 +19,7 @@
       "phone": "+1 555-0142",
       "role": "user",
       "status": "approved",
-      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+      "avatar": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/alex-rivera-zq02FOmZmzEitNOoFRZN6WUtbBwbbi.jpg",
       "createdAt": "2026-10-15T12:29:16.666Z"
     },
     {
@@ -30,7 +30,7 @@
       "phone": "+1 555-0188",
       "role": "user",
       "status": "approved",
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80",
+      "avatar": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/david-chen-QWRd32KpLPJb0Xhb6QAmvi5f5JgPvJ.jpg",
       "createdAt": "2026-10-15T12:29:16.666Z"
     },
     {
@@ -57,14 +57,14 @@
       "category": "Technology & AI",
       "bio": "Ex-Google AI lead, Forbes 30u30, angel investor in 40+ AI startups. Helping founders scale & ship transformative products.",
       "hourlyRate": 250,
-      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
+      "avatar": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/marcus-vance-i67OGtrohqWmmtNDv5jS7iSL9yewYH.jpg",
       "status": "approved",
       "isVerified": true,
       "certificateStatus": "verified",
       "certification": {
         "title": "Stanford Executive AI & Venture Architecture",
         "fileName": "stanford_ai_fellowship.pdf",
-        "fileUrl": "/uploads/sample_cert.pdf",
+        "fileUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/certificates/sample_cert-zhH3CUhkBkgyjCm7vFKcgsUu2sQjNP.pdf",
         "uploadedAt": "2026-10-10T12:00:00Z"
       },
       "availability": {
@@ -127,14 +127,14 @@
       "category": "Health & Fitness",
       "bio": "MD & Neuro-nutritionist. Featured on Huberman Lab & Rogan. I design science-backed protocols for peak human performance.",
       "hourlyRate": 300,
-      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80",
+      "avatar": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/sophia-reyes-Qg5DvsqDv5rMhFTmshTYXs5ihtfY0O.jpg",
       "status": "approved",
       "isVerified": true,
       "certificateStatus": "verified",
       "certification": {
         "title": "Harvard Medical Longevity & Metabolic Medicine Board",
         "fileName": "harvard_med_board.pdf",
-        "fileUrl": "/uploads/sample_cert.pdf",
+        "fileUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/certificates/sample_cert-zhH3CUhkBkgyjCm7vFKcgsUu2sQjNP.pdf",
         "uploadedAt": "2026-10-11T14:30:00Z"
       },
       "availability": {
@@ -188,14 +188,14 @@
       "category": "Fashion & Lifestyle",
       "bio": "Creative director for top luxury fashion houses in Paris & Milan. 2.4M followers. Mentoring next-gen creators on brand partnerships.",
       "hourlyRate": 200,
-      "avatar": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80",
+      "avatar": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/jordan-sterling-ZBSC9MsE695xR4meWYtdz31go3dEGb.jpg",
       "status": "approved",
       "isVerified": false,
       "certificateStatus": "pending",
       "certification": {
         "title": "Parsons School of Design Master Accreditation",
         "fileName": "parsons_master_cert.pdf",
-        "fileUrl": "/uploads/sample_cert.pdf",
+        "fileUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/certificates/sample_cert-zhH3CUhkBkgyjCm7vFKcgsUu2sQjNP.pdf",
         "uploadedAt": "2026-10-14T09:15:00Z"
       },
       "availability": {
@@ -254,14 +254,14 @@
       "category": "Business & Finance",
       "bio": "Built & exited 2 SaaS ventures ($60M ARR). Investing in pre-seed software businesses across North America & APAC.",
       "hourlyRate": 350,
-      "avatar": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80",
+      "avatar": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/kavita-patel-zREHzJ3owxhE4zobtDjZSvjSVJ5APQ.jpg",
       "status": "pending_review",
       "isVerified": false,
       "certificateStatus": "pending",
       "certification": {
         "title": "Wharton FinTech Fellow Certification",
         "fileName": "wharton_fintech_cert.pdf",
-        "fileUrl": "/uploads/sample_cert.pdf",
+        "fileUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/certificates/sample_cert-zhH3CUhkBkgyjCm7vFKcgsUu2sQjNP.pdf",
         "uploadedAt": "2026-10-15T08:00:00Z"
       },
       "availability": {
