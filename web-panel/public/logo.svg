@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 220" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mfGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="25%" stop-color="#6366F1" />
+      <stop offset="55%" stop-color="#A855F7" />
+      <stop offset="80%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#FF5E62" />
+    </linearGradient>
+    <linearGradient id="headLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+    <linearGradient id="headRight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7A59" />
+      <stop offset="100%" stop-color="#FF5E62" />
+    </linearGradient>
+    <linearGradient id="fameTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9333EA" />
+      <stop offset="50%" stop-color="#EC4899" />
+      <stop offset="100%" stop-color="#FF7A59" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Person Head -->
+  <circle cx="65" cy="50" r="16" fill="url(#headLeft)" />
+
+  <!-- Right Person Head -->
+  <circle cx="165" cy="50" r="16" fill="url(#headRight)" />
+
+  <!-- Infinity Loop Body with Gradient -->
+  <path d="M 115 130 
+           C 140 168 185 168 205 130 
+           C 225 92 185 75 165 75
+           C 140 75 125 105 115 130
+           C 105 155 90 185 65 185
+           C 30 185 15 155 15 130
+           C 15 95 45 75 65 75
+           C 85 75 102 105 115 130 Z" 
+        fill="none" 
+        stroke="url(#mfGradient)" 
+        stroke-width="22" 
+        stroke-linecap="round" 
+        stroke-linejoin="round" />
+
+  <!-- Camera inside right loop -->
+  <g transform="translate(150, 118)">
+    <rect x="0" y="4" width="22" height="16" rx="3" fill="#FFFFFF" />
+    <polygon points="23,8 31,4 31,20 23,16" fill="#FFFFFF" />
+    <circle cx="11" cy="12" r="3.5" fill="#EC4899" />
+  </g>
+
+  <!-- Text MeetFame -->
+  <g transform="translate(245, 120)">
+    <text x="0" y="0" font-family="'Plus Jakarta Sans', 'Outfit', sans-serif" font-weight="900" font-size="58" fill="#FFFFFF" letter-spacing="-1">Meet<tspan fill="url(#fameTextGrad)">Fame</tspan></text>
+    <!-- Tagline -->
+    <text x="2" y="28" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="16" fill="#94A3B8" letter-spacing="3">ADMIN PANEL</text>
+  </g>
+</svg>
