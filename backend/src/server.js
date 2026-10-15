@@ -33,7 +33,7 @@ const uploadsPath = path.join(__dirname, '../data/uploads');
 app.use('/uploads', express.static(uploadsPath));
 
 // MongoDB Connectivity
-const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_DB;
+const MONGODB_URI = process.env.MONGODB_URI;
 if (MONGODB_URI) {
   mongoose.connect(MONGODB_URI)
     .then(async () => {

@@ -68,7 +68,6 @@ PORT=5001
 NODE_ENV=development
 
 # MongoDB Atlas Database
-MONGO_DB=mongodb+srv://vishalkaushalit_db_user:iybDJ7XRhQVs9JKk@meet-fame-db.keuvht8.mongodb.net/meetfame?retryWrites=true&w=majority
 MONGODB_URI=mongodb+srv://vishalkaushalit_db_user:iybDJ7XRhQVs9JKk@meet-fame-db.keuvht8.mongodb.net/meetfame?retryWrites=true&w=majority
 
 # Vercel Blob Storage Token (Paste your token from Vercel Dashboard -> Storage -> Blob)

@@ -48,7 +48,6 @@ In your Vercel Project -> **Settings** -> **Environment Variables**, add the fol
 | Key | Value | Description |
 |---|---|---|
 | `MONGODB_URI` | `mongodb+srv://vishalkaushalit_db_user:iybDJ7XRhQVs9JKk@meet-fame-db.keuvht8.mongodb.net/meetfame?retryWrites=true&w=majority` | Your MongoDB Atlas connection string |
-| `MONGO_DB` | `mongodb+srv://vishalkaushalit_db_user:iybDJ7XRhQVs9JKk@meet-fame-db.keuvht8.mongodb.net/meetfame?retryWrites=true&w=majority` | Fallback variable name |
 | `JWT_SECRET` | `meetfame_super_secret_jwt_key_production_2026` | Custom JWT secret for auth sessions |
 | `BLOB_READ_WRITE_TOKEN` | *(Automatically added when you attach Blob Store in Step 3)* | Required for Vercel Blob uploads |
 
