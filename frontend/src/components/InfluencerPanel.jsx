@@ -384,7 +384,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 <Save className="w-4 h-4" />
                 <span>
                   {savingSlots ? (
-                    <LogoLoader variant="button" label="Saving…" />
+                    <span>Saving...</span>
                   ) : (
                     'Save Availability & Generate Slots'
                   )}
@@ -772,7 +772,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <Upload className="w-4 h-4" />
               <span>
                 {certUploading ? (
-                  <LogoLoader variant="button" label="Submitting…" />
+                  <span>Submitting...</span>
                 ) : (
                   'Submit Certificate for Verification'
                 )}

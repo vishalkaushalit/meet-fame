@@ -1,4 +1,3 @@
-import LogoLoader from './LogoLoader';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Save } from 'lucide-react';
@@ -121,11 +120,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             className="dashboard-button"
           >
             <Save size={15} />
-            {saving ? (
-              <LogoLoader variant="button" label="Saving…" />
-            ) : (
-              'Save changes'
-            )}
+            {saving ? <span>Saving…</span> : 'Save changes'}
           </button>
         </footer>
       </form>

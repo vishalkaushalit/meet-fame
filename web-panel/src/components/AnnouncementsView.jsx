@@ -1,4 +1,3 @@
-import LogoLoader from './LogoLoader';
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import { adminApi } from '../api';
@@ -88,11 +87,7 @@ export default function AnnouncementsView() {
         className="dashboard-button disabled:opacity-50"
       >
         <Send size={15} />
-        {sending ? (
-          <LogoLoader variant="button" label="Sending…" />
-        ) : (
-          'Send announcement'
-        )}
+        {sending ? <span>Sending…</span> : 'Send announcement'}
       </button>
     </form>
   );

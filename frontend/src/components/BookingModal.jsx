@@ -431,7 +431,7 @@ export default function BookingModal({
                 className="py-3 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center gap-2 text-sm"
               >
                 {submitting ? (
-                  <LogoLoader variant="button" label="Confirming…" />
+                  <span>Confirming...</span>
                 ) : (
                   'Confirm & Book Slot'
                 )}

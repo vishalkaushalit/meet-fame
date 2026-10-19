@@ -534,7 +534,7 @@ export default function ApprovalsView() {
                     className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50"
                   >
                     {updatingUser === u.id ? (
-                      <LogoLoader variant="button" label="Saving…" />
+                      <span>Saving…</span>
                     ) : (
                       'Block User'
                     )}
@@ -547,7 +547,7 @@ export default function ApprovalsView() {
                     className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
                   >
                     {updatingUser === u.id ? (
-                      <LogoLoader variant="button" label="Saving…" />
+                      <span>Saving…</span>
                     ) : u.status === 'blocked' ? (
                       'Unblock User'
                     ) : (
