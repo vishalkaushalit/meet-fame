@@ -1,4 +1,5 @@
 import express from 'express';
+import { dayRanges } from '../../../shared/availability.js';
 import { addNotification } from '../notifications.js';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
@@ -266,7 +267,7 @@ router.get('/influencers/:id/slots-overview', (req, res) => {
     const weeklySlotPlan = {};
 
     for (const d of days) {
-      const ranges = (influencer.availability && influencer.availability[d]) || [];
+      const ranges = dayRanges(influencer.availability?.[d]);
       weeklySlotPlan[d] = {
         ranges,
         generatedSlots: generateDaySlots(ranges)

@@ -1,3 +1,4 @@
+import { normalizeAvailability, dayRanges } from '../../../shared/availability';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
@@ -25,7 +26,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const { user, updateUserProfile } = useAuth();
   
   const [activeTab, setActiveTab] = useState('slots'); // 'slots' | 'bookings' | 'certificate' | 'profile'
-  const [availability, setAvailability] = useState(user?.availability || {
+  const [availability, setAvailability] = useState(() => normalizeAvailability(user?.availability || {
     monday: [{ start: '09:00', end: '12:00' }, { start: '17:00', end: '20:00' }],
     tuesday: [{ start: '10:00', end: '14:00' }],
     wednesday: [{ start: '09:00', end: '12:00' }],
@@ -33,7 +34,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
     friday: [{ start: '09:00', end: '13:00' }],
     saturday: [{ start: '10:00', end: '12:00' }],
     sunday: []
-  });
+  }));
 
   const [activeDay, setActiveDay] = useState('monday');
   const [generatedSlots, setGeneratedSlots] = useState({});
@@ -58,7 +59,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       try {
         const infData = await api.influencers.getById(user.id);
         if (infData.influencer?.availability) {
-          setAvailability(infData.influencer.availability);
+          setAvailability(normalizeAvailability(infData.influencer.availability));
         }
         if (infData.generatedSlotsByDay) {
           setGeneratedSlots(infData.generatedSlotsByDay);
@@ -85,22 +86,22 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const handleAddRange = (day) => {
     setAvailability(prev => ({
       ...prev,
-      [day]: [...(prev[day] || []), { start: '14:00', end: '17:00' }]
+      [day]: { ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }] }
     }));
   };
 
   const handleRemoveRange = (day, idx) => {
     setAvailability(prev => ({
       ...prev,
-      [day]: prev[day].filter((_, i) => i !== idx)
+      [day]: { ranges: dayRanges(prev[day]).filter((_, i) => i !== idx) }
     }));
   };
 
   const handleRangeChange = (day, idx, field, val) => {
     setAvailability(prev => {
-      const dayList = [...(prev[day] || [])];
+      const dayList = [...dayRanges(prev[day])];
       dayList[idx] = { ...dayList[idx], [field]: val };
-      return { ...prev, [day]: dayList };
+      return { ...prev, [day]: { ranges: dayList } };
     });
   };
 
@@ -301,7 +302,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             {/* Day Selector Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-3 mb-6">
               {days.map(d => {
-                const count = availability[d]?.length || 0;
+                const count = dayRanges(availability[d]).length || 0;
                 const slotCount = generatedSlots[d]?.length || 0;
                 return (
                   <button
@@ -345,13 +346,13 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 </button>
               </div>
 
-              {availability[activeDay]?.length === 0 ? (
+              {dayRanges(availability[activeDay]).length === 0 ? (
                 <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
                   You are marked unavailable on {activeDay}s. Click "Add Time Window" to open booking slots.
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {availability[activeDay]?.map((range, idx) => (
+                  {dayRanges(availability[activeDay]).map((range, idx) => (
                     <div key={idx} className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800">
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-slate-400" />

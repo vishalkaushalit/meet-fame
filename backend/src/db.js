@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { normalizeAvailability } from '../../shared/availability.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
@@ -356,7 +357,7 @@ class Database {
   init() {
     if (!fs.existsSync(DB_FILE)) {
       const initial = getInitialData();
-      fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), 'utf-8');
+      this.write(initial);
       console.log(' MeetFame Database initialized with seed data at:', DB_FILE);
     }
   }
@@ -364,17 +365,20 @@ class Database {
   read() {
     try {
       const data = fs.readFileSync(DB_FILE, 'utf-8');
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      for (const creator of parsed.influencers || []) creator.availability = normalizeAvailability(creator.availability);
+      return parsed;
     } catch (err) {
       console.error('Error reading database file, resetting to initial seed:', err);
       const initial = getInitialData();
-      fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), 'utf-8');
+      this.write(initial);
       return initial;
     }
   }
 
   write(data) {
     try {
+      for (const creator of data.influencers || []) creator.availability = normalizeAvailability(creator.availability);
       const tempPath = `${DB_FILE}.tmp`;
       fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
       fs.renameSync(tempPath, DB_FILE);

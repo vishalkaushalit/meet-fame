@@ -1,4 +1,5 @@
 import express from 'express';
+import { normalizeAvailability } from '../../../shared/availability.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
@@ -102,7 +103,7 @@ router.post('/register-influencer', upload.single('certificateFile'), async (req
       isVerified: false,
       certificateStatus: (req.file || certificateTitle) ? 'pending' : 'none',
       certification: (req.file || certificateTitle) ? certData : null,
-      availability: parsedAvailability,
+      availability: normalizeAvailability(parsedAvailability),
       createdAt: new Date().toISOString()
     };
 

@@ -1,3 +1,4 @@
+import { dayRanges } from '../../shared/availability.js';
 // Slot generation utilities for 1-hour slots
 
 /**
@@ -65,7 +66,7 @@ export function generateOneHourSlotsFromRange(startTime, endTime) {
  */
 export function generateDaySlots(ranges = []) {
   const allSlots = [];
-  for (const range of ranges) {
+  for (const range of dayRanges(ranges)) {
     if (range.start && range.end) {
       const slots = generateOneHourSlotsFromRange(range.start, range.end);
       allSlots.push(...slots);

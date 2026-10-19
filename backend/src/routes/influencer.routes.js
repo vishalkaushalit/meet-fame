@@ -1,4 +1,5 @@
 import express from 'express';
+import { normalizeAvailability } from '../../../shared/availability.js';
 import { addNotification } from '../notifications.js';
 import { requireSession } from '../middleware/session.js';
 import multer from 'multer';
@@ -114,8 +115,8 @@ router.put('/:id/availability', requireSession, (req, res) => {
       return res.status(404).json({ error: 'Influencer not found' });
     }
 
-    const changed = JSON.stringify(data.influencers[idx].availability) !== JSON.stringify(availability);
-    data.influencers[idx].availability = availability;
+    const changed = JSON.stringify(data.influencers[idx].availability) !== JSON.stringify(normalizeAvailability(availability));
+    data.influencers[idx].availability = normalizeAvailability(availability);
     if (changed) {
       const creator = data.influencers[idx];
       addNotification(data, creator.id, 'influencer', 'Availability updated', 'Your weekly availability has been updated. Existing booked sessions keep their scheduled times.');

@@ -1,3 +1,4 @@
+import { dayRanges } from '../../../shared/availability';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ExternalLink } from 'lucide-react';
@@ -66,7 +67,7 @@ export default function AccountDetailsDialog({ account, onClose }) {
           {details.role === 'influencer' && <>
             <section><h3>About</h3><p>{text(details.bio)}</p></section>
             <section><h3>Certificate</h3><p>{text(details.certification?.title)}</p>{details.certification?.fileName && <p>{details.certification.fileName}</p>}{certificateUrl && <a href={certificateUrl} target="_blank" rel="noreferrer">View certificate <ExternalLink size={14} /></a>}</section>
-            <section><h3>Weekly availability</h3><dl className="account-details-fields">{['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => <div key={day}><dt className="capitalize">{day}</dt><dd>{details.availability?.[day]?.length ? details.availability[day].map(range => `${range.start}–${range.end}`).join(', ') : 'Unavailable'}</dd></div>)}</dl></section>
+            <section><h3>Weekly availability</h3><dl className="account-details-fields">{['monday','tuesday','wednesday','thursday','friday','saturday','sunday'].map(day => <div key={day}><dt className="capitalize">{day}</dt><dd>{dayRanges(details.availability?.[day]).length ? dayRanges(details.availability?.[day]).map(range => `${range.start}–${range.end}`).join(', ') : 'Unavailable'}</dd></div>)}</dl></section>
           </>}
         </>}
       </div>

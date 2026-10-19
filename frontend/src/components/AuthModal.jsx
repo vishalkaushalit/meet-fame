@@ -1,3 +1,4 @@
+import { normalizeAvailability, dayRanges } from '../../../shared/availability';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -43,7 +44,7 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
   // Day-wise availability configuration for influencer
   // Default Monday: 9-12 and 17-20 as described in prompt!
-  const [availability, setAvailability] = useState({
+  const [availability, setAvailability] = useState(() => normalizeAvailability({
     monday: [
       { start: '09:00', end: '12:00' },
       { start: '17:00', end: '20:00' }
@@ -54,7 +55,7 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
     friday: [{ start: '09:00', end: '13:00' }],
     saturday: [{ start: '10:00', end: '12:00' }],
     sunday: []
-  });
+  }));
 
   const [activeDayTab, setActiveDayTab] = useState('monday');
 
@@ -75,7 +76,7 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
   // Calculate 1-hour slots for active tab to show real-time auto-generation preview!
   const generatePreviewSlots = (ranges = []) => {
     const slots = [];
-    ranges.forEach(r => {
+    dayRanges(ranges).forEach(r => {
       if (!r.start || !r.end) return;
       const [sh] = r.start.split(':').map(Number);
       const [eh] = r.end.split(':').map(Number);
@@ -97,22 +98,22 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
   const handleAddRange = (day) => {
     setAvailability(prev => ({
       ...prev,
-      [day]: [...(prev[day] || []), { start: '14:00', end: '17:00' }]
+      [day]: { ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }] }
     }));
   };
 
   const handleRemoveRange = (day, index) => {
     setAvailability(prev => ({
       ...prev,
-      [day]: prev[day].filter((_, idx) => idx !== index)
+      [day]: { ranges: dayRanges(prev[day]).filter((_, idx) => idx !== index) }
     }));
   };
 
   const handleRangeChange = (day, index, field, value) => {
     setAvailability(prev => {
-      const updated = [...(prev[day] || [])];
+      const updated = [...dayRanges(prev[day])];
       updated[index] = { ...updated[index], [field]: value };
-      return { ...prev, [day]: updated };
+      return { ...prev, [day]: { ranges: updated } };
     });
   };
 
@@ -434,8 +435,8 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                       }`}
                     >
                       {d.slice(0, 3)}
-                      {availability[d]?.length > 0 && (
-                        <span className="ml-1 text-[10px] opacity-75">({availability[d].length})</span>
+                      {dayRanges(availability[d]).length > 0 && (
+                        <span className="ml-1 text-[10px] opacity-75">({dayRanges(availability[d]).length})</span>
                       )}
                     </button>
                   ))}
@@ -443,12 +444,12 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
                 {/* Time ranges for selected day */}
                 <div className="space-y-2 mb-3">
-                  {availability[activeDayTab]?.length === 0 ? (
+                  {dayRanges(availability[activeDayTab]).length === 0 ? (
                     <div className="text-xs text-slate-500 py-3 text-center bg-slate-900/60 rounded-xl border border-slate-800/80">
                       No availability configured for {activeDayTab}. Click "Add Range" to open slots.
                     </div>
                   ) : (
-                    availability[activeDayTab]?.map((range, idx) => (
+                    dayRanges(availability[activeDayTab]).map((range, idx) => (
                       <div key={idx} className="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-slate-800">
                         <Clock className="w-3.5 h-3.5 text-slate-400 ml-1" />
                         <span className="text-xs text-slate-400">From</span>

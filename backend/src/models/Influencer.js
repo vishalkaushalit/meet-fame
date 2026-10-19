@@ -1,3 +1,4 @@
+import { normalizeAvailability } from '../../../shared/availability.js';
 import mongoose from 'mongoose';
 
 const availabilityRangeSchema = new mongoose.Schema({
@@ -5,14 +6,15 @@ const availabilityRangeSchema = new mongoose.Schema({
   end: { type: String, required: true }    // e.g. "12:00"
 }, { _id: false });
 
+const daySchema = new mongoose.Schema({ ranges: [availabilityRangeSchema] }, { _id: false });
 const dayAvailabilitySchema = new mongoose.Schema({
-  monday: [availabilityRangeSchema],
-  tuesday: [availabilityRangeSchema],
-  wednesday: [availabilityRangeSchema],
-  thursday: [availabilityRangeSchema],
-  friday: [availabilityRangeSchema],
-  saturday: [availabilityRangeSchema],
-  sunday: [availabilityRangeSchema]
+  monday: daySchema,
+  tuesday: daySchema,
+  wednesday: daySchema,
+  thursday: daySchema,
+  friday: daySchema,
+  saturday: daySchema,
+  sunday: daySchema
 }, { _id: false });
 
 const certificationSchema = new mongoose.Schema({
@@ -54,7 +56,7 @@ const influencerSchema = new mongoose.Schema({
   // Day-wise time ranges
   availability: {
     type: dayAvailabilitySchema,
-    default: () => ({
+    default: () => normalizeAvailability({
       monday: [{ start: '09:00', end: '12:00' }, { start: '17:00', end: '20:00' }],
       tuesday: [{ start: '10:00', end: '14:00' }],
       wednesday: [{ start: '09:00', end: '12:00' }],
