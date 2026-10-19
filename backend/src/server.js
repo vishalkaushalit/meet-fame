@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import { createDatabaseMiddleware } from './databaseContext.js';
 import { mongoStore } from './mongoStore.js';
+import { mongoConnection } from './mongoConnection.js';
 
 // Load environment variables
 dotenv.config();
@@ -39,10 +40,10 @@ app.use('/uploads', express.static(uploadsPath));
 // MongoDB Connectivity
 const MONGODB_URI = process.env.MONGODB_URI;
 if (MONGODB_URI) {
-  mongoose.connect(MONGODB_URI)
+  mongoConnection.connect()
     .then(() => { console.log('MongoDB connected. Persistent API storage is active.'); })
-    .catch(err => {
-      console.warn('MongoDB connection unavailable. Persistent API requests will return 503.');
+    .catch(() => {
+      console.warn('MongoDB connection unavailable:', mongoConnection.status().issue);
     });
 } else {
   console.log('ℹ️  No MONGODB_URI provided, running with high-performance persistent JSON storage.');
@@ -82,6 +83,7 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0',
     time: new Date().toISOString(),
     mongoConnected: mongoose.connection.readyState === 1,
+    database: mongoConnection.status(),
     vercelBlobEnabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN)
   });
 });

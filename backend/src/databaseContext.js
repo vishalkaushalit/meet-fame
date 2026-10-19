@@ -24,7 +24,9 @@ export function createDatabaseMiddleware(store) {
         return res;
       };
       databaseContext.run(context, next);
-    } catch {
+    } catch (error) {
+      // Never include connection strings or driver messages in responses/logs.
+      console.error('Persistent database initialization failed', { name: error.name, code: error.code, codeName: error.codeName });
       res.status(503).json({ error: 'Persistent database is unavailable. Please try again later.' });
     }
   };

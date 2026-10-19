@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { mongoConnection } from './mongoConnection.js';
 import { db } from './db.js';
 import { normalizeAvailability } from '../../shared/availability.js';
 const collections = ['users', 'influencers', 'admins', 'bookings', 'messages', 'notifications'];
@@ -11,8 +12,7 @@ const stored = (name, item, version, id) => {
   return record;
 };
 async function initialize() {
-  if (mongoose.connection.readyState === 2) await mongoose.connection.asPromise();
-  if (mongoose.connection.readyState !== 1) throw new Error('MongoDB is not connected');
+  await mongoConnection.connect();
   const mongo = mongoose.connection.db;
   const local = db.read();
   // Import the retained JSON records once per collection, without overwriting
@@ -37,6 +37,7 @@ async function initialize() {
 }
 export const mongoStore = {
   async load() {
+    await mongoConnection.connect();
     if (!initialized) initialized = initialize().catch(error => { initialized = null; throw error; });
     await initialized;
     const local = db.read();
