@@ -9,6 +9,14 @@ function getAuthHeaders() {
 }
 
 export const adminApi = {
+  profile: {
+    update: async profile => {
+      const res = await fetch(`${API_BASE}/admin/profile`, { method: 'PUT', headers: getAuthHeaders(), body: JSON.stringify(profile) });
+      const data = await res.json();
+      if (!res.ok) throw data;
+      return data;
+    }
+  },
   announcements: {
     send: async payload => {
       const res = await fetch(`${API_BASE}/admin/announcements`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload) });

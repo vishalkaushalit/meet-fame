@@ -17,10 +17,26 @@ router.use((req, res, next) => {
     if (decoded.role !== 'admin' || !db.read().admins.some(admin => admin.id === decoded.id)) {
       return res.status(403).json({ error: 'Administrator access required' });
     }
+    req.adminId = decoded.id;
     return next();
   } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });
   }
+});
+
+router.put('/profile', (req, res) => {
+  const { name, email, phone } = req.body;
+  if (typeof name !== 'string' || !name.trim() || name.trim().length > 100 || typeof email !== 'string' || email.trim().length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || typeof phone !== 'string' || phone.trim().length > 40) return res.status(400).json({ error: 'Enter a valid name, email and phone number (up to 40 characters).' });
+  const data = db.read();
+  const account = data.admins.find(item => item.id === req.adminId);
+  if (!account) return res.status(404).json({ error: 'Administrator account not found.' });
+  const normalizedEmail = email.trim().toLowerCase();
+  if (data.admins.some(item => item.id !== account.id && item.email.toLowerCase() === normalizedEmail)) return res.status(409).json({ error: 'This email is already used by another administrator.' });
+  account.name = name.trim(); account.email = normalizedEmail; account.phone = phone.trim();
+  account.updatedAt = new Date().toISOString();
+  if (!db.write(data)) return res.status(500).json({ error: 'Unable to save profile. Please try again.' });
+  const { password, ...user } = account;
+  return res.json({ success: true, user });
 });
 
 /**

@@ -55,7 +55,7 @@ export default function App() {
       {!admin ? (
         <AdminLogin onLoginSuccess={handleLoginSuccess} />
       ) : (
-        <AdminDashboard admin={admin} onLogout={handleLogout} />
+        <AdminDashboard admin={admin} onLogout={handleLogout} onProfileUpdated={setAdmin} />
       )}
     </div>
   );

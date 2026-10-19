@@ -1,19 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
 import ApprovalsView from './ApprovalsView';
-import UsersView from './UsersView';
 import AnnouncementsView from './AnnouncementsView';
 import AccountDetailsDialog from './AccountDetailsDialog';
+import AdminEditProfile from './AdminEditProfile';
 import SlotsInspectorView from './SlotsInspectorView';
 import BookingsView from './BookingsView';
 import ConversationsView from './ConversationsView';
 import { adminApi } from '../api';
-import { LayoutDashboard, ShieldCheck, Clock, CalendarDays, MessageSquare, Users, Sparkles, DollarSign, LogOut, ExternalLink, ArrowUpRight, ArrowRight, RefreshCw, Menu, X, AlertCircle, CheckCircle2, ChevronDown, UserRound, Megaphone } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, Clock, CalendarDays, MessageSquare, Users, Sparkles, DollarSign, LogOut, ExternalLink, ArrowUpRight, ArrowRight, RefreshCw, Menu, X, AlertCircle, CheckCircle2, ChevronDown, UserRound, Megaphone, Pencil } from 'lucide-react';
 import './dashboard.css';
 
 const navigation = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, description: 'A clear view of your platform, all in one place.' },
-  { id: 'users', label: 'Users', icon: Users, description: 'Browse users, influencers and admins, and manage account access.' },
   { id: 'approvals', label: 'Approvals', icon: ShieldCheck, description: 'Review registrations and verify professional credentials.' },
   { id: 'bookings', label: 'Bookings', icon: CalendarDays, description: 'Manage sessions across the MeetFame community.' },
   { id: 'slots', label: 'Availability', icon: Clock, description: 'Explore creator schedules and booked time slots.' },
@@ -23,10 +22,12 @@ const navigation = [
 const money = value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
 const initials = name => (name || 'Administrator').split(' ').map(part => part[0]).slice(0, 2).join('').toUpperCase();
 
-export default function AdminDashboard({ admin, onLogout }) {
+export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
   const [activeTab, setActiveTab] = useState('overview');
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [profileNotice, setProfileNotice] = useState('');
   const profileMenu = useRef(null);
   const profileTrigger = useRef(null);
   useEffect(() => {
@@ -54,7 +55,6 @@ export default function AdminDashboard({ admin, onLogout }) {
   const [refreshing, setRefreshing] = useState(false);
   const [updated, setUpdated] = useState(null);
   const [days, setDays] = useState(7);
-  const [usersRefreshKey, setUsersRefreshKey] = useState(0);
   const load = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -107,6 +107,7 @@ export default function AdminDashboard({ admin, onLogout }) {
         </div>
         <div className="sidebar-footer"><button className="signout-button" onClick={onLogout}><LogOut size={17} /> Sign out</button></div>
       </aside>
+      {editProfileOpen && <AdminEditProfile admin={admin} onClose={() => setEditProfileOpen(false)} onSaved={user => { onProfileUpdated(user); setEditProfileOpen(false); setProfileNotice('Profile updated successfully.'); }} />}
       {profileOpen && <AccountDetailsDialog account={{ ...admin, role: 'admin' }} onClose={() => { setProfileOpen(false); profileTrigger.current?.focus(); }} />}
       <div className="dashboard-workspace">
         <header className="dashboard-topbar"><div className="breadcrumb"><button className="mobile-menu" aria-label="Open navigation" onClick={() => setMobileOpen(true)}><Menu size={21} /></button><span>Workspace</span><span>/</span><strong>{current.label}</strong></div><div className="admin-profile-menu" ref={profileMenu} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setProfileMenuOpen(false); }}>
@@ -115,11 +116,13 @@ export default function AdminDashboard({ admin, onLogout }) {
           </button>
           {profileMenuOpen && <div id="admin-profile-options" className="profile-dropdown" aria-label="Admin account options">
             <button type="button" onClick={() => { setProfileMenuOpen(false); setProfileOpen(true); }}><UserRound size={16} aria-hidden="true" />Profile</button>
+            <button type="button" onClick={() => { setProfileMenuOpen(false); setEditProfileOpen(true); }}><Pencil size={16} aria-hidden="true" />Edit profile</button>
             <button type="button" className="profile-logout" onClick={() => { setProfileMenuOpen(false); onLogout(); }}><LogOut size={16} aria-hidden="true" />Sign out</button>
           </div>}
         </div></header>
         <main className="dashboard-main">
-          <div className="dashboard-page-heading"><div><p className="eyebrow">MEETFAME ADMIN</p><h1>{activeTab === 'overview' ? 'Platform overview' : current.label}</h1><p>{current.description}</p></div><button className="dashboard-button" onClick={() => { load(); if (activeTab === 'users') setUsersRefreshKey(value => value + 1); }} disabled={refreshing}><RefreshCw size={15} className={refreshing ? 'refresh-spinning' : ''} />{refreshing ? 'Refreshing…' : 'Refresh data'}</button></div>
+          <div className="dashboard-page-heading"><div><p className="eyebrow">MEETFAME ADMIN</p><h1>{activeTab === 'overview' ? 'Platform overview' : current.label}</h1><p>{current.description}</p></div><button className="dashboard-button" onClick={load} disabled={refreshing}><RefreshCw size={15} className={refreshing ? 'refresh-spinning' : ''} />{refreshing ? 'Refreshing…' : 'Refresh data'}</button></div>
+          {profileNotice && <p role="status" className="mb-4 text-xs text-emerald-400">{profileNotice}</p>}
           {error && <div className="dashboard-error" role="alert"><AlertCircle size={18} /><span>{error}{updated && ' Showing the last successful update.'}</span><button onClick={load} disabled={refreshing}>Retry</button></div>}
           {activeTab === 'overview' ? <>
             <div className="dashboard-metrics">{metrics.map(metric => <article className="metric-card" key={metric.label}><div className="metric-top"><span>{metric.label}</span><span className={`metric-icon ${metric.color}`}><metric.icon size={18} /></span></div><strong className="metric-value">{metric.value ?? '—'}</strong><p>{metric.detail}</p></article>)}</div>
@@ -127,7 +130,7 @@ export default function AdminDashboard({ admin, onLogout }) {
             <section className="dashboard-card review-card"><div className="card-heading"><div><h2>Needs your attention</h2><p>Keep your community moving forward</p></div><span className="attention-dot" /></div><div className="review-total">{pending ?? '—'}<span>pending reviews</span></div>{[{ label: 'Creator registrations', value: stats?.pendingInfluencers, icon: Users }, { label: 'Certificate verification', value: stats?.pendingCertificates, icon: ShieldCheck }, { label: 'Client registrations', value: stats?.pendingUsers, icon: CheckCircle2 }].map(item => <button className="review-row" key={item.label} onClick={() => navigate('approvals')}><item.icon size={17} /><span>{item.label}</span><strong>{item.value ?? '—'}</strong><ArrowRight size={15} /></button>)}<button className="primary-dashboard-button" onClick={() => navigate('approvals')}>Open review queue <ArrowUpRight size={17} /></button></section></div>
             <section className="dashboard-card"><div className="card-heading"><div><h2>Recent bookings</h2><p>The latest connections on your platform</p></div><button className="text-action" onClick={() => navigate('bookings')}>View all bookings <ArrowRight size={16} /></button></div><div className="dashboard-table-wrap"><table className="dashboard-table"><thead><tr><th>Client / Creator</th><th>Session</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>{bookings.slice(0, 5).map(booking => <tr key={booking.id}><td><div className="booking-person"><span className="booking-avatar">{initials(booking.userName)}</span><div><strong>{booking.userName}</strong><small>with {booking.influencerName}</small></div></div></td><td>{booking.topic || 'Consultation'}<small>{booking.slotLabel || booking.slot}</small></td><td>{booking.date}</td><td className="booking-amount">{money(booking.price)}</td><td><span className={`booking-status ${statuses.includes(booking.status) ? booking.status : ''}`}>{booking.status || 'Unknown'}</span></td></tr>)}</tbody></table>{!bookings.length && <div className="dashboard-empty"><CalendarDays size={28} /><strong>{stats ? 'No bookings yet' : 'Booking data unavailable'}</strong><p>{stats ? 'New sessions will appear here as clients make bookings.' : 'Refresh the dashboard to load your latest bookings.'}</p></div>}</div></section>
             <div className="dashboard-footnote"><span className={error ? 'sync-dot offline' : 'sync-dot'} />{updated ? `Last updated ${updated.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} · Refreshes every 30 seconds` : 'Waiting for the first successful update'}</div>
-          </> : <div className="dashboard-detail">{activeTab === 'announcements' && <AnnouncementsView />}{activeTab === 'users' && <UsersView refreshKey={usersRefreshKey} />}{activeTab === 'approvals' && <ApprovalsView />}{activeTab === 'slots' && <SlotsInspectorView />}{activeTab === 'bookings' && <BookingsView />}{activeTab === 'conversations' && <ConversationsView />}</div>}
+          </> : <div className="dashboard-detail">{activeTab === 'announcements' && <AnnouncementsView />}{activeTab === 'approvals' && <ApprovalsView />}{activeTab === 'slots' && <SlotsInspectorView />}{activeTab === 'bookings' && <BookingsView />}{activeTab === 'conversations' && <ConversationsView />}</div>}
         </main>
       </div>
     </div>
