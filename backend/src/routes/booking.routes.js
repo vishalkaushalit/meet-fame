@@ -1,5 +1,5 @@
 import express from 'express';
-import { notifyBooking } from '../notifications.js';
+import { notifyNewBooking, ensureMeetingReminders } from '../notifications.js';
 import { requireSession } from '../middleware/session.js';
 import { bookingWindow } from '../../../shared/bookingTime.js';
 import { db } from '../db.js';
@@ -146,7 +146,8 @@ router.post('/', requireSession, (req, res) => {
     };
 
     data.bookings.push(newBooking);
-    notifyBooking(data, newBooking, 'Meeting confirmed');
+    notifyNewBooking(data, newBooking);
+    ensureMeetingReminders(data);
 
     // Auto-create initial message in conversation
     const conversationId = `${user.id}_${influencer.id}`;
@@ -163,7 +164,7 @@ router.post('/', requireSession, (req, res) => {
       timestamp: new Date().toISOString()
     });
 
-    db.write(data);
+    if (!db.write(data)) return res.status(500).json({ error: 'Unable to save booking.' });
 
     return res.status(201).json({
       success: true,
@@ -218,7 +219,6 @@ router.put('/:id/status', requireSession, (req, res) => {
     if (!['confirmed', 'completed', 'cancelled'].includes(status)) return res.status(400).json({ error: 'Invalid booking status.' });
     if (booking.status !== status) {
       booking.status = status;
-      notifyBooking(data, booking, status === 'cancelled' ? 'Meeting cancelled' : 'Meeting updated');
     }
     db.write(data);
 

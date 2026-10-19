@@ -19,6 +19,11 @@ import {
 export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-bookings'
+  useEffect(() => {
+    const showBookings = () => setActiveTab('my-bookings');
+    window.addEventListener('meetfame-show-bookings', showBookings);
+    return () => window.removeEventListener('meetfame-show-bookings', showBookings);
+  }, []);
   const [influencers, setInfluencers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');

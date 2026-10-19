@@ -26,6 +26,11 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const { user, updateUserProfile } = useAuth();
   
   const [activeTab, setActiveTab] = useState('slots'); // 'slots' | 'bookings' | 'certificate' | 'profile'
+  useEffect(() => {
+    const showBookings = () => setActiveTab('bookings');
+    window.addEventListener('meetfame-show-bookings', showBookings);
+    return () => window.removeEventListener('meetfame-show-bookings', showBookings);
+  }, []);
   const [availability, setAvailability] = useState(() => normalizeAvailability(user?.availability || {
     monday: [{ start: '09:00', end: '12:00' }, { start: '17:00', end: '20:00' }],
     tuesday: [{ start: '10:00', end: '14:00' }],
