@@ -72,44 +72,46 @@ function AppContent() {
       {/* If logged in, show app top bar */}
       {user && (
         <header className="sticky top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Logo size="sm" showTagline={false} />
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 min-h-[80px] py-4 flex items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+              <Logo size="sm" showTagline={false} className="shrink-0" />
+              <span className="hidden md:inline-flex shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
                 {role === 'influencer' ? 'Creator Dashboard' : 'Client Portal'}
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
               <a
                 href={import.meta.env.VITE_ADMIN_PANEL_URL || (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden sm:flex items-center gap-1 text-xs text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors"
+                className="hidden lg:flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors"
                 title="Open Admin Command Center in new tab"
               >
                 <span>Admin Panel</span>
                 <ExternalLink className="w-3 h-3 text-brand-purple" />
               </a>
 
-              <div className="flex items-center gap-2 pl-3 border-l border-slate-800">
+              <div className="flex min-w-0 items-center gap-2 sm:gap-3 lg:pl-4 lg:border-l border-slate-800">
                 <img
                   src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
                   alt={user.name}
-                  className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-700"
+                  className="w-9 h-9 shrink-0 rounded-xl object-cover ring-1 ring-slate-700"
                 />
-                <div className="hidden sm:block text-left text-xs">
-                  <div className="font-bold text-white flex items-center gap-1">
-                    <span>{user.name}</span>
+                <div className="hidden sm:block min-w-0 max-w-[160px] xl:max-w-[220px] text-left text-xs">
+                  <div className="font-bold text-white flex min-w-0 items-center gap-1">
+                    <span className="truncate" title={user.name}>{user.name}</span>
                     {user.isVerified && <VerifiedBadge size="sm" />}
                   </div>
-                  <div className="text-[10px] text-slate-400 capitalize">{user.role}</div>
+                  <div className="mt-1 text-[10px] leading-4 text-slate-400 capitalize">{user.role}</div>
                 </div>
 
                 <button
                   onClick={logout}
                   className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors ml-1"
                   title="Sign Out"
+                  aria-label="Sign out"
+                  type="button"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
