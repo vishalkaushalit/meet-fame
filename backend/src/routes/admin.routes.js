@@ -1,4 +1,5 @@
 import express from 'express';
+import { addNotification } from '../notifications.js';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 import { generateDaySlots, getDayNameFromDate } from '../slotUtils.js';
@@ -24,6 +25,22 @@ router.use((req, res, next) => {
 /**
  * ADMIN PLATFORM STATS & METRICS
  */
+router.post('/announcements', (req, res) => {
+  const { title, message, audience } = req.body;
+  if (typeof title !== 'string' || !title.trim() || title.trim().length > 100 || typeof message !== 'string' || !message.trim() || message.trim().length > 2000 || !['all', 'user', 'influencer'].includes(audience)) return res.status(400).json({ error: 'Provide a title, message and valid audience.' });
+  const data = db.read();
+  let sent = 0;
+  for (const [role, accounts] of [['user', data.users], ['influencer', data.influencers]]) {
+    if (audience !== 'all' && audience !== role) continue;
+    for (const account of accounts.filter(item => item.status === 'approved')) {
+      addNotification(data, account.id, role, title.trim(), message.trim());
+      sent++;
+    }
+  }
+  if (!db.write(data)) return res.status(500).json({ error: 'Unable to save announcement.' });
+  return res.status(201).json({ success: true, sent });
+});
+
 router.get('/stats', (req, res) => {
   try {
     const data = db.read();

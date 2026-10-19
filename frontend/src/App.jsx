@@ -8,6 +8,8 @@ import BookingModal from './components/BookingModal';
 import ChatModal from './components/ChatModal';
 import StatusAlertModal from './components/StatusAlertModal';
 import Logo from './components/Logo';
+import Notifications from './components/Notifications';
+import VideoCall from './components/VideoCall';
 import VerifiedBadge from './components/VerifiedBadge';
 import { api } from './api';
 import { LogOut, User, Sparkles, ExternalLink } from 'lucide-react';
@@ -16,6 +18,7 @@ function AppContent() {
   const { user, role, logout } = useAuth();
 
   // Modals state
+  const [callBooking, setCallBooking] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authRole, setAuthRole] = useState('user');
   const [authTab, setAuthTab] = useState('login');
@@ -81,6 +84,7 @@ function AppContent() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+              <Notifications key={`${user.role}:${user.id}`} />
               <a
                 href={import.meta.env.VITE_ADMIN_PANEL_URL || (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')}
                 target="_blank"
@@ -131,15 +135,17 @@ function AppContent() {
             featuredInfluencers={featured}
           />
         ) : role === 'influencer' ? (
-          <InfluencerPanel onOpenChat={handleOpenChat} />
+          <InfluencerPanel onOpenChat={handleOpenChat} onJoinCall={setCallBooking} />
         ) : (
           <UserPanel
             onBookInfluencer={handleBookInfluencer}
             onOpenChat={handleOpenChat}
+            onJoinCall={setCallBooking}
           />
         )}
       </main>
 
+      {user && callBooking && <VideoCall key={`${user.id}:${callBooking.id}`} booking={callBooking} role={role} onClose={() => setCallBooking(null)} />}
       {/* Modals & Dialogs */}
       <AuthModal
         isOpen={authModalOpen}

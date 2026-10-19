@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
 import ApprovalsView from './ApprovalsView';
 import UsersView from './UsersView';
+import AnnouncementsView from './AnnouncementsView';
 import AccountDetailsDialog from './AccountDetailsDialog';
 import SlotsInspectorView from './SlotsInspectorView';
 import BookingsView from './BookingsView';
 import ConversationsView from './ConversationsView';
 import { adminApi } from '../api';
-import { LayoutDashboard, ShieldCheck, Clock, CalendarDays, MessageSquare, Users, Sparkles, DollarSign, LogOut, ExternalLink, ArrowUpRight, ArrowRight, RefreshCw, Menu, X, AlertCircle, CheckCircle2, ChevronDown, UserRound } from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, Clock, CalendarDays, MessageSquare, Users, Sparkles, DollarSign, LogOut, ExternalLink, ArrowUpRight, ArrowRight, RefreshCw, Menu, X, AlertCircle, CheckCircle2, ChevronDown, UserRound, Megaphone } from 'lucide-react';
 import './dashboard.css';
 
 const navigation = [
@@ -16,6 +17,7 @@ const navigation = [
   { id: 'approvals', label: 'Approvals', icon: ShieldCheck, description: 'Review registrations and verify professional credentials.' },
   { id: 'bookings', label: 'Bookings', icon: CalendarDays, description: 'Manage sessions across the MeetFame community.' },
   { id: 'slots', label: 'Availability', icon: Clock, description: 'Explore creator schedules and booked time slots.' },
+  { id: 'announcements', label: 'Announcements', icon: Megaphone, description: 'Send updates to users and influencers.' },
   { id: 'conversations', label: 'Conversations', icon: MessageSquare, description: 'Review conversations between clients and creators.' },
 ];
 const money = value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
@@ -125,7 +127,7 @@ export default function AdminDashboard({ admin, onLogout }) {
             <section className="dashboard-card review-card"><div className="card-heading"><div><h2>Needs your attention</h2><p>Keep your community moving forward</p></div><span className="attention-dot" /></div><div className="review-total">{pending ?? '—'}<span>pending reviews</span></div>{[{ label: 'Creator registrations', value: stats?.pendingInfluencers, icon: Users }, { label: 'Certificate verification', value: stats?.pendingCertificates, icon: ShieldCheck }, { label: 'Client registrations', value: stats?.pendingUsers, icon: CheckCircle2 }].map(item => <button className="review-row" key={item.label} onClick={() => navigate('approvals')}><item.icon size={17} /><span>{item.label}</span><strong>{item.value ?? '—'}</strong><ArrowRight size={15} /></button>)}<button className="primary-dashboard-button" onClick={() => navigate('approvals')}>Open review queue <ArrowUpRight size={17} /></button></section></div>
             <section className="dashboard-card"><div className="card-heading"><div><h2>Recent bookings</h2><p>The latest connections on your platform</p></div><button className="text-action" onClick={() => navigate('bookings')}>View all bookings <ArrowRight size={16} /></button></div><div className="dashboard-table-wrap"><table className="dashboard-table"><thead><tr><th>Client / Creator</th><th>Session</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>{bookings.slice(0, 5).map(booking => <tr key={booking.id}><td><div className="booking-person"><span className="booking-avatar">{initials(booking.userName)}</span><div><strong>{booking.userName}</strong><small>with {booking.influencerName}</small></div></div></td><td>{booking.topic || 'Consultation'}<small>{booking.slotLabel || booking.slot}</small></td><td>{booking.date}</td><td className="booking-amount">{money(booking.price)}</td><td><span className={`booking-status ${statuses.includes(booking.status) ? booking.status : ''}`}>{booking.status || 'Unknown'}</span></td></tr>)}</tbody></table>{!bookings.length && <div className="dashboard-empty"><CalendarDays size={28} /><strong>{stats ? 'No bookings yet' : 'Booking data unavailable'}</strong><p>{stats ? 'New sessions will appear here as clients make bookings.' : 'Refresh the dashboard to load your latest bookings.'}</p></div>}</div></section>
             <div className="dashboard-footnote"><span className={error ? 'sync-dot offline' : 'sync-dot'} />{updated ? `Last updated ${updated.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} · Refreshes every 30 seconds` : 'Waiting for the first successful update'}</div>
-          </> : <div className="dashboard-detail">{activeTab === 'users' && <UsersView refreshKey={usersRefreshKey} />}{activeTab === 'approvals' && <ApprovalsView />}{activeTab === 'slots' && <SlotsInspectorView />}{activeTab === 'bookings' && <BookingsView />}{activeTab === 'conversations' && <ConversationsView />}</div>}
+          </> : <div className="dashboard-detail">{activeTab === 'announcements' && <AnnouncementsView />}{activeTab === 'users' && <UsersView refreshKey={usersRefreshKey} />}{activeTab === 'approvals' && <ApprovalsView />}{activeTab === 'slots' && <SlotsInspectorView />}{activeTab === 'bookings' && <BookingsView />}{activeTab === 'conversations' && <ConversationsView />}</div>}
         </main>
       </div>
     </div>

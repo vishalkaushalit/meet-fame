@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import VerifiedBadge from './VerifiedBadge';
 import {
+  Video,
   Calendar,
   Clock,
   Upload,
@@ -19,7 +20,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 
-export default function InfluencerPanel({ onOpenChat }) {
+export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const { user, updateUserProfile } = useAuth();
   
   const [activeTab, setActiveTab] = useState('slots'); // 'slots' | 'bookings' | 'certificate' | 'profile'
@@ -472,6 +473,8 @@ export default function InfluencerPanel({ onOpenChat }) {
                     </div>
                   </div>
 
+                  <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                  {b.status === 'confirmed' && b.meetingType === 'video' && <button onClick={() => onJoinCall(b)} className="px-4 py-2 rounded-xl bg-brand-purple text-white text-xs font-bold flex items-center gap-2"><Video size={15} />Join call</button>}
                   <button
                     onClick={() => onOpenChat && onOpenChat({ id: b.userId, name: b.userName }, 'user')}
                     className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 self-start md:self-auto transition-colors"
@@ -479,6 +482,7 @@ export default function InfluencerPanel({ onOpenChat }) {
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>Chat with Client</span>
                   </button>
+                  </div>
                 </div>
               ))}
             </div>

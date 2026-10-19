@@ -1,4 +1,6 @@
 import express from 'express';
+import { notifyBooking } from '../notifications.js';
+import { requireSession } from '../middleware/session.js';
 import { db } from '../db.js';
 import { generateDaySlots, getDayNameFromDate } from '../slotUtils.js';
 
@@ -71,7 +73,7 @@ router.get('/slots', (req, res) => {
  * CREATE A BOOKING
  * User books a 1-hour slot for a specific influencer and date.
  */
-router.post('/', (req, res) => {
+router.post('/', requireSession, (req, res) => {
   try {
     const {
       influencerId,
@@ -82,6 +84,8 @@ router.post('/', (req, res) => {
       topic,
       meetingType
     } = req.body;
+
+    if (req.session.role !== 'user' || req.session.id !== userId) return res.status(403).json({ error: 'You can only book for your own account.' });
 
     if (!influencerId || !userId || !date || !slot) {
       return res.status(400).json({ error: 'Missing required booking fields (influencerId, userId, date, slot)' });
@@ -131,6 +135,7 @@ router.post('/', (req, res) => {
     };
 
     data.bookings.push(newBooking);
+    notifyBooking(data, newBooking, 'Meeting confirmed');
 
     // Auto-create initial message in conversation
     const conversationId = `${user.id}_${influencer.id}`;
@@ -188,7 +193,7 @@ router.get('/my-bookings', (req, res) => {
 /**
  * CANCEL OR UPDATE BOOKING STATUS
  */
-router.put('/:id/status', (req, res) => {
+router.put('/:id/status', requireSession, (req, res) => {
   try {
     const { status } = req.body;
     const data = db.read();
@@ -197,7 +202,13 @@ router.put('/:id/status', (req, res) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    data.bookings[idx].status = status;
+    const booking = data.bookings[idx];
+    if (req.session.role !== 'admin' && !(req.session.role === 'user' && req.session.id === booking.userId) && !(req.session.role === 'influencer' && req.session.id === booking.influencerId)) return res.status(403).json({ error: 'You cannot update this booking.' });
+    if (!['confirmed', 'completed', 'cancelled'].includes(status)) return res.status(400).json({ error: 'Invalid booking status.' });
+    if (booking.status !== status) {
+      booking.status = status;
+      notifyBooking(data, booking, status === 'cancelled' ? 'Meeting cancelled' : 'Meeting updated');
+    }
     db.write(data);
 
     return res.json({ success: true, booking: data.bookings[idx] });

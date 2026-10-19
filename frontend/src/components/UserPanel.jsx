@@ -15,7 +15,7 @@ import {
   Video
 } from 'lucide-react';
 
-export default function UserPanel({ onBookInfluencer, onOpenChat }) {
+export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-bookings'
   const [influencers, setInfluencers] = useState([]);
@@ -297,7 +297,8 @@ export default function UserPanel({ onBookInfluencer, onOpenChat }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 self-start md:self-auto">
+                  <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                    {b.status === 'confirmed' && b.meetingType === 'video' && <button onClick={() => onJoinCall(b)} className="px-4 py-2 rounded-xl bg-brand-purple text-white text-xs font-bold flex items-center gap-2"><Video size={15} />Join call</button>}
                     <button
                       onClick={() => onOpenChat && onOpenChat({ id: b.influencerId, name: b.influencerName }, 'influencer')}
                       className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 transition-colors"

@@ -1,0 +1,41 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { db } from '../src/db.js';
+import { notifyBooking } from '../src/notifications.js';
+import notifications from '../src/routes/notification.routes.js';
+import admin from '../src/routes/admin.routes.js';
+import bookings from '../src/routes/booking.routes.js';
+import { requireSession } from '../src/middleware/session.js';
+import jwt from 'jsonwebtoken';
+const handler = (router, path, method) => router.stack.find(layer => layer.route?.path === path && layer.route.methods[method]).route.stack.at(-1).handle;
+const response = () => ({ code: 200, status(code) { this.code = code; return this; }, json(body) { this.body = body; return this; } });
+test('meeting notifications and read state are scoped to the authenticated recipient', () => {
+ const read = db.read, write = db.write;
+ const booking = { id:'b1', userId:'u1', influencerId:'i1', userName:'Client', influencerName:'Creator', date:'2026-10-22', slotLabel:'10:00–11:00', topic:'Coaching', status:'confirmed' };
+ const data = { users:[{id:'u1',status:'approved'},{id:'u2',status:'blocked'}], influencers:[{id:'i1',status:'approved'}], bookings:[booking], notifications:[] };
+ db.read=()=>data; db.write=()=>true;
+ try {
+  notifyBooking(data,booking,'Meeting confirmed');
+  assert.equal(data.notifications.length,2);
+  const session={id:'u1',role:'user'};
+  const list=response(); handler(notifications,'/','get')({session},list);
+  assert.equal(list.body.notifications.length,1); assert.equal(list.body.unreadCount,1);
+  assert.match(list.body.notifications[0].message,/2026-10-22/);
+  const wrong=response(); handler(notifications,'/:id/read','put')({session,params:{id:data.notifications[1].id}},wrong);
+  assert.equal(wrong.code,404);
+  handler(notifications,'/read-all','put')({session},response());
+  assert.ok(data.notifications[0].readAt); assert.equal(data.notifications[1].readAt,null);
+  const denied=response(); handler(bookings,'/:id/status','put')({session:{id:'stranger',role:'user'},params:{id:'b1'},body:{status:'cancelled'}},denied);
+  assert.equal(denied.code,403); assert.equal(data.notifications.length,2);
+  handler(bookings,'/:id/status','put')({session,params:{id:'b1'},body:{status:'cancelled'}},response());
+  assert.equal(data.notifications.length,4); assert.equal(data.notifications[2].title,'Meeting cancelled');
+  handler(bookings,'/:id/status','put')({session,params:{id:'b1'},body:{status:'cancelled'}},response());
+  assert.equal(data.notifications.length,4);
+  const sent=response(); handler(admin,'/announcements','post')({body:{title:'News',message:'An update',audience:'influencer'}},sent);
+  assert.equal(sent.body.sent,1); assert.equal(data.notifications.at(-1).recipientRole,'influencer');
+  const invalid=response(); handler(admin,'/announcements','post')({body:{title:' ',message:'Message',audience:'all'}},invalid); assert.equal(invalid.code,400);
+  const unauth=response(); requireSession({headers:{}},unauth,()=>assert.fail()); assert.equal(unauth.code,401);
+  const token=jwt.sign({id:'u2',role:'user'},process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026');
+  const blocked=response(); requireSession({headers:{authorization:`Bearer ${token}`}},blocked,()=>assert.fail()); assert.equal(blocked.code,403);
+ } finally { db.read=read; db.write=write; }
+});

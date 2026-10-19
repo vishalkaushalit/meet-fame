@@ -1,4 +1,6 @@
 import express from 'express';
+import { addNotification } from '../notifications.js';
+import { requireSession } from '../middleware/session.js';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -98,8 +100,9 @@ router.get('/:id', (req, res) => {
  * Update Influencer Availability (Day-wise time ranges)
  * E.g. Monday: 9am-12pm and 5pm-8pm -> autogenerates 1-hour slots: 9-10, 10-11, 11-12, 5-6, 6-7, 7-8
  */
-router.put('/:id/availability', (req, res) => {
+router.put('/:id/availability', requireSession, (req, res) => {
   try {
+    if (req.session.role !== 'admin' && !(req.session.role === 'influencer' && req.session.id === req.params.id)) return res.status(403).json({ error: 'You cannot change this schedule.' });
     const { availability } = req.body;
     if (!availability) {
       return res.status(400).json({ error: 'Availability data is required' });
@@ -111,7 +114,14 @@ router.put('/:id/availability', (req, res) => {
       return res.status(404).json({ error: 'Influencer not found' });
     }
 
+    const changed = JSON.stringify(data.influencers[idx].availability) !== JSON.stringify(availability);
     data.influencers[idx].availability = availability;
+    if (changed) {
+      const creator = data.influencers[idx];
+      addNotification(data, creator.id, 'influencer', 'Availability updated', 'Your weekly availability has been updated. Existing booked sessions keep their scheduled times.');
+      const clients = new Set(data.bookings.filter(booking => booking.influencerId === creator.id && booking.status === 'confirmed' && booking.date >= new Date().toISOString().slice(0,10)).map(booking => booking.userId));
+      for (const id of clients) addNotification(data, id, 'user', 'Creator availability updated', `${creator.name} updated their weekly availability. Your existing booked sessions keep their scheduled times.`);
+    }
     db.write(data);
 
     // Compute generated 1-hour slots for the response

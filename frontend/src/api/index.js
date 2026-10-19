@@ -9,6 +9,22 @@ function getAuthHeaders() {
 }
 
 export const api = {
+  calls: {
+    request: async (bookingId, action, payload = {}) => {
+      const res = await fetch(`${API_BASE}/calls/${encodeURIComponent(bookingId)}/${action}`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(payload), keepalive: action === 'leave' });
+      const data = await res.json();
+      if (!res.ok) throw Object.assign(new Error(data.error || 'Call request failed.'), { status: res.status });
+      return data;
+    }
+  },
+  notifications: {
+    request: async (path = '', method = 'GET') => {
+      const res = await fetch(`${API_BASE}/notifications${path}`, { method, headers: getAuthHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw data;
+      return data;
+    }
+  },
   auth: {
     login: async (email, password, role) => {
       const res = await fetch(`${API_BASE}/auth/login`, {
