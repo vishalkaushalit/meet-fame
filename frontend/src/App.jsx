@@ -1,3 +1,4 @@
+import ThemeToggle from './components/ThemeToggle';
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './components/LandingPage';
@@ -87,6 +88,7 @@ function AppContent() {
             </div>
 
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+              <ThemeToggle />
               <Notifications key={`${user.role}:${user.id}`} />
               <a
                 href={

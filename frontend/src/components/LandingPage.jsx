@@ -1,3 +1,4 @@
+import ThemeToggle from './ThemeToggle';
 import React from 'react';
 import Logo from './Logo';
 import VerifiedBadge from './VerifiedBadge';
@@ -57,6 +58,7 @@ export default function LandingPage({
 
           {/* Auth Actions */}
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <button
               onClick={() => onOpenAuth('user', 'login')}
               className="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"

@@ -1,3 +1,4 @@
+import ThemeToggle from './ThemeToggle';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
 import ApprovalsView from './ApprovalsView';
@@ -307,6 +308,7 @@ export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
             <span>/</span>
             <strong>{current.label}</strong>
           </div>
+          <ThemeToggle />
           <div
             className="admin-profile-menu"
             ref={profileMenu}

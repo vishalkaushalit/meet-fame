@@ -1,3 +1,4 @@
+import ThemeToggle from './ThemeToggle';
 import React, { useState } from 'react';
 import Logo from './Logo';
 import { adminApi } from '../api';
@@ -49,6 +50,7 @@ export default function AdminLogin({ onLoginSuccess }) {
 
         <div className="text-center mb-8">
           <div className="flex justify-center mb-3">
+            <ThemeToggle />
             <Logo size="lg" />
           </div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2">

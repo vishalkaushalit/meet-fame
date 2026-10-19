@@ -12,10 +12,18 @@ export default function LogoLoader({
       aria-label={label}
     >
       <img
-        className="logo-loader-brand"
+        className="logo-loader-brand theme-logo-dark"
         src={`${import.meta.env.BASE_URL}branding/meetfame-logo.png`}
         width="935"
         height="221"
+        alt=""
+        aria-hidden="true"
+      />
+      <img
+        className="logo-loader-brand theme-logo-light"
+        src={`${import.meta.env.BASE_URL}branding/meetfame-logo-light.svg`}
+        width="1100"
+        height="280"
         alt=""
         aria-hidden="true"
       />
