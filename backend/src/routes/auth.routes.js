@@ -8,7 +8,8 @@ import { db } from '../db.js';
 import { uploadToStorage } from '../blobStorage.js';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
+// Read at request time: server environment configuration loads after route imports.
+const getJwtSecret = () => process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +34,7 @@ const upload = multer({
 
 // Helper to sign JWT
 function generateToken(payload) {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' });
 }
 
 /**
@@ -248,6 +249,12 @@ router.post('/login', (req, res) => {
       }
 
       // Prompt rule: "When the admin approves the influencer request only then the influencer will be active for login otherwise a popup is shown that the account is under selected status by the admin"
+      if (influencer.status === 'blocked') {
+        const reason = influencer.statusReason || 'Please contact support.';
+        const message = `Your account has been blocked by an administrator. Reason: ${reason}`;
+        return res.status(403).json({ success: false, status: 'blocked', role: 'influencer', reason, error: message, message });
+      }
+
       if (influencer.status === 'pending_review') {
         return res.status(403).json({
           success: false,
@@ -288,6 +295,13 @@ router.post('/login', (req, res) => {
       const match = bcrypt.compareSync(password, user.password);
       if (!match) {
         return res.status(401).json({ error: 'Invalid password' });
+      }
+
+      if (['blocked', 'rejected'].includes(user.status)) {
+        const message = user.status === 'blocked'
+          ? `Your account has been blocked by an administrator. Reason: ${user.statusReason || 'Please contact support.'}`
+          : 'Your account has been rejected by an administrator. Please contact support.';
+        return res.status(403).json({ success: false, status: user.status, role: 'user', reason: user.statusReason || '', error: message, message });
       }
 
       if (user.status === 'pending_review') {
@@ -347,7 +361,7 @@ router.get('/me', (req, res) => {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, getJwtSecret());
     const data = db.read();
     let account = null;
 
@@ -361,6 +375,10 @@ router.get('/me', (req, res) => {
 
     if (!account) {
       return res.status(404).json({ error: 'Account not found' });
+    }
+
+    if (['user', 'influencer'].includes(decoded.role) && ['blocked', 'rejected', 'pending_review'].includes(account.status)) {
+      return res.status(403).json({ error: 'Account access is restricted by an administrator.', status: account.status });
     }
 
     const { password: _, ...safeAccount } = account;

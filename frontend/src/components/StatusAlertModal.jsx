@@ -47,12 +47,12 @@ export default function StatusAlertModal() {
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-slate-800 border border-slate-700">
           <span className={`w-2 h-2 rounded-full ${isPending ? 'bg-amber-400 animate-ping' : 'bg-rose-400'}`} />
           <span className={isPending ? 'text-amber-300' : 'text-rose-300'}>
-            Status: {isPending ? 'Pending Review' : 'Action Required'}
+            Status: {isPending ? 'Pending Review' : statusAlert.status === 'blocked' ? 'Blocked' : 'Action Required'}
           </span>
         </div>
 
         {/* Message */}
-        <p className="text-slate-300 text-sm leading-relaxed mb-6">
+        <p className="text-slate-300 text-sm leading-relaxed mb-6 whitespace-pre-wrap break-words">
           {statusAlert.message}
         </p>
 
@@ -60,9 +60,9 @@ export default function StatusAlertModal() {
         <div className="bg-slate-950/60 rounded-xl p-3 text-xs text-slate-400 mb-6 text-left border border-slate-800">
           <div className="flex items-center gap-1.5 text-slate-300 font-semibold mb-1">
             <ShieldCheck className="w-4 h-4 text-brand-indigo" />
-            <span>Admin Review Process</span>
+            <span>{statusAlert.status === 'blocked' ? 'Account access' : 'Admin Review Process'}</span>
           </div>
-          <p>Our administration team verifies credentials, categories, and specialization certificates to keep MeetFame trusted. Once approved, full access is granted immediately.</p>
+          <p>{statusAlert.status === 'blocked' ? 'Contact support if you need help with this decision. Access can be restored by an administrator.' : 'Our administration team verifies credentials, categories, and specialization certificates to keep MeetFame trusted. Once approved, full access is granted immediately.'}</p>
         </div>
 
         {/* Action Button */}

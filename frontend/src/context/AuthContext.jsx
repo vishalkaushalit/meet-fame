@@ -44,9 +44,9 @@ export function AuthProvider({ children }) {
       return res;
     } catch (err) {
       // Prompt requirement: "When the admin approves the influencer request only then the influencer will be active for login otherwise a popup is shown that the account is under selected status by the admin."
-      if (err.status === 'pending_review' || err.status === 'rejected') {
+      if (err.status === 'pending_review' || err.status === 'rejected' || err.status === 'blocked') {
         setStatusAlert({
-          title: err.status === 'pending_review' ? 'Account Under Review' : 'Account Status Notice',
+          title: err.status === 'pending_review' ? 'Account Under Review' : err.status === 'blocked' ? 'Account Blocked' : 'Account Status Notice',
           message: err.message || 'Your account is under review by the admin. You will be able to access your dashboard once approved.',
           status: err.status
         });

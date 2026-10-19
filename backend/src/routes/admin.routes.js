@@ -1,8 +1,25 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
 import { generateDaySlots, getDayNameFromDate } from '../slotUtils.js';
 
 const router = express.Router();
+
+// Administrative actions require a current administrator account.
+router.use((req, res, next) => {
+  const token = req.headers.authorization?.startsWith('Bearer ')
+    ? req.headers.authorization.slice(7) : null;
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026');
+    if (decoded.role !== 'admin' || !db.read().admins.some(admin => admin.id === decoded.id)) {
+      return res.status(403).json({ error: 'Administrator access required' });
+    }
+    return next();
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+});
 
 /**
  * ADMIN PLATFORM STATS & METRICS
@@ -61,6 +78,41 @@ router.get('/influencers', (req, res) => {
 /**
  * GET ALL USERS (With status filter)
  */
+// Unified directory is protected by the administrator middleware above.
+router.get('/accounts', (req, res) => {
+  try {
+    const data = db.read();
+    const accounts = [['user', data.users], ['influencer', data.influencers], ['admin', data.admins]]
+      .flatMap(([role, records]) => records.map(account => ({
+        id: account.id,
+        name: account.name,
+        email: account.email,
+        phone: account.phone,
+        createdAt: account.createdAt,
+        role,
+        status: role === 'admin' ? 'active' : account.status,
+        statusReason: role === 'admin' ? '' : account.statusReason || ''
+      })));
+    return res.json({ accounts });
+  } catch {
+    return res.status(500).json({ error: 'Failed to fetch account directory' });
+  }
+});
+
+router.get('/accounts/:role/:id', (req, res) => {
+  try {
+    const collections = { user: 'users', influencer: 'influencers', admin: 'admins' };
+    const collection = Object.hasOwn(collections, req.params.role) ? collections[req.params.role] : null;
+    if (!collection) return res.status(400).json({ error: 'Invalid account role' });
+    const account = db.read()[collection].find(item => item.id === req.params.id);
+    if (!account) return res.status(404).json({ error: 'Account not found' });
+    const { password, ...safeAccount } = account;
+    return res.json({ account: { ...safeAccount, role: req.params.role, status: req.params.role === 'admin' ? 'active' : account.status } });
+  } catch {
+    return res.status(500).json({ error: 'Failed to fetch account details' });
+  }
+});
+
 router.get('/users', (req, res) => {
   try {
     const { status } = req.query;
@@ -83,8 +135,12 @@ router.get('/users', (req, res) => {
 router.put('/influencers/:id/status', (req, res) => {
   try {
     const { status, reason } = req.body;
-    if (!['approved', 'rejected', 'pending_review'].includes(status)) {
+    if (!['approved', 'rejected', 'pending_review', 'blocked'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    if (status === 'blocked' && (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 1000)) {
+      return res.status(400).json({ error: 'A blocking remark between 1 and 1000 characters is required.' });
     }
 
     const data = db.read();
@@ -94,7 +150,7 @@ router.put('/influencers/:id/status', (req, res) => {
     }
 
     data.influencers[idx].status = status;
-    if (reason) data.influencers[idx].statusReason = reason;
+    data.influencers[idx].statusReason = status === 'approved' ? '' : (typeof reason === 'string' ? reason.trim() : '');
 
     db.write(data);
 
@@ -114,7 +170,14 @@ router.put('/influencers/:id/status', (req, res) => {
  */
 router.put('/users/:id/status', (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, reason } = req.body;
+    if (!['approved', 'rejected', 'pending_review', 'blocked'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid status' });
+    }
+    if (status === 'blocked' && (typeof reason !== 'string' || !reason.trim() || reason.trim().length > 1000)) {
+      return res.status(400).json({ error: 'A blocking remark between 1 and 1000 characters is required.' });
+    }
+
     const data = db.read();
     const idx = data.users.findIndex(u => u.id === req.params.id);
     if (idx === -1) {
@@ -122,6 +185,7 @@ router.put('/users/:id/status', (req, res) => {
     }
 
     data.users[idx].status = status;
+    data.users[idx].statusReason = status === 'approved' ? '' : (typeof reason === 'string' ? reason.trim() : '');
     db.write(data);
 
     const { password: _, ...safeUser } = data.users[idx];

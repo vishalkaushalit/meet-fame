@@ -37,7 +37,7 @@ const influencerSchema = new mongoose.Schema({
   // Admin approval status
   status: {
     type: String,
-    enum: ['pending_review', 'approved', 'rejected'],
+    enum: ['pending_review', 'approved', 'rejected', 'blocked'],
     default: 'pending_review'
   },
   statusReason: { type: String, default: '' },

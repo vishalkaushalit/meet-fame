@@ -50,7 +50,7 @@ router.get('/', (req, res) => {
       );
     }
 
-    const safeList = list.map(({ password, ...rest }) => ({
+    const safeList = list.map(({ password, statusReason, ...rest }) => ({
       ...rest,
       // Provide preview of weekly total slots
       totalWeeklySlots: Object.values(rest.availability || {}).reduce((acc, ranges) => {
@@ -75,7 +75,7 @@ router.get('/:id', (req, res) => {
       return res.status(404).json({ error: 'Influencer not found' });
     }
 
-    const { password, ...safeInfluencer } = influencer;
+    const { password, statusReason, ...safeInfluencer } = influencer;
 
     // Calculate auto-generated 1-hour slots for every configured day
     const generatedSlotsByDay = {};

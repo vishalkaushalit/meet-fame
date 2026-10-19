@@ -9,6 +9,19 @@ function getAuthHeaders() {
 }
 
 export const adminApi = {
+  accounts: {
+    getDetails: async (role, id) => {
+      const res = await fetch(`${API_BASE}/admin/accounts/${encodeURIComponent(role)}/${encodeURIComponent(id)}`, { headers: getAuthHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw data;
+      return data;
+    },
+    getAll: async () => {
+      const res = await fetch(`${API_BASE}/admin/accounts`, { headers: getAuthHeaders() });
+      if (!res.ok) throw new Error('Failed to fetch accounts');
+      return res.json();
+    }
+  },
   auth: {
     login: async (email, password) => {
       const res = await fetch(`${API_BASE}/auth/login`, {
@@ -90,11 +103,11 @@ export const adminApi = {
       return res.json();
     },
 
-    updateStatus: async (id, status) => {
+    updateStatus: async (id, status, reason = '') => {
       const res = await fetch(`${API_BASE}/admin/users/${id}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status, reason })
       });
       const data = await res.json();
       if (!res.ok) throw data;
