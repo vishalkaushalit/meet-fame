@@ -1,199 +1,95 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Logo from './Logo';
 import ApprovalsView from './ApprovalsView';
 import SlotsInspectorView from './SlotsInspectorView';
 import BookingsView from './BookingsView';
 import ConversationsView from './ConversationsView';
 import { adminApi } from '../api';
-import {
-  Shield,
-  Clock,
-  Calendar,
-  MessageSquare,
-  Users,
-  Sparkles,
-  DollarSign,
-  LogOut,
-  ExternalLink,
-  CheckCircle2,
-  AlertTriangle
-} from 'lucide-react';
+import { LayoutDashboard, ShieldCheck, Clock, CalendarDays, MessageSquare, Users, Sparkles, DollarSign, LogOut, ExternalLink, ArrowUpRight, ArrowRight, RefreshCw, Menu, X, AlertCircle, CheckCircle2 } from 'lucide-react';
+import './dashboard.css';
+
+const navigation = [
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard, description: 'A clear view of your platform, all in one place.' },
+  { id: 'approvals', label: 'Approvals', icon: ShieldCheck, description: 'Review registrations and verify professional credentials.' },
+  { id: 'bookings', label: 'Bookings', icon: CalendarDays, description: 'Manage sessions across the MeetFame community.' },
+  { id: 'slots', label: 'Availability', icon: Clock, description: 'Explore creator schedules and booked time slots.' },
+  { id: 'conversations', label: 'Conversations', icon: MessageSquare, description: 'Review conversations between clients and creators.' },
+];
+const money = value => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value || 0);
+const initials = name => (name || 'Administrator').split(' ').map(part => part[0]).slice(0, 2).join('').toUpperCase();
 
 export default function AdminDashboard({ admin, onLogout }) {
-  const [activeTab, setActiveTab] = useState('approvals'); // 'approvals' | 'slots' | 'bookings' | 'conversations'
+  const [activeTab, setActiveTab] = useState('overview');
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [stats, setStats] = useState(null);
-
-  useEffect(() => {
-    async function loadStats() {
-      try {
-        const res = await adminApi.stats.getOverview();
-        setStats(res);
-      } catch (err) {
-        console.error('Failed to load stats:', err);
-      }
+  const [bookings, setBookings] = useState([]);
+  const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [updated, setUpdated] = useState(null);
+  const [days, setDays] = useState(7);
+  const load = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const [overview, result] = await Promise.all([adminApi.stats.getOverview(), adminApi.bookings.getAll()]);
+      setStats(overview);
+      setBookings(result.bookings || []);
+      setUpdated(new Date());
+      setError('');
+    } catch {
+      setError('Unable to refresh dashboard data. Check your connection and try again.');
+    } finally {
+      setRefreshing(false);
     }
-    loadStats();
-    const interval = setInterval(loadStats, 10000);
-    return () => clearInterval(interval);
   }, []);
+  useEffect(() => {
+    const timer = setInterval(load, 30000);
+    return () => clearInterval(timer);
+  }, [load]);
+  // Refresh summary counts after approval actions in a different view.
+  useEffect(() => { if (activeTab === 'overview') load(); }, [activeTab, load]);
+
+  const navigate = id => { setActiveTab(id); setMobileOpen(false); };
+  const current = navigation.find(item => item.id === activeTab);
+  const pending = stats ? (stats.pendingInfluencers || 0) + (stats.pendingCertificates || 0) + (stats.pendingUsers || 0) : null;
+  const metrics = [
+    { label: 'Total creators', value: stats?.totalInfluencers, detail: stats ? `${stats.verifiedInfluencers || 0} verified creators` : 'Waiting for platform data', icon: Sparkles, color: 'violet' },
+    { label: 'Total bookings', value: stats?.totalBookings, detail: stats ? `${stats.confirmedBookings || 0} confirmed sessions` : 'Waiting for platform data', icon: CalendarDays, color: 'blue' },
+    { label: 'Platform volume', value: stats ? money(stats.totalVolume) : null, detail: 'All-time booking value', icon: DollarSign, color: 'green' },
+    { label: 'Total clients', value: stats?.totalUsers, detail: stats ? `${stats.pendingUsers || 0} awaiting approval` : 'Waiting for platform data', icon: Users, color: 'orange' },
+  ];
+  const activity = Array.from({ length: days }, (_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - days + index + 1);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return { key, label: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }), count: bookings.filter(booking => booking.date === key).length };
+  });
+  const maximum = Math.max(1, ...activity.map(day => day.count));
+  const statuses = ['confirmed', 'completed', 'cancelled'];
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 flex flex-col selection:bg-brand-purple selection:text-white">
-      {/* Top Admin Header */}
-      <header className="sticky top-0 z-40 bg-[#0B0F19]/90 backdrop-blur-xl border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Logo size="sm" />
-            <span className="hidden sm:inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              Admin Portal
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a
-              href={import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173'}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white py-2 px-3 rounded-xl hover:bg-slate-800 transition-colors border border-slate-800"
-            >
-              <span>View Main Website</span>
-              <ExternalLink className="w-3.5 h-3.5 text-brand-purple" />
-            </a>
-
-            <div className="flex items-center gap-2 pl-3 border-l border-slate-800">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-purple text-white font-bold flex items-center justify-center text-xs">
-                AD
-              </div>
-              <div className="hidden sm:block text-left text-xs">
-                <div className="font-bold text-white">{admin?.name || 'Administrator'}</div>
-                <div className="text-[10px] text-slate-400">Super Admin</div>
-              </div>
-
-              <button
-                onClick={onLogout}
-                className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors ml-1"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-8">
-        {/* KPI Summary Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-md">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-              <span className="font-semibold uppercase tracking-wider text-[10px]">Influencers</span>
-              <Sparkles className="w-4 h-4 text-brand-purple" />
-            </div>
-            <div className="text-3xl font-black text-white">{stats?.totalInfluencers ?? 4}</div>
-            <div className="text-[11px] text-amber-400 mt-1 font-semibold flex items-center gap-1">
-              <span>{stats?.pendingInfluencers ?? 1} pending review</span>
-            </div>
-          </div>
-
-          <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-md">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-              <span className="font-semibold uppercase tracking-wider text-[10px]">Verified Badges</span>
-              <CheckCircle2 className="w-4 h-4 text-[#0095F6]" />
-            </div>
-            <div className="text-3xl font-black text-[#0095F6]">{stats?.verifiedInfluencers ?? 2}</div>
-            <div className="text-[11px] text-blue-400 mt-1 font-semibold">
-              {stats?.pendingCertificates ?? 1} certs waiting verification
-            </div>
-          </div>
-
-          <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-md">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-              <span className="font-semibold uppercase tracking-wider text-[10px]">Total Bookings</span>
-              <Calendar className="w-4 h-4 text-brand-coral" />
-            </div>
-            <div className="text-3xl font-black text-white">{stats?.totalBookings ?? 3}</div>
-            <div className="text-[11px] text-emerald-400 mt-1 font-semibold">
-              {stats?.confirmedBookings ?? 3} confirmed 1-hour slots
-            </div>
-          </div>
-
-          <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-md">
-            <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-              <span className="font-semibold uppercase tracking-wider text-[10px]">Platform Volume</span>
-              <DollarSign className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="text-3xl font-black text-emerald-400">${stats?.totalVolume ?? 800}</div>
-            <div className="text-[11px] text-slate-400 mt-1">
-              Across {stats?.totalUsers ?? 3} active clients
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 border-b border-slate-800 pb-4 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('approvals')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'approvals'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-lg shadow-indigo-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <Shield className="w-4 h-4" />
-            <span>Registration & Certificate Approvals</span>
-            {(stats?.pendingInfluencers || stats?.pendingCertificates) ? (
-              <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
-                {(stats?.pendingInfluencers || 0) + (stats?.pendingCertificates || 0)}
-              </span>
-            ) : null}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('slots')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'slots'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-lg shadow-indigo-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <Clock className="w-4 h-4" />
-            <span>Influencer Slots Inspector (Available & Booked)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('bookings')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'bookings'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-lg shadow-indigo-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Platform Bookings</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('conversations')}
-            className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'conversations'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-lg shadow-indigo-500/20'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span>Conversations Monitor</span>
-          </button>
-        </div>
-
-        {/* Active Tab View */}
-        <div>
-          {activeTab === 'approvals' && <ApprovalsView />}
-          {activeTab === 'slots' && <SlotsInspectorView />}
-          {activeTab === 'bookings' && <BookingsView />}
-          {activeTab === 'conversations' && <ConversationsView />}
-        </div>
-      </main>
+    <div className="dashboard-shell">
+      {mobileOpen && <button className="sidebar-scrim" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
+      <aside className={`dashboard-sidebar ${mobileOpen ? 'is-open' : ''}`}>
+        <div className="sidebar-brand"><Logo size="sm" /><button className="mobile-close" aria-label="Close navigation" onClick={() => setMobileOpen(false)}><X size={20} /></button></div>
+        <div className="workspace-label"><span className="workspace-mark">M</span><div>MeetFame workspace<small>Administration</small></div><ShieldCheck size={15} /></div>
+        <p className="nav-caption">WORKSPACE</p>
+        <nav aria-label="Dashboard navigation">{navigation.map(item => <button key={item.id} onClick={() => navigate(item.id)} className={`nav-item ${activeTab === item.id ? 'selected' : ''}`} aria-current={activeTab === item.id ? 'page' : undefined}><item.icon size={19} /><span>{item.label}</span>{item.id === 'approvals' && pending > 0 && <b>{pending}</b>}</button>)}</nav>
+        <div className="sidebar-bottom"><div className="workspace-note"><ShieldCheck size={20} /><strong>Your platform, connected.</strong><p>Manage the people and sessions that make MeetFame happen.</p><a href={import.meta.env.VITE_FRONTEND_URL || '/'} target="_blank" rel="noreferrer">Visit main website <ExternalLink size={14} /></a></div><button className="signout-button" onClick={onLogout}><LogOut size={17} /> Sign out</button></div>
+      </aside>
+      <div className="dashboard-workspace">
+        <header className="dashboard-topbar"><div className="breadcrumb"><button className="mobile-menu" aria-label="Open navigation" onClick={() => setMobileOpen(true)}><Menu size={21} /></button><span>Workspace</span><span>/</span><strong>{current.label}</strong></div><div className="admin-profile"><span className="profile-avatar">{initials(admin?.name)}</span><div><strong>{admin?.name || 'Administrator'}</strong><small>Super admin</small></div></div></header>
+        <main className="dashboard-main">
+          <div className="dashboard-page-heading"><div><p className="eyebrow">MEETFAME ADMIN</p><h1>{activeTab === 'overview' ? 'Platform overview' : current.label}</h1><p>{current.description}</p></div><button className="dashboard-button" onClick={load} disabled={refreshing}><RefreshCw size={15} className={refreshing ? 'refresh-spinning' : ''} />{refreshing ? 'Refreshing…' : 'Refresh data'}</button></div>
+          {error && <div className="dashboard-error" role="alert"><AlertCircle size={18} /><span>{error}{updated && ' Showing the last successful update.'}</span><button onClick={load} disabled={refreshing}>Retry</button></div>}
+          {activeTab === 'overview' ? <>
+            <div className="dashboard-metrics">{metrics.map(metric => <article className="metric-card" key={metric.label}><div className="metric-top"><span>{metric.label}</span><span className={`metric-icon ${metric.color}`}><metric.icon size={18} /></span></div><strong className="metric-value">{metric.value ?? '—'}</strong><p>{metric.detail}</p></article>)}</div>
+            <div className="dashboard-middle"><section className="dashboard-card activity-card"><div className="card-heading"><div><h2>Booking activity</h2><p>Sessions scheduled over the last {days} days</p></div><select aria-label="Booking activity period" value={days} onChange={event => setDays(Number(event.target.value))}><option value={7}>Last 7 days</option><option value={14}>Last 14 days</option><option value={30}>Last 30 days</option></select></div><div className="activity-total"><strong>{stats ? activity.reduce((sum, day) => sum + day.count, 0) : '—'}</strong><span>scheduled sessions</span></div><div className="activity-chart" role="img" aria-label={stats ? activity.map(day => `${day.label}: ${day.count} bookings`).join(', ') : 'Booking activity unavailable'}>{activity.map((day, index) => <div className="chart-column" key={day.key}><div className="chart-track"><div className="chart-bar" style={{ height: stats ? `${day.count / maximum * 100}%` : '0%' }} title={`${day.label}: ${day.count} bookings`} /></div><span>{days <= 7 || index % Math.ceil(days / 7) === 0 ? day.label : ''}</span></div>)}</div></section>
+            <section className="dashboard-card review-card"><div className="card-heading"><div><h2>Needs your attention</h2><p>Keep your community moving forward</p></div><span className="attention-dot" /></div><div className="review-total">{pending ?? '—'}<span>pending reviews</span></div>{[{ label: 'Creator registrations', value: stats?.pendingInfluencers, icon: Users }, { label: 'Certificate verification', value: stats?.pendingCertificates, icon: ShieldCheck }, { label: 'Client registrations', value: stats?.pendingUsers, icon: CheckCircle2 }].map(item => <button className="review-row" key={item.label} onClick={() => navigate('approvals')}><item.icon size={17} /><span>{item.label}</span><strong>{item.value ?? '—'}</strong><ArrowRight size={15} /></button>)}<button className="primary-dashboard-button" onClick={() => navigate('approvals')}>Open review queue <ArrowUpRight size={17} /></button></section></div>
+            <section className="dashboard-card"><div className="card-heading"><div><h2>Recent bookings</h2><p>The latest connections on your platform</p></div><button className="text-action" onClick={() => navigate('bookings')}>View all bookings <ArrowRight size={16} /></button></div><div className="dashboard-table-wrap"><table className="dashboard-table"><thead><tr><th>Client / Creator</th><th>Session</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>{bookings.slice(0, 5).map(booking => <tr key={booking.id}><td><div className="booking-person"><span className="booking-avatar">{initials(booking.userName)}</span><div><strong>{booking.userName}</strong><small>with {booking.influencerName}</small></div></div></td><td>{booking.topic || 'Consultation'}<small>{booking.slotLabel || booking.slot}</small></td><td>{booking.date}</td><td className="booking-amount">{money(booking.price)}</td><td><span className={`booking-status ${statuses.includes(booking.status) ? booking.status : ''}`}>{booking.status || 'Unknown'}</span></td></tr>)}</tbody></table>{!bookings.length && <div className="dashboard-empty"><CalendarDays size={28} /><strong>{stats ? 'No bookings yet' : 'Booking data unavailable'}</strong><p>{stats ? 'New sessions will appear here as clients make bookings.' : 'Refresh the dashboard to load your latest bookings.'}</p></div>}</div></section>
+            <div className="dashboard-footnote"><span className={error ? 'sync-dot offline' : 'sync-dot'} />{updated ? `Last updated ${updated.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} · Refreshes every 30 seconds` : 'Waiting for the first successful update'}</div>
+          </> : <div className="dashboard-detail">{activeTab === 'approvals' && <ApprovalsView />}{activeTab === 'slots' && <SlotsInspectorView />}{activeTab === 'bookings' && <BookingsView />}{activeTab === 'conversations' && <ConversationsView />}</div>}
+        </main>
+      </div>
     </div>
   );
 }
