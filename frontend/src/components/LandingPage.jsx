@@ -25,7 +25,7 @@ export default function LandingPage({
       {/* Top Banner / Navbar */}
       <header className="sticky top-0 z-40 bg-[#0A0F1D]/80 backdrop-blur-xl border-b border-slate-800/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Logo size="md" showTagline={true} />
+          <Logo size="header" />
 
           {/* Nav Links */}
           <div className="hidden lg:flex items-center gap-8 text-xs font-semibold text-slate-300">

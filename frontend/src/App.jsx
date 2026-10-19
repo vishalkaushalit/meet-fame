@@ -75,9 +75,9 @@ function AppContent() {
       {/* If logged in, show app top bar */}
       {user && (
         <header className="sticky top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800">
-          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 min-h-[80px] py-4 flex items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 h-20 py-4 flex items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-              <Logo size="sm" showTagline={false} className="shrink-0" />
+              <Logo size="header" className="shrink-0" />
               <span className="hidden md:inline-flex shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
                 {role === 'influencer' ? 'Creator Dashboard' : 'Client Portal'}
               </span>
