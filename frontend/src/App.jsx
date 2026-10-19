@@ -155,6 +155,7 @@ function AppContent() {
       />
 
       <BookingModal
+        onBookingSuccess={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}
         isOpen={bookingModalOpen}
         influencer={selectedInfluencer}
         onClose={() => setBookingModalOpen(false)}

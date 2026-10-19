@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { databaseContext } from './databaseContext.js';
 import { normalizeAvailability } from '../../shared/availability.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -363,6 +364,8 @@ class Database {
   }
 
   read() {
+    const context = databaseContext.getStore();
+    if (context) return structuredClone(context.state);
     try {
       const data = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(data);
@@ -377,6 +380,13 @@ class Database {
   }
 
   write(data) {
+    const context = databaseContext.getStore();
+    if (context) {
+      for (const creator of data.influencers || []) creator.availability = normalizeAvailability(creator.availability);
+      context.state = structuredClone(data);
+      context.dirty = true;
+      return true;
+    }
     try {
       for (const creator of data.influencers || []) creator.availability = normalizeAvailability(creator.availability);
       const tempPath = `${DB_FILE}.tmp`;

@@ -45,6 +45,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const [generatedSlots, setGeneratedSlots] = useState({});
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [bookingsError, setBookingsError] = useState('');
   const [saveSuccess, setSaveSuccess] = useState('');
   const [savingSlots, setSavingSlots] = useState(false);
 
@@ -73,19 +74,31 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
         console.error('Failed to load influencer data:', err);
       }
 
-      setLoadingBookings(true);
-      try {
-        const bks = await api.bookings.getMyBookings({ influencerId: user.id });
-        setBookings(bks.bookings || []);
-      } catch (err) {
-        console.error('Failed to load bookings:', err);
-      } finally {
-        setLoadingBookings(false);
-      }
+
     }
 
     loadData();
   }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+    const load = async (showLoading = false) => {
+      if (showLoading) setLoadingBookings(true);
+      try {
+        const result = await api.bookings.getMyBookings({ influencerId: user.id });
+        if (active) { setBookings(result.bookings || []); setBookingsError(''); }
+      } catch {
+        if (active) setBookingsError('Unable to load bookings. Please try again.');
+      } finally { if (active && showLoading) setLoadingBookings(false); }
+    };
+    const refresh = () => load();
+    load(true);
+    window.addEventListener('meetfame-bookings-updated', refresh);
+    window.addEventListener('focus', refresh);
+    const timer = activeTab === 'bookings' ? setInterval(refresh, 15000) : null;
+    return () => { active = false; clearInterval(timer); window.removeEventListener('meetfame-bookings-updated', refresh); window.removeEventListener('focus', refresh); };
+  }, [user?.id, activeTab]);
 
   // Handle slot range modifications
   const handleAddRange = (day) => {
@@ -442,9 +455,10 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
           </div>
 
+          {bookingsError && <div role="alert" className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl">{bookingsError}<button className="ml-3 underline" onClick={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}>Retry</button></div>}
           {loadingBookings ? (
             <div className="py-12 text-center text-xs text-slate-400">Loading appointments...</div>
-          ) : bookings.length === 0 ? (
+          ) : bookingsError && bookings.length === 0 ? null : bookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
               No sessions booked yet. Once clients book your slots, they will appear here!
             </div>

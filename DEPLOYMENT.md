@@ -77,3 +77,12 @@ In your Vercel Project -> **Settings** -> **Environment Variables**, add the fol
 - **Verified Influencer**: `marcus@techcreator.io` / `password123` (at `/`)
 - **Pending Review Influencer**: `kavita@angelvc.in` / `password123` (Triggers review popup)
 - **User / Fan**: `alex@example.com` / `password123`
+
+
+## Persistent booking storage
+
+Set a working `MONGODB_URI` in the Vercel project's Production environment and redeploy. Use a MongoDB replica set (MongoDB Atlas supports transactions). The API uses MongoDB for account, booking, notification, and message records; local development without a URI continues to use JSON storage.
+
+On first use, empty collections import retained JSON records. Existing MongoDB records are preserved. Legacy accounts without string IDs retain their matching local ID by email. Unique indexes prevent duplicate IDs and concurrent reservations of the same active slot. Multi-record changes commit in a transaction before the API sends a successful response. Unavailable storage returns 503 rather than silently accepting an ephemeral booking.
+
+`/api/health` should report `mongoConnected: true` after startup. Then verify a new booking from the user, influencer, admin panel, and a fresh browser session. A booking absent from the deployed API cannot be restored automatically; do not create replacement reservations without confirming their date and time.

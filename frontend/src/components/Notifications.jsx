@@ -35,7 +35,8 @@ export default function Notifications() {
     poll();
     const focus = () => { if (document.visibilityState === 'visible') poll(); };
     document.addEventListener('visibilitychange', focus);
-    return () => { active = false; clearTimeout(timer); document.removeEventListener('visibilitychange', focus); refresh.current = null; };
+    window.addEventListener('meetfame-bookings-updated', poll);
+    return () => { active = false; clearTimeout(timer); document.removeEventListener('visibilitychange', focus); window.removeEventListener('meetfame-bookings-updated', poll); refresh.current = null; };
   }, [load]);
   useEffect(() => {
     if (!open) return;

@@ -8,15 +8,15 @@
       "dest": "/api/index.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/admin/(.*)",
       "dest": "/admin/index.html"
     },
     {
       "src": "/admin",
       "dest": "/admin/index.html"
-    },
-    {
-      "handle": "filesystem"
     },
     {
       "src": "/(.*)",

@@ -4,6 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import { createDatabaseMiddleware } from './databaseContext.js';
+import { mongoStore } from './mongoStore.js';
 
 // Load environment variables
 dotenv.config();
@@ -38,29 +40,9 @@ app.use('/uploads', express.static(uploadsPath));
 const MONGODB_URI = process.env.MONGODB_URI;
 if (MONGODB_URI) {
   mongoose.connect(MONGODB_URI)
-    .then(async () => {
-      console.log('🍃 MongoDB connected successfully to Atlas!');
-      try {
-        const { Influencer } = await import('./models/Influencer.js');
-        const { User } = await import('./models/User.js');
-        const { Admin } = await import('./models/Admin.js');
-        const { db } = await import('./db.js');
-        const localData = db.read();
-
-        const infCount = await Influencer.countDocuments();
-        if (infCount === 0 && localData.influencers?.length > 0) {
-          console.log('🌱 Seeding MongoDB collections from initial dataset...');
-          await Influencer.insertMany(localData.influencers.map(({ id, ...i }) => i));
-          await User.insertMany(localData.users.map(({ id, ...u }) => u));
-          await Admin.insertMany(localData.admins.map(({ id, ...a }) => a));
-          console.log('✅ MongoDB seeded with initial Admin, Influencers, and Users!');
-        }
-      } catch (seedErr) {
-        console.log('ℹ️  MongoDB collection sync note:', seedErr.message);
-      }
-    })
+    .then(() => { console.log('MongoDB connected. Persistent API storage is active.'); })
     .catch(err => {
-      console.warn('⚠️  MongoDB connection error (operating in file-backed persistent mode):', err.message);
+      console.warn('MongoDB connection unavailable. Persistent API requests will return 503.');
     });
 } else {
   console.log('ℹ️  No MONGODB_URI provided, running with high-performance persistent JSON storage.');
@@ -72,6 +54,16 @@ if (process.env.BLOB_READ_WRITE_TOKEN) {
 } else {
   console.log('📁 Vercel Blob token not set. Using local file storage for uploads.');
 }
+
+// Use durable storage for all API snapshots when configured. Never silently
+// acknowledge writes to an ephemeral Vercel filesystem.
+const persistentDatabase = createDatabaseMiddleware(mongoStore);
+app.use('/api', (req, res, next) => {
+  if (req.path === '/health') return next();
+  if (process.env.MONGODB_URI) return persistentDatabase(req, res, next);
+  if (process.env.VERCEL) return res.status(503).json({ error: 'Booking service is temporarily unavailable. Please try again later.' });
+  return next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);

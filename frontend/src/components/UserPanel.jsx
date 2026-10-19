@@ -31,6 +31,7 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
   const [myBookings, setMyBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [bookingsError, setBookingsError] = useState('');
 
   const categories = [
     'All',
@@ -57,22 +58,25 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
     loadInfluencers();
   }, [selectedCategory, searchQuery]);
 
-  // Fetch user's bookings
+  // Refresh after a successful booking and while the bookings view is open.
   useEffect(() => {
     if (!user?.id) return;
-    async function loadBookings() {
-      setLoadingBookings(true);
+    let active = true;
+    const load = async (showLoading = false) => {
+      if (showLoading) setLoadingBookings(true);
       try {
-        const res = await api.bookings.getMyBookings({ userId: user.id });
-        setMyBookings(res.bookings || []);
-      } catch (err) {
-        console.error('Failed to load user bookings:', err);
-      } finally {
-        setLoadingBookings(false);
-      }
-    }
-
-    loadBookings();
+        const result = await api.bookings.getMyBookings({ userId: user.id });
+        if (active) { setMyBookings(result.bookings || []); setBookingsError(''); }
+      } catch {
+        if (active) setBookingsError('Unable to load bookings. Please try again.');
+      } finally { if (active && showLoading) setLoadingBookings(false); }
+    };
+    const refresh = () => load();
+    load(true);
+    window.addEventListener('meetfame-bookings-updated', refresh);
+    window.addEventListener('focus', refresh);
+    const timer = activeTab === 'my-bookings' ? setInterval(refresh, 15000) : null;
+    return () => { active = false; clearInterval(timer); window.removeEventListener('meetfame-bookings-updated', refresh); window.removeEventListener('focus', refresh); };
   }, [user?.id, activeTab]);
 
   return (
@@ -265,9 +269,10 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
             </div>
           </div>
 
+          {bookingsError && <div role="alert" className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl">{bookingsError}<button className="ml-3 underline" onClick={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}>Retry</button></div>}
           {loadingBookings ? (
             <div className="py-12 text-center text-xs text-slate-400">Loading bookings...</div>
-          ) : myBookings.length === 0 ? (
+          ) : bookingsError && myBookings.length === 0 ? null : myBookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
               You haven't booked any sessions yet. Browse creators to schedule your first 1-hour slot!
             </div>
