@@ -124,7 +124,10 @@ function AppContent() {
                 </div>
 
                 <button
-                  onClick={logout}
+                  onClick={() => {
+                    setCallBooking(null);
+                    logout();
+                  }}
                   className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors ml-1"
                   title="Sign Out"
                   aria-label="Sign out"

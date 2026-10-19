@@ -23,12 +23,17 @@ export const api = {
     },
   },
   calls: {
-    request: async (bookingId, action, payload = {}) => {
+    request: async (bookingId, action, payload = {}, sessionToken) => {
       const res = await fetch(
         `${API_BASE}/calls/${encodeURIComponent(bookingId)}/${action}`,
         {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: {
+            ...getAuthHeaders(),
+            ...(action === 'leave' && sessionToken
+              ? { Authorization: `Bearer ${sessionToken}` }
+              : {}),
+          },
           body: JSON.stringify(payload),
           keepalive: action === 'leave',
         },

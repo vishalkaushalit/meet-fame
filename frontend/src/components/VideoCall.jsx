@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Video, VideoOff, Mic, MicOff, PhoneOff, X, Timer } from 'lucide-react';
+import {
+  Video,
+  VideoOff,
+  Mic,
+  MicOff,
+  PhoneOff,
+  X,
+  Timer,
+  MonitorUp,
+  MonitorOff,
+} from 'lucide-react';
 import { api } from '../api';
 import { callAvailability } from '../../../shared/bookingTime';
 
@@ -8,6 +18,14 @@ export default function VideoCall({ booking, role, onClose }) {
   const localVideo = useRef(null),
     remoteVideo = useRef(null);
   const runtime = useRef(null);
+  const previewStream = useRef(null);
+  const previewRequest = useRef(false);
+  const mounted = useRef(true);
+  const [previewing, setPreviewing] = useState(false);
+  const [previewBusy, setPreviewBusy] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState('Ready to join');
   const [error, setError] = useState('');
   const [joining, setJoining] = useState(false);
@@ -20,35 +38,161 @@ export default function VideoCall({ booking, role, onClose }) {
     role === 'user' ? booking.influencerName : booking.userName;
   const cleanup = () => {
     const run = runtime.current;
+    previewStream.current?.getTracks().forEach((track) => track.stop());
+    previewStream.current = null;
+    if (mounted.current) {
+      setPreviewing(false);
+      setConnected(false);
+      setSharing(false);
+    }
     if (!run) return;
     run.alive = false;
     clearTimeout(run.timer);
     clearTimeout(run.endTimer);
     clearInterval(run.countdownTimer);
+    run.display?.getTracks().forEach((track) => {
+      track.onended = null;
+      track.stop();
+    });
     run.pc?.close();
     run.stream?.getTracks().forEach((track) => track.stop());
     if (localVideo.current) localVideo.current.srcObject = null;
     if (remoteVideo.current) remoteVideo.current.srcObject = null;
     if (run.sessionId)
       api.calls
-        .request(booking.id, 'leave', { sessionId: run.sessionId })
+        .request(booking.id, 'leave', { sessionId: run.sessionId }, run.token)
         .catch(() => {});
     runtime.current = null;
   };
   useEffect(() => {
+    mounted.current = true;
     const prior = document.activeElement;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     closeButton.current?.focus();
     const unload = () => cleanup();
+    const endSession = () => {
+      cleanup();
+      onClose();
+    };
+    window.addEventListener('meetfame-session-ending', endSession);
     window.addEventListener('pagehide', unload);
     return () => {
+      mounted.current = false;
       cleanup();
       window.removeEventListener('pagehide', unload);
+      window.removeEventListener('meetfame-session-ending', endSession);
       document.body.style.overflow = overflow;
       prior?.focus();
     };
   }, []);
+
+  const preview = async () => {
+    if (previewRequest.current || previewStream.current) return;
+    previewRequest.current = true;
+    setPreviewBusy(true);
+    setError('');
+    try {
+      if (!navigator.mediaDevices?.getUserMedia)
+        throw new Error('Camera preview requires HTTPS or localhost.');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      if (!mounted.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      previewStream.current = stream;
+      if (localVideo.current) localVideo.current.srcObject = stream;
+      setMuted(false);
+      setCameraOff(false);
+      setPreviewing(true);
+      setStatus('Check your camera and microphone, then join.');
+    } catch (error) {
+      if (mounted.current)
+        setError(
+          error.name === 'NotAllowedError'
+            ? 'Allow camera and microphone access in your browser, then try again.'
+            : error.message,
+        );
+    } finally {
+      previewRequest.current = false;
+      if (mounted.current) setPreviewBusy(false);
+    }
+  };
+  const stopSharing = async (run) => {
+    if (!run?.display) return;
+    const display = run.display;
+    run.display = null;
+    display.getTracks().forEach((track) => {
+      track.onended = null;
+      track.stop();
+    });
+    try {
+      const sender = run.pc
+        ?.getSenders()
+        .find((item) => item.track?.kind === 'video');
+      if (sender) await sender.replaceTrack(run.stream.getVideoTracks()[0]);
+    } catch {
+      if (run.alive)
+        setError('Could not restore the camera. Leave and rejoin.');
+    }
+    if (run.alive) {
+      if (localVideo.current) localVideo.current.srcObject = run.stream;
+      setSharing(false);
+    }
+  };
+  const shareScreen = async () => {
+    const run = runtime.current;
+    if (!run?.alive || shareBusy) return;
+    setShareBusy(true);
+    try {
+      if (run.display) {
+        await stopSharing(run);
+        return;
+      }
+      const display = await navigator.mediaDevices.getDisplayMedia({
+        video: true,
+        audio: false,
+      });
+      if (!run.alive) {
+        display.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      const sender = run.pc
+        ?.getSenders()
+        .find((item) => item.track?.kind === 'video');
+      if (!sender) {
+        display.getTracks().forEach((track) => track.stop());
+        throw new Error(
+          'Wait for the other participant to connect before presenting.',
+        );
+      }
+      try {
+        await sender.replaceTrack(display.getVideoTracks()[0]);
+      } catch (error) {
+        display.getTracks().forEach((track) => track.stop());
+        throw error;
+      }
+      if (!run.alive) {
+        display.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      run.display = display;
+      display.getVideoTracks()[0].onended = () => stopSharing(run);
+      if (localVideo.current) localVideo.current.srcObject = display;
+      setSharing(true);
+      setError('');
+    } catch (error) {
+      if (run.alive && error.name !== 'NotAllowedError')
+        setError(
+          error.message || 'Screen sharing is unavailable in this browser.',
+        );
+    } finally {
+      if (mounted.current) setShareBusy(false);
+    }
+  };
 
   const join = async () => {
     if (runtime.current) return;
@@ -59,12 +203,15 @@ export default function VideoCall({ booking, role, onClose }) {
       );
       return;
     }
+    setConnected(false);
+    setSharing(false);
     setSecondsLeft(null);
     setJoining(true);
     setError('');
     setStatus('Requesting camera and microphone…');
     const run = {
       alive: true,
+      token: localStorage.getItem('meetfame_token'),
       pc: null,
       stream: null,
       peerId: null,
@@ -72,6 +219,7 @@ export default function VideoCall({ booking, role, onClose }) {
       after: 0,
       pending: [],
       failures: 0,
+      restartAttempts: 0,
     };
     runtime.current = run;
     const send = (type, payload) =>
@@ -85,16 +233,24 @@ export default function VideoCall({ booking, role, onClose }) {
       run.pc?.close();
       run.pc = null;
       run.pending = [];
+      setConnected(false);
       if (remoteVideo.current) remoteVideo.current.srcObject = null;
     };
     const createPeer = () => {
       const pc = new RTCPeerConnection({ iceServers: run.iceServers });
       run.pc = pc;
       for (const track of run.stream.getTracks())
-        pc.addTrack(track, run.stream);
+        pc.addTrack(
+          track.kind === 'video' && run.display
+            ? run.display.getVideoTracks()[0]
+            : track,
+          run.stream,
+        );
       pc.ontrack = (event) => {
+        if (!run.alive || run.pc !== pc) return;
         if (remoteVideo.current) {
-          remoteVideo.current.srcObject = event.streams[0];
+          remoteVideo.current.srcObject =
+            event.streams[0] || new MediaStream([event.track]);
           remoteVideo.current
             .play()
             .catch(() =>
@@ -103,7 +259,7 @@ export default function VideoCall({ booking, role, onClose }) {
         }
       };
       pc.onicecandidate = (event) => {
-        if (event.candidate && run.alive)
+        if (event.candidate && run.alive && run.pc === pc)
           send('candidate', event.candidate.toJSON()).catch((error) => {
             if (run.alive) setError(error.message);
           });
@@ -111,14 +267,38 @@ export default function VideoCall({ booking, role, onClose }) {
       pc.onconnectionstatechange = () => {
         if (!run.alive || run.pc !== pc) return;
         if (pc.connectionState === 'connected') {
+          setConnected(true);
+          run.restartAttempts = 0;
           setStatus('Connected');
           setError('');
-        } else if (pc.connectionState === 'failed')
-          setError(
-            'Unable to connect. Leave and rejoin the call. A TURN relay may be required on this network.',
-          );
-        else if (pc.connectionState === 'disconnected')
-          setStatus('Connection interrupted…');
+        } else if (pc.connectionState === 'failed') {
+          setConnected(false);
+          setStatus('Reconnecting…');
+          if (
+            role === 'user' &&
+            run.restartAttempts++ < 2 &&
+            pc.signalingState === 'stable'
+          ) {
+            (async () => {
+              await pc.setLocalDescription(
+                await pc.createOffer({ iceRestart: true }),
+              );
+              if (run.alive && run.pc === pc)
+                await send('offer', {
+                  type: pc.localDescription.type,
+                  sdp: pc.localDescription.sdp,
+                });
+            })().catch((error) => {
+              if (run.alive) setError(error.message);
+            });
+          } else
+            setError(
+              'Connection failed. Leave and rejoin, or try another network.',
+            );
+        } else if (pc.connectionState === 'disconnected') {
+          setConnected(false);
+          setStatus('Connection interrupted. Trying to reconnect…');
+        }
       };
       return pc;
     };
@@ -192,10 +372,13 @@ export default function VideoCall({ booking, role, onClose }) {
         throw new Error(
           'Video calls require a supported browser on HTTPS or localhost.',
         );
-      run.stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
+      run.stream =
+        previewStream.current ||
+        (await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        }));
+      previewStream.current = null;
       if (!run.alive) {
         run.stream.getTracks().forEach((track) => track.stop());
         return;
@@ -206,7 +389,7 @@ export default function VideoCall({ booking, role, onClose }) {
       run.iceServers = result.iceServers;
       if (!run.alive) {
         api.calls
-          .request(booking.id, 'leave', { sessionId: run.sessionId })
+          .request(booking.id, 'leave', { sessionId: run.sessionId }, run.token)
           .catch(() => {});
         return;
       }
@@ -233,8 +416,8 @@ export default function VideoCall({ booking, role, onClose }) {
       }, remaining);
       setJoined(true);
       setJoining(false);
-      setMuted(false);
-      setCameraOff(false);
+      setMuted(!run.stream.getAudioTracks().some((track) => track.enabled));
+      setCameraOff(!run.stream.getVideoTracks().some((track) => track.enabled));
       setStatus(`Waiting for ${counterpart}…`);
       poll();
     } catch (error) {
@@ -254,7 +437,7 @@ export default function VideoCall({ booking, role, onClose }) {
   };
   const toggle = (kind) => {
     const tracks =
-      runtime.current?.stream
+      (runtime.current?.stream || previewStream.current)
         ?.getTracks()
         .filter((track) => track.kind === kind) || [];
     for (const track of tracks) track.enabled = !track.enabled;
@@ -309,7 +492,32 @@ export default function VideoCall({ booking, role, onClose }) {
             <X size={21} />
           </button>
         </header>
-        <div className="video-call-stage">
+        <div
+          className={`video-call-stage ${!joined && previewing ? 'video-call-preview' : ''}`}
+        >
+          {!connected && (
+            <div className="video-call-placeholder">
+              <Video size={36} />
+              <strong>
+                {!joined
+                  ? previewing
+                    ? 'Ready when you are'
+                    : 'Check your camera before joining'
+                  : status}
+              </strong>
+              <span>
+                {joined
+                  ? counterpart
+                  : 'Your camera and microphone stay under your control.'}
+              </span>
+            </div>
+          )}
+          {joined && (
+            <span className="video-call-participant">
+              {counterpart}
+              {connected ? ' · Connected' : ' · Connecting'}
+            </span>
+          )}
           {joined && secondsLeft !== null && secondsLeft <= 60 && (
             <div
               className="video-call-countdown"
@@ -330,7 +538,15 @@ export default function VideoCall({ booking, role, onClose }) {
             ref={remoteVideo}
             autoPlay
             playsInline
-            controls
+            style={{ visibility: connected ? 'visible' : 'hidden' }}
+            controls={false}
+            onClick={() => remoteVideo.current?.play().catch(() => {})}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                remoteVideo.current?.play().catch(() => {});
+              }
+            }}
             tabIndex={0}
             aria-label={`${counterpart}'s video`}
           />
@@ -342,7 +558,10 @@ export default function VideoCall({ booking, role, onClose }) {
               muted
               aria-label="Your video preview"
             />
-            <span>You{cameraOff ? ' · Camera off' : ''}</span>
+            <span>
+              You{sharing ? ' · Presenting' : cameraOff ? ' · Camera off' : ''}
+              {muted ? ' · Muted' : ''}
+            </span>
           </div>
         </div>
         <p role="status" className="video-call-status">
@@ -354,9 +573,40 @@ export default function VideoCall({ booking, role, onClose }) {
           </p>
         )}
         <footer>
+          {!joined && (
+            <button
+              disabled={joining || previewBusy || previewing}
+              onClick={preview}
+            >
+              <Video size={18} />
+              {previewBusy
+                ? 'Opening camera…'
+                : previewing
+                  ? 'Preview ready'
+                  : 'Camera preview'}
+            </button>
+          )}
+          {!joined && previewing && (
+            <>
+              <button
+                aria-label={muted ? 'Unmute microphone' : 'Mute microphone'}
+                aria-pressed={muted}
+                onClick={() => toggle('audio')}
+              >
+                {muted ? <MicOff size={20} /> : <Mic size={20} />}
+              </button>
+              <button
+                aria-label={cameraOff ? 'Turn camera on' : 'Turn camera off'}
+                aria-pressed={cameraOff}
+                onClick={() => toggle('video')}
+              >
+                {cameraOff ? <VideoOff size={20} /> : <Video size={20} />}
+              </button>
+            </>
+          )}
           {!joined ? (
             <button
-              disabled={joining}
+              disabled={joining || previewBusy}
               className="video-call-join"
               onClick={join}
             >
@@ -381,6 +631,16 @@ export default function VideoCall({ booking, role, onClose }) {
               >
                 {cameraOff ? <VideoOff size={20} /> : <Video size={20} />}
               </button>
+              {navigator.mediaDevices?.getDisplayMedia && (
+                <button
+                  disabled={shareBusy || (!connected && !sharing)}
+                  aria-pressed={sharing}
+                  onClick={shareScreen}
+                >
+                  {sharing ? <MonitorOff size={20} /> : <MonitorUp size={20} />}
+                  {sharing ? 'Stop presenting' : 'Present screen'}
+                </button>
+              )}
               <button
                 className="video-call-leave"
                 onClick={() => {

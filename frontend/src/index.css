@@ -709,3 +709,48 @@
 .logo-loader-button .logo-loader-track {
   height: 2px;
 }
+
+.video-call-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 24px;
+  pointer-events: none;
+}
+.video-call-placeholder strong {
+  font-size: 16px;
+  color: #e2e8f0;
+}
+.video-call-placeholder span {
+  font-size: 12px;
+}
+.video-call-preview .video-call-local {
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  border: 0;
+  aspect-ratio: auto;
+}
+.video-call-preview .video-call-local video {
+  object-fit: contain;
+}
+.video-call-participant {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 2;
+  background: #0f172acc;
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+}
+.video-call-dialog > footer {
+  flex-wrap: wrap;
+}

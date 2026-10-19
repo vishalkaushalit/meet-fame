@@ -14,25 +14,42 @@ export function AuthProvider({ children }) {
   const [statusAlert, setStatusAlert] = useState(null);
 
   useEffect(() => {
+    let active = true;
     async function loadUser() {
       if (!token) {
+        setUser(null);
         setLoading(false);
         return;
       }
       try {
         const res = await api.auth.getMe();
-        setUser(res.user);
+        if (active) setUser(res.user);
       } catch (err) {
+        if (!active) return;
         console.warn('Session expired or invalid token:', err);
         localStorage.removeItem('meetfame_token');
         setToken(null);
         setUser(null);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
     loadUser();
+    return () => {
+      active = false;
+    };
   }, [token]);
+
+  useEffect(() => {
+    const syncSession = (event) => {
+      if (event.key !== 'meetfame_token' && event.key !== null) return;
+      window.dispatchEvent(new Event('meetfame-session-ending'));
+      setUser(null);
+      setToken(localStorage.getItem('meetfame_token'));
+    };
+    window.addEventListener('storage', syncSession);
+    return () => window.removeEventListener('storage', syncSession);
+  }, []);
 
   const login = async (email, password, role) => {
     try {
@@ -92,6 +109,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
+    window.dispatchEvent(new Event('meetfame-session-ending'));
     localStorage.removeItem('meetfame_token');
     setToken(null);
     setUser(null);

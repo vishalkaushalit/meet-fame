@@ -98,3 +98,10 @@ Check `/api/health` after deploying the latest code. `database.issue` reports a 
 - `mongoConnected: true` but initialization still fails: check Vercel function logs for the safe initialization error code (for example, an existing duplicate record or conflicting index).
 
 A failed connection is retried on the next API request; simultaneous requests share one connection attempt. A database outage never falls back to accepting writes into the Vercel filesystem.
+
+
+## Embedded video calls
+
+Calls remain inside MeetFame using WebRTC, with MongoDB-backed signaling. Set `TURN_URL` (comma-separated relay URLs), `TURN_USERNAME`, and `TURN_CREDENTIAL` in the backend deployment environment, then redeploy. Obtain these from your TURN service; do not place credentials in frontend environment variables. Without a relay, some networks cannot establish a media connection.
+
+Test with two approved participant accounts on separate devices and networks during a confirmed video booking. Allow camera/microphone access over HTTPS, check the preview, join both sides, test mute/camera, screen sharing and its browser Stop sharing control, temporary network interruption, leaving/rejoining, and the booked end time. Screen sharing availability depends on the browser/device. The application never redirects participants to Google Meet.
