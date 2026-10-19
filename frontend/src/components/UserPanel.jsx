@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import VerifiedBadge from './VerifiedBadge';
+import JoinCallButton from './JoinCallButton';
 import {
   Search,
   Filter,
@@ -298,7 +299,7 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-                    {b.status === 'confirmed' && b.meetingType === 'video' && <button onClick={() => onJoinCall(b)} className="px-4 py-2 rounded-xl bg-brand-purple text-white text-xs font-bold flex items-center gap-2"><Video size={15} />Join call</button>}
+                    {b.status === 'confirmed' && b.meetingType === 'video' && <JoinCallButton booking={b} onJoinCall={onJoinCall} />}
                     <button
                       onClick={() => onOpenChat && onOpenChat({ id: b.influencerId, name: b.influencerName }, 'influencer')}
                       className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 transition-colors"

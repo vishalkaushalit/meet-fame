@@ -2,7 +2,7 @@
 
 Users open **My Bookings** and influencers open their **Bookings** tab, then select **Join call** on a confirmed video booking. The call dialog requests camera and microphone access only after pressing its Join call button. Both participants must join the same booking. Use two separate browser profiles or devices for testing.
 
-The browser sends media through WebRTC. Authenticated HTTP polling exchanges offers, answers, and ICE candidates every two seconds. Only that booking's user and influencer can access its room; administrators cannot join. Cancelled/completed bookings and restricted accounts cannot join or continue signaling. A booking's confirmed status controls access; there is currently no time-of-day restriction.
+The browser sends media through WebRTC. Authenticated HTTP polling exchanges offers, answers, and ICE candidates every two seconds. Only that booking's user and influencer can access its room; administrators cannot join. Cancelled/completed bookings and restricted accounts cannot join or continue signaling. Access is limited to the booked date and slot in India time (IST, UTC+05:30), including the start and excluding the end. The backend validates the window on every join, poll, and signal request. The client closes the peer connection and stops media when the server-provided remaining duration expires.
 
 ## Configuration
 

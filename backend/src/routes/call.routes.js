@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { db } from '../db.js';
 import { requireSession } from '../middleware/session.js';
 import { mutateRoom } from '../callRooms.js';
+import { bookingWindow } from '../../../shared/bookingTime.js';
 const router = express.Router();
 router.use(requireSession);
 router.use('/:bookingId', (req, res, next) => {
@@ -11,6 +12,15 @@ router.use('/:bookingId', (req, res, next) => {
   const allowed = req.session.role === 'user' && booking.userId === req.session.id || req.session.role === 'influencer' && booking.influencerId === req.session.id;
   if (!allowed) return res.status(403).json({ error: 'Only the booked participants may join this call.' });
   if (booking.status !== 'confirmed' || booking.meetingType !== 'video') return res.status(409).json({ error: 'Calls require a confirmed video booking.' });
+  // Allow cleanup after the slot ends; all other signaling requires an active slot.
+  if (req.path !== '/leave') {
+    const window = bookingWindow(booking);
+    if (!window) return res.status(409).json({ error: 'This booking has an invalid schedule. Please contact support.' });
+    const now = Date.now();
+    if (now < window.start) return res.status(403).json({ error: `You can join only during your booked slot: ${booking.date}, ${booking.slotLabel || booking.slot} IST.` });
+    if (now >= window.end) return res.status(403).json({ error: 'Your booked session has ended.' });
+    req.callWindow = window;
+  }
   next();
 });
 const peerRole = role => role === 'user' ? 'influencer' : 'user';
@@ -33,7 +43,7 @@ router.post('/:bookingId/join', wrap(async (req, res) => {
   });
   const iceServers = [{ urls: 'stun:stun.l.google.com:19302' }];
   if (process.env.TURN_URL && process.env.TURN_USERNAME && process.env.TURN_CREDENTIAL) iceServers.push({ urls: process.env.TURN_URL.split(',').map(url => url.trim()), username: process.env.TURN_USERNAME, credential: process.env.TURN_CREDENTIAL });
-  res.json({ sessionId, iceServers });
+  res.json({ sessionId, iceServers, endsAt: req.callWindow?.end, serverNow: Date.now() });
 }));
 router.post('/:bookingId/poll', wrap(async (req, res) => {
   const result = await mutateRoom(req.params.bookingId, state => {
