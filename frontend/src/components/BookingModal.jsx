@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import VerifiedBadge from './VerifiedBadge';
@@ -17,14 +17,19 @@ import {
 export default function BookingModal({ influencer, isOpen, onClose, onBookingSuccess }) {
   const { user } = useAuth();
 
-  // Tomorrow's date as default or next Monday
-  const getTomorrowString = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
+  const dateInput = useRef(null);
+  const indiaDate = (days = 0) => new Date(Date.now() + 19800000 + days * 86400000).toISOString().slice(0, 10);
+  const [date, setDate] = useState(() => indiaDate(1));
+  const weekday = date ? new Date(`${date}T12:00:00+05:30`).toLocaleDateString('en-IN', { weekday: 'long', timeZone: 'Asia/Kolkata' }) : '';
+  const openDatePicker = () => {
+    const input = dateInput.current;
+    if (!input) return;
+    try {
+      if (typeof input.showPicker === 'function') input.showPicker();
+      else input.focus();
+    } catch { input.focus(); }
   };
 
-  const [date, setDate] = useState(getTomorrowString());
   const [slotsData, setSlotsData] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState('');
   const [topic, setTopic] = useState('1-on-1 Strategy & Mentorship Session');
@@ -38,24 +43,30 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
   useEffect(() => {
     if (!influencer?.id || !date || !isOpen) return;
 
+    let active = true;
     async function loadSlots() {
       setLoadingSlots(true);
+      setSlotsData(null);
+      setSelectedSlot('');
       setError('');
       try {
         const res = await api.bookings.getSlots(influencer.id, date);
+        if (!active) return;
         setSlotsData(res);
         // Find first available slot
         const firstAvailable = res.slots?.find(s => !s.isBooked);
         setSelectedSlot(firstAvailable ? firstAvailable.slot : '');
       } catch (err) {
+        if (!active) return;
         console.error('Error fetching slots:', err);
         setError('Failed to load slots for this date');
       } finally {
-        setLoadingSlots(false);
+        if (active) setLoadingSlots(false);
       }
     }
 
     loadSlots();
+    return () => { active = false; };
   }, [influencer?.id, date, isOpen]);
 
   if (!isOpen || !influencer) return null;
@@ -155,25 +166,31 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
 
             {/* Date Picker */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
+              <label htmlFor="booking-date" className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-brand-coral" />
                   Select Date
                 </span>
-                {slotsData && (
+                {weekday && (
                   <span className="text-brand-purple text-xs font-semibold capitalize">
-                    {slotsData.dayOfWeek}
+                    {weekday}
                   </span>
                 )}
               </label>
+              <div className="booking-date-picker">
               <input
+                ref={dateInput}
+                id="booking-date"
                 type="date"
                 required
                 value={date}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full bg-slate-950/80 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
+                min={indiaDate()}
+                onClick={openDatePicker}
+                onChange={(e) => { setDate(e.target.value); setSlotsData(null); setSelectedSlot(''); }}
+                className="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-4 pr-14 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
               />
+              <button type="button" aria-label="Open booking date picker" title="Choose date" onClick={openDatePicker}><Calendar size={19} aria-hidden="true" /></button>
+              </div>
             </div>
 
             {/* 1-Hour Slots Dropdown (Per Prompt Requirement) */}
