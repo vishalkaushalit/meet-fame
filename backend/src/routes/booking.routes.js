@@ -42,10 +42,8 @@ router.get('/slots', (req, res) => {
     const bookedSlotIds = new Set(bookedOnDate.map(b => b.slot));
 
     const now = Date.now();
-    const slotsWithBookingStatus = generatedSlots.filter(slot => {
+    const slotsWithBookingStatus = generatedSlots.map(slot => {
       const window = bookingWindow({ date, slot: slot.slotId });
-      return window && window.start > now;
-    }).map(slot => {
       const isBooked = bookedSlotIds.has(slot.slotId);
       const existingBooking = isBooked ? bookedOnDate.find(b => b.slot === slot.slotId) : null;
       return {
@@ -54,6 +52,7 @@ router.get('/slots', (req, res) => {
         startTime: slot.startTime,
         endTime: slot.endTime,
         isBooked,
+        isPast: !window || window.start <= now,
         bookedBy: existingBooking ? existingBooking.userName : null,
         bookingId: existingBooking ? existingBooking.id : null
       };
@@ -66,7 +65,7 @@ router.get('/slots', (req, res) => {
       date,
       dayOfWeek,
       totalSlots: slotsWithBookingStatus.length,
-      availableSlotsCount: slotsWithBookingStatus.filter(s => !s.isBooked).length,
+      availableSlotsCount: slotsWithBookingStatus.filter(s => !s.isBooked && !s.isPast).length,
       slots: slotsWithBookingStatus
     });
   } catch (err) {

@@ -40,9 +40,9 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
     return () => clearInterval(timer);
   }, [isOpen]);
   const serverTime = clock ? clock.serverNow + (performance.now() - clock.receivedAt) : Date.now();
-  const visibleSlots = (slotsData?.slots || []).filter(slot => {
+  const visibleSlots = (slotsData?.slots || []).map(slot => {
     const window = bookingWindow({ date, slot: slot.slot });
-    return window && window.start > serverTime;
+    return { ...slot, isPast: !window || window.start <= serverTime };
   });
 
   const [selectedSlot, setSelectedSlot] = useState('');
@@ -69,7 +69,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
         setClock({ serverNow: res.serverNow || Date.now(), receivedAt: performance.now() });
         setSlotsData(res);
         // Find first available slot
-        const firstAvailable = res.slots?.find(s => !s.isBooked);
+        const firstAvailable = res.slots?.find(s => !s.isBooked && !s.isPast);
         setSelectedSlot(firstAvailable ? firstAvailable.slot : '');
       } catch (err) {
         if (!active) return;
@@ -86,7 +86,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
 
   useEffect(() => {
     if (!slotsData || !selectedSlot) return;
-    if (!visibleSlots.some(slot => slot.slot === selectedSlot && !slot.isBooked)) setSelectedSlot('');
+    if (!visibleSlots.some(slot => slot.slot === selectedSlot && !slot.isBooked && !slot.isPast)) setSelectedSlot('');
   }, [tick, slotsData, selectedSlot, date]);
 
   if (!isOpen || !influencer) return null;
@@ -97,7 +97,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
       setError('Please log in as a user to book an appointment.');
       return;
     }
-    if (!selectedSlot || !visibleSlots.some(slot => slot.slot === selectedSlot && !slot.isBooked)) {
+    if (!selectedSlot || !visibleSlots.some(slot => slot.slot === selectedSlot && !slot.isBooked && !slot.isPast)) {
       setError('Please select an available 1-hour time slot.');
       return;
     }
@@ -221,7 +221,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                   Select 1-Hour Slot
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  {slotsData ? `${visibleSlots.filter(slot => !slot.isBooked).length} of ${visibleSlots.length} available · IST` : ''}
+                  {slotsData ? `${visibleSlots.filter(slot => !slot.isBooked && !slot.isPast).length} of ${visibleSlots.length} available · IST` : ''}
                 </span>
               </label>
 
@@ -231,7 +231,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                 </div>
               ) : slotsData && visibleSlots.length === 0 ? (
                 <div className="p-4 text-center text-xs text-amber-400 bg-amber-500/10 rounded-xl border border-amber-500/20">
-                  No upcoming slots remain for this date (IST). Please pick another date.
+                  No slots are configured for this date. Please pick another date.
                 </div>
               ) : (
                 <>
@@ -246,10 +246,10 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                       <option
                         key={slotItem.slot}
                         value={slotItem.slot}
-                        disabled={slotItem.isBooked}
-                        className={slotItem.isBooked ? 'bg-slate-900 text-slate-500 line-through' : 'bg-slate-900 text-white'}
+                        disabled={slotItem.isBooked || slotItem.isPast}
+                        className={slotItem.isBooked || slotItem.isPast ? 'bg-slate-900 text-slate-500 line-through' : 'bg-slate-900 text-white'}
                       >
-                        {slotItem.label} {slotItem.isBooked ? '— [Already Booked]' : '— [Available]'}
+                        {slotItem.label} {slotItem.isBooked ? '— [Already Booked]' : slotItem.isPast ? '— [Past]' : '— [Available]'}
                       </option>
                     ))}
                   </select>
@@ -262,10 +262,10 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                         <button
                           key={s.slot}
                           type="button"
-                          disabled={s.isBooked}
+                          disabled={s.isBooked || s.isPast}
                           onClick={() => setSelectedSlot(s.slot)}
                           className={`p-2.5 rounded-xl text-xs font-semibold text-center border transition-all ${
-                            s.isBooked
+                            s.isBooked || s.isPast
                               ? 'bg-slate-950/60 border-slate-800 text-slate-600 cursor-not-allowed line-through'
                               : isSelected
                               ? 'bg-gradient-to-r from-brand-indigo to-brand-purple border-brand-purple text-white shadow-lg shadow-indigo-500/30'
@@ -274,7 +274,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                         >
                           <div className="font-mono">{s.slot}</div>
                           <div className={`text-[10px] mt-0.5 ${s.isBooked ? 'text-rose-500/80' : isSelected ? 'text-white/90' : 'text-slate-400'}`}>
-                            {s.isBooked ? 'Booked' : 'Available'}
+                            {s.isBooked ? 'Booked' : s.isPast ? 'Past' : 'Available'}
                           </div>
                         </button>
                       );
