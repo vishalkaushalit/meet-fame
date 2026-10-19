@@ -1,3 +1,4 @@
+import { addPersistenceFields } from './persistence.js';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import mongoose from 'mongoose';
 
@@ -67,5 +68,7 @@ const influencerSchema = new mongoose.Schema({
     })
   }
 }, { timestamps: true });
+
+addPersistenceFields(influencerSchema);
 
 export const Influencer = mongoose.models.Influencer || mongoose.model('Influencer', influencerSchema);

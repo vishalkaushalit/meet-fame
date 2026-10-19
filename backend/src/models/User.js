@@ -1,3 +1,4 @@
+import { addPersistenceFields } from './persistence.js';
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
@@ -14,5 +15,7 @@ const userSchema = new mongoose.Schema({
     default: 'approved'
   }
 }, { timestamps: true });
+
+addPersistenceFields(userSchema);
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);

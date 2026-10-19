@@ -2,7 +2,14 @@ import mongoose from 'mongoose';
 import { mongoConnection } from './mongoConnection.js';
 import { db } from './db.js';
 import { normalizeAvailability } from '../../shared/availability.js';
-const collections = ['users', 'influencers', 'admins', 'bookings', 'messages', 'notifications'];
+import { User } from './models/User.js';
+import { Influencer } from './models/Influencer.js';
+import { Admin } from './models/Admin.js';
+import { Booking } from './models/Booking.js';
+import { Message } from './models/Message.js';
+import { Notification } from './models/Notification.js';
+export const persistenceModels = { users: User, influencers: Influencer, admins: Admin, bookings: Booking, messages: Message, notifications: Notification };
+const collections = Object.keys(persistenceModels);
 let initialized;
 const slotKey = booking => booking.status !== 'cancelled' ? `${booking.influencerId}:${booking.date}:${booking.slot}` : undefined;
 const stored = (name, item, version, id) => {
@@ -13,27 +20,25 @@ const stored = (name, item, version, id) => {
 };
 async function initialize() {
   await mongoConnection.connect();
-  const mongo = mongoose.connection.db;
   const local = db.read();
   // Import the retained JSON records once per collection, without overwriting
   // records already maintained in MongoDB.
   for (const name of collections) {
-    await mongo.collection(name).createIndex({ id: 1 }, { unique: true, partialFilterExpression: { id: { $type: 'string' } } });
-    if (!local[name]?.length || await mongo.collection(name).countDocuments({}, { limit: 1 })) continue;
+    const Model = persistenceModels[name];
+    await Model.createIndexes();
+    if (!local[name]?.length || await Model.countDocuments({}).limit(1)) continue;
     for (const item of local[name]) {
       try {
-        await mongo.collection(name).updateOne({ id: item.id }, { $setOnInsert: stored(name, item, 0) }, { upsert: true });
+        await Model.updateOne({ id: item.id }, { $setOnInsert: stored(name, item, 0) }, { upsert: true, runValidators: true, timestamps: false });
       } catch (error) {
         // Another cold-start instance may have inserted this seed simultaneously.
-        if (error.code !== 11000 || !await mongo.collection(name).findOne({ id: item.id })) throw error;
+        if (error.code !== 11000 || !await Model.exists({ id: item.id })) throw error;
       }
     }
   }
-  for await (const booking of mongo.collection('bookings').find({ status: { $ne: 'cancelled' }, _activeSlot: { $exists: false } })) {
-    await mongo.collection('bookings').updateOne({ _id: booking._id, _activeSlot: { $exists: false } }, { $set: { _activeSlot: slotKey(booking) } });
+  for await (const booking of Booking.find({ status: { $ne: 'cancelled' }, _activeSlot: { $exists: false } }).lean().cursor()) {
+    await Booking.updateOne({ _id: booking._id, _activeSlot: { $exists: false } }, { $set: { _activeSlot: slotKey(booking) } });
   }
-  await mongo.collection('notifications').createIndex({ key: 1 }, { unique: true, partialFilterExpression: { key: { $type: 'string' } } });
-  await mongo.collection('bookings').createIndex({ _activeSlot: 1 }, { unique: true, partialFilterExpression: { _activeSlot: { $type: 'string' } } });
 }
 export const mongoStore = {
   async load() {
@@ -43,10 +48,12 @@ export const mongoStore = {
     const local = db.read();
     const state = {}, originals = {};
     await Promise.all(collections.map(async name => {
-      const records = await mongoose.connection.db.collection(name).find({}).toArray();
+      const records = await persistenceModels[name].find({}).lean().exec();
       originals[name] = new Map();
       state[name] = records.map(record => {
-        const { _id, _version, _activeSlot, ...value } = record;
+        const { _id, _version, _activeSlot, ...fields } = record;
+        // Keep the existing API contract (ISO strings) while models store Dates.
+        const value = JSON.parse(JSON.stringify(fields));
         const match = !value.id && value.email ? (local[name] || []).find(item => item.email?.toLowerCase() === value.email.toLowerCase()) : null;
         value.id ||= match?.id || String(_id);
         if (name === 'influencers') value.availability = normalizeAvailability(value.availability);
@@ -65,10 +72,10 @@ export const mongoStore = {
             const original = snapshot.originals[name].get(item.id);
             if (original && JSON.stringify(original.value) === JSON.stringify(item)) continue;
             if (!original) {
-              await mongoose.connection.db.collection(name).insertOne(stored(name, item, 0), { session });
+              await persistenceModels[name].create([stored(name, item, 0)], { session });
             } else {
               const filter = { _id: original._id, _version: original.version ?? { $exists: false } };
-              const result = await mongoose.connection.db.collection(name).replaceOne(filter, stored(name, item, (original.version || 0) + 1, original._id), { session });
+              const result = await persistenceModels[name].replaceOne(filter, stored(name, item, (original.version || 0) + 1, original._id), { session, runValidators: true, timestamps: false });
               if (!result.matchedCount) throw Object.assign(new Error('Concurrent record update'), { code: 'WRITE_CONFLICT' });
             }
           }

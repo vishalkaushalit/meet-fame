@@ -1,3 +1,4 @@
+import { addPersistenceFields } from './persistence.js';
 import mongoose from 'mongoose';
 
 const bookingSchema = new mongoose.Schema({
@@ -14,7 +15,11 @@ const bookingSchema = new mongoose.Schema({
   topic: { type: String, default: 'General Consultation & Mentorship' },
   meetingType: { type: String, enum: ['video', 'in-person'], default: 'video' },
   status: { type: String, enum: ['confirmed', 'completed', 'cancelled'], default: 'confirmed' },
+  _activeSlot: String,
   price: { type: Number, default: 150 }
 }, { timestamps: true });
+
+addPersistenceFields(bookingSchema);
+bookingSchema.index({ _activeSlot: 1 }, { unique: true, partialFilterExpression: { _activeSlot: { $type: 'string' } } });
 
 export const Booking = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
