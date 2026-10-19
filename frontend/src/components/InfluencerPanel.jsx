@@ -1,3 +1,5 @@
+import Pagination, { usePagination } from './Pagination';
+import './creator-dashboard.css';
 import LogoLoader from './LogoLoader';
 import { normalizeAvailability, dayRanges } from '../../../shared/availability';
 import React, { useState, useEffect } from 'react';
@@ -21,6 +23,7 @@ import {
   Save,
   Sparkles,
   ExternalLink,
+  Info,
 } from 'lucide-react';
 
 export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
@@ -215,13 +218,15 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   );
   const totalEarnings = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
 
+  const bookingPagination = usePagination(bookings);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div className="creator-dashboard max-w-7xl mx-auto px-4 sm:px-6 py-8">
       {/* Influencer Profile Top Card */}
-      <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl mb-8 relative overflow-hidden">
+      <div className="creator-summary p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-purple/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+        <div className="creator-summary-content flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="flex items-center gap-5">
             <div className="relative">
               <img
@@ -230,7 +235,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                   'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
                 }
                 alt={user?.name}
-                className="w-20 h-20 rounded-2xl object-cover ring-2 ring-brand-purple/50 shadow-md"
+                className="creator-avatar w-20 h-20 rounded-2xl object-cover ring-2 ring-brand-purple/50 shadow-md"
               />
               {user?.isVerified && (
                 <div className="absolute -bottom-1 -right-1 bg-slate-900 p-0.5 rounded-full">
@@ -240,7 +245,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
+              <div className="creator-name flex items-center gap-2">
                 <h1 className="text-2xl font-black text-white">{user?.name}</h1>
                 {user?.isVerified ? (
                   <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-bold">
@@ -267,25 +272,25 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 <span>
                   Rate:{' '}
                   <strong className="text-emerald-400">
-                    ${user?.hourlyRate || 150} / hr
+                    ${user?.hourlyRate ?? 150} / hr
                   </strong>
                 </span>
                 <span>•</span>
-                <span>
-                  Status:{' '}
-                  <strong className="text-emerald-400 uppercase">
-                    {user?.status}
-                  </strong>
+                <span
+                  className={`creator-status creator-status-${user?.status}`}
+                >
+                  <CheckCircle size={14} aria-hidden="true" />
+                  {user?.status?.replace(/_/g, ' ')}
                 </span>
               </div>
             </div>
           </div>
 
           {/* Quick Metrics */}
-          <div className="flex items-center gap-3">
+          <div className="creator-metrics flex items-center gap-3">
             <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-[100px]">
               <span className="text-[11px] text-slate-400 uppercase font-semibold">
-                Weekly Slots
+                <Calendar size={20} aria-hidden="true" /> Weekly Slots
               </span>
               <div className="text-2xl font-black text-white mt-0.5">
                 {totalSlotsCount}
@@ -293,7 +298,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
             <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-[100px]">
               <span className="text-[11px] text-slate-400 uppercase font-semibold">
-                Bookings
+                <Users size={20} aria-hidden="true" /> Bookings
               </span>
               <div className="text-2xl font-black text-brand-purple mt-0.5">
                 {bookings.length}
@@ -301,7 +306,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
             <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-[100px]">
               <span className="text-[11px] text-slate-400 uppercase font-semibold">
-                Revenue
+                <DollarSign size={20} aria-hidden="true" /> Revenue
               </span>
               <div className="text-2xl font-black text-emerald-400 mt-0.5">
                 ${totalEarnings}
@@ -309,54 +314,63 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
           </div>
         </div>
+      </div>
+      {/* Navigation Tabs */}
+      <div
+        className="creator-tabs flex items-center gap-2 overflow-x-auto"
+        role="tablist"
+        aria-label="Creator dashboard sections"
+      >
+        <button
+          role="tab"
+          aria-selected={activeTab === 'slots'}
+          onClick={() => setActiveTab('slots')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            activeTab === 'slots'
+              ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+          }`}
+        >
+          <Clock className="w-4 h-4" />
+          <span>Manage Slots & Availability</span>
+        </button>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-2 mt-8 pt-6 border-t border-slate-800/80 overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('slots')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'slots'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Clock className="w-4 h-4" />
-            <span>Manage Slots & Availability</span>
-          </button>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'bookings'}
+          onClick={() => setActiveTab('bookings')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            activeTab === 'bookings'
+              ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>My Bookings ({bookings.length})</span>
+        </button>
 
-          <button
-            onClick={() => setActiveTab('bookings')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'bookings'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Booked Sessions ({bookings.length})</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('certificate')}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-              activeTab === 'certificate'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            <FileCheck className="w-4 h-4" />
-            <span>Verification & Certificate</span>
-            {user?.isVerified ? (
-              <span className="px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 text-[10px]">
-                Verified
-              </span>
-            ) : user?.certificateStatus === 'pending' ? (
-              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">
-                Pending
-              </span>
-            ) : null}
-          </button>
-        </div>
+        <button
+          role="tab"
+          aria-selected={activeTab === 'certificate'}
+          onClick={() => setActiveTab('certificate')}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+            activeTab === 'certificate'
+              ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800'
+          }`}
+        >
+          <FileCheck className="w-4 h-4" />
+          <span>Verification & Certificate</span>
+          {user?.isVerified ? (
+            <span className="px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 text-[10px]">
+              Verified
+            </span>
+          ) : user?.certificateStatus === 'pending' ? (
+            <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">
+              Pending
+            </span>
+          ) : null}
+        </button>
       </div>
 
       {/* TAB 1: SLOTS & AVAILABILITY MANAGER */}
@@ -551,15 +565,15 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
       {/* TAB 2: BOOKED SESSIONS */}
       {activeTab === 'bookings' && (
-        <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
+        <div className="creator-appointments p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-purple" />
-                <span>Client Appointments & Booked Slots</span>
+                <span>My Bookings</span>
               </h3>
               <p className="text-slate-400 text-xs mt-1">
-                View confirmed 1-hour sessions booked by users.
+                Manage your sessions and connect with your clients.
               </p>
             </div>
           </div>
@@ -590,72 +604,84 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {bookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="p-4 md:p-5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-brand-purple/20 text-brand-purple flex items-center justify-center font-bold text-sm flex-shrink-0">
+              {bookingPagination.items.map((b, index) => (
+                <article key={b.id} className="creator-appointment">
+                  <div className="creator-client">
+                    <span
+                      className="record-serial"
+                      aria-label={`Serial number ${bookingPagination.start + index}`}
+                    >
+                      Sr. No. {bookingPagination.start + index}
+                    </span>
+                    <span className="creator-client-avatar" aria-hidden="true">
                       {b.userName?.charAt(0) || 'U'}
-                    </div>
+                    </span>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm">
-                          {b.userName}
-                        </h4>
-                        <span className="text-[11px] text-slate-400">
-                          ({b.userEmail})
-                        </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          {b.status}
-                        </span>
+                      <h4>{b.userName}</h4>
+                      <p>{b.userEmail}</p>
+                    </div>
+                  </div>
+                  <div className="creator-session-info">
+                    <div className="creator-topic">
+                      <MessageSquare size={17} aria-hidden="true" />
+                      <div>
+                        <span>Topic</span>
+                        <strong>{b.topic || '1-on-1 session'}</strong>
                       </div>
-                      <p className="text-xs text-slate-300 font-medium mt-1">
-                        Topic: <span className="text-white">{b.topic}</span>
-                      </p>
-                      <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                        <span>
-                          Date: <strong className="text-white">{b.date}</strong>{' '}
-                          ({b.dayOfWeek})
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Time:{' '}
-                          <strong className="text-brand-purple font-mono">
-                            {b.slotLabel || b.slot}
-                          </strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Fee:{' '}
-                          <strong className="text-emerald-400">
-                            ${b.price}
-                          </strong>
-                        </span>
+                    </div>
+                    <div className="creator-session-time">
+                      <span>
+                        <Calendar size={16} aria-hidden="true" />
+                        {b.date}{' '}
+                        <span className="capitalize">({b.dayOfWeek})</span>
+                      </span>
+                      <span>
+                        <Clock size={16} aria-hidden="true" />
+                        {b.slotLabel || b.slot} <small>IST</small>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="creator-session-meta">
+                    <span
+                      className={`creator-status creator-status-${b.status}`}
+                    >
+                      <CheckCircle size={13} aria-hidden="true" />
+                      {b.status}
+                    </span>
+                    <div className="creator-fee">
+                      <DollarSign size={16} aria-hidden="true" />
+                      <div>
+                        <span>Fee</span>
+                        <strong>${b.price ?? 0}</strong>
                       </div>
                     </div>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                  <div className="creator-session-actions">
                     {b.status === 'confirmed' && b.meetingType === 'video' && (
                       <JoinCallButton booking={b} onJoinCall={onJoinCall} />
                     )}
                     <button
+                      className="creator-chat-button"
                       onClick={() =>
-                        onOpenChat &&
-                        onOpenChat({ id: b.userId, name: b.userName }, 'user')
+                        onOpenChat?.({ id: b.userId, name: b.userName }, 'user')
                       }
-                      className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 self-start md:self-auto transition-colors"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Chat with Client</span>
+                      <MessageSquare size={17} aria-hidden="true" />
+                      Chat with Client
                     </button>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}
+          {!loadingBookings && (
+            <Pagination pagination={bookingPagination} label="bookings" />
+          )}
+          <p className="creator-session-note">
+            <Info size={18} aria-hidden="true" />
+            You can join the meeting at the scheduled time or chat with the
+            client for any updates.
+          </p>
         </div>
       )}
 

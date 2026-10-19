@@ -1,3 +1,4 @@
+import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
@@ -45,6 +46,8 @@ export default function ConversationsView() {
     );
   });
 
+  const threadPagination = usePagination(filtered, searchTerm);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -81,7 +84,7 @@ export default function ConversationsView() {
             </div>
 
             <div className="space-y-2 flex-1 overflow-y-auto max-h-[500px]">
-              {filtered.map((conv) => {
+              {threadPagination.items.map((conv, index) => {
                 const isSelected =
                   selectedConv?.conversationId === conv.conversationId;
                 return (
@@ -95,6 +98,9 @@ export default function ConversationsView() {
                         : 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-800/40 text-slate-300'
                     }`}
                   >
+                    <span className="record-serial">
+                      Sr. No. {threadPagination.start + index}
+                    </span>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5 font-bold text-xs text-white">
                         <span>{conv.userName}</span>
@@ -119,15 +125,16 @@ export default function ConversationsView() {
                 );
               })}
             </div>
+            <Pagination pagination={threadPagination} label="conversations" />
           </div>
 
           {/* Active Thread Inspector (7 cols) */}
           <div className="lg:col-span-7 bg-slate-900 rounded-3xl border border-slate-800 flex flex-col overflow-hidden">
             {selectedConv ? (
               <>
-                <div className="p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
+                <div className="conversation-header p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="font-bold text-white text-sm">
                         Client: {selectedConv.userName}
                       </span>
@@ -136,18 +143,18 @@ export default function ConversationsView() {
                         Creator: {selectedConv.influencerName}
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                    <p className="text-[10px] text-slate-500 font-mono mt-0.5 break-all">
                       Thread ID: {selectedConv.conversationId}
                     </p>
                   </div>
 
-                  <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <span className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                     Live Audit Log
                   </span>
                 </div>
 
                 {/* Messages Feed */}
-                <div className="flex-1 p-5 overflow-y-auto space-y-3 bg-[#080D1A] max-h-[460px]">
+                <div className="conversation-feed flex-1 p-5 overflow-y-auto space-y-3 bg-[#080D1A] max-h-[460px]">
                   {selectedConv.messages?.map((msg) => {
                     const isInfluencer = msg.senderRole === 'influencer';
                     return (
@@ -174,14 +181,14 @@ export default function ConversationsView() {
                         </span>
 
                         <div
-                          className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed ${
+                          className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed break-words ${
                             isInfluencer
-                              ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white rounded-tr-none'
+                              ? 'conversation-message-creator bg-gradient-to-r from-brand-indigo to-brand-purple text-white rounded-tr-none'
                               : 'bg-slate-800 text-slate-200 border border-slate-700/70 rounded-tl-none'
                           }`}
                         >
                           {msg.text}
-                          <div className="text-[9px] text-slate-400 mt-1 text-right">
+                          <div className="conversation-message-time text-[9px] text-slate-400 mt-1 text-right">
                             {new Date(msg.timestamp).toLocaleString()}
                           </div>
                         </div>

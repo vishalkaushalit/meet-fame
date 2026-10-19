@@ -1,3 +1,5 @@
+import Pagination from './Pagination';
+import { paginate } from '../../../shared/pagination';
 import LogoLoader from './LogoLoader';
 import React, { useEffect, useState } from 'react';
 import {
@@ -186,6 +188,7 @@ export default function UsersView({ refreshKey = 0 }) {
             <table className="dashboard-table">
               <thead>
                 <tr>
+                  <th scope="col">Sr. No.</th>
                   <th scope="col">User</th>
                   <th scope="col">Role</th>
                   <th scope="col">Contact</th>
@@ -196,8 +199,11 @@ export default function UsersView({ refreshKey = 0 }) {
                 </tr>
               </thead>
               <tbody>
-                {visible.map((user) => (
+                {visible.map((user, index) => (
                   <tr key={`${user.role}:${user.id}`}>
+                    <td className="record-serial-cell">
+                      {(currentPage - 1) * 10 + index + 1}
+                    </td>
                     <td>
                       <div className="booking-person">
                         <span className="booking-avatar">
@@ -315,30 +321,10 @@ export default function UsersView({ refreshKey = 0 }) {
               </p>
             </div>
           )}
-          <div className="users-pagination">
-            <span>
-              {filtered.length
-                ? `${(currentPage - 1) * 10 + 1}–${Math.min(currentPage * 10, filtered.length)} of ${filtered.length} accounts`
-                : '0 accounts'}
-            </span>
-            <div>
-              <button
-                disabled={currentPage === 1}
-                onClick={() => setPage(currentPage - 1)}
-              >
-                Previous
-              </button>
-              <span>
-                Page {currentPage} of {pageCount}
-              </span>
-              <button
-                disabled={currentPage === pageCount}
-                onClick={() => setPage(currentPage + 1)}
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            pagination={{ ...paginate(filtered, currentPage), setPage }}
+            label="accounts"
+          />
         </>
       )}
       {viewingAccount && (

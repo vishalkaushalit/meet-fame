@@ -1,329 +1,433 @@
-import LogoLoader from './LogoLoader';
-import React, { useState, useEffect } from 'react';
-import { adminApi } from '../api';
-import VerifiedBadge from './VerifiedBadge';
+import React, { useEffect, useState } from 'react';
 import {
-  Calendar,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Clock,
-  User,
-  CheckCircle,
-  AlertCircle,
-  Search,
-  Filter,
-  DollarSign,
-  ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
+import LogoLoader from './LogoLoader';
+import VerifiedBadge from './VerifiedBadge';
+import { adminApi } from '../api';
+import {
+  calendarWeek,
+  calendarDaySlots,
+  calendarMinutes,
+  calendarRows,
+  shiftCalendarDate,
+} from '../../../shared/availabilityCalendar';
+import './availability-calendar.css';
 
+const dateLabel = (date, options) =>
+  new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', ...options }).format(
+    new Date(`${date}T00:00:00Z`),
+  );
+const timeLabel = (minutes) =>
+  `${Math.floor(minutes / 60) % 12 || 12}${minutes % 60 ? ':' + String(minutes % 60).padStart(2, '0') : ''} ${minutes >= 720 ? 'PM' : 'AM'}`;
 export default function SlotsInspectorView() {
   const [influencers, setInfluencers] = useState([]);
-  const [selectedInfluencerId, setSelectedInfluencerId] = useState('');
-
-  // Default to upcoming Monday 2026-10-19 or tomorrow
-  const [inspectDate, setInspectDate] = useState('2026-10-19');
-  const [slotsOverview, setSlotsOverview] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  // Load all influencers
-  useEffect(() => {
-    async function loadInfluencers() {
-      try {
-        const res = await adminApi.influencers.getAll();
-        setInfluencers(res.influencers || []);
-        if (res.influencers?.length > 0) {
-          setSelectedInfluencerId(res.influencers[0].id);
-        }
-      } catch (err) {
-        console.error('Failed to load influencers:', err);
-      }
-    }
-    loadInfluencers();
-  }, []);
-
-  // Load slots overview when selected influencer or inspectDate changes
-  useEffect(() => {
-    if (!selectedInfluencerId) return;
-
-    async function loadOverview() {
-      setLoading(true);
-      try {
-        const res = await adminApi.influencers.getSlotsOverview(
-          selectedInfluencerId,
-          inspectDate,
-        );
-        setSlotsOverview(res);
-      } catch (err) {
-        console.error('Failed to load slots overview:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadOverview();
-  }, [selectedInfluencerId, inspectDate]);
-
-  const selectedInfluencer = influencers.find(
-    (i) => i.id === selectedInfluencerId,
+  const [creatorId, setCreatorId] = useState('');
+  const [date, setDate] = useState(() =>
+    new Date(Date.now() + 19800000).toISOString().slice(0, 10),
   );
-  const days = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
-
+  const [mode, setMode] = useState('week');
+  const [overview, setOverview] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [listLoading, setListLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [listError, setListError] = useState('');
+  const [reload, setReload] = useState(0);
+  const [selection, setSelection] = useState(null);
+  useEffect(() => {
+    let active = true;
+    setListLoading(true);
+    setListError('');
+    adminApi.influencers
+      .getAll()
+      .then((result) => {
+        if (!active) return;
+        const records = result.influencers || [];
+        setInfluencers(records);
+        setCreatorId((current) =>
+          records.some((item) => item.id === current)
+            ? current
+            : records[0]?.id || '',
+        );
+      })
+      .catch(() => {
+        if (active)
+          setListError('Unable to load influencers. Please try again.');
+      })
+      .finally(() => {
+        if (active) setListLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [reload]);
+  useEffect(() => {
+    if (!creatorId) return;
+    let active = true;
+    setLoading(true);
+    setError('');
+    setOverview(null);
+    setSelection(null);
+    adminApi.influencers
+      .getSlotsOverview(creatorId, date)
+      .then((result) => {
+        if (active) setOverview(result);
+      })
+      .catch(() => {
+        if (active) setError('Unable to load the schedule. Please try again.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [creatorId, date, reload]);
+  const creator = influencers.find((item) => item.id === creatorId);
+  const week = calendarWeek(date);
+  const columns = (
+    mode === 'week' ? week : week.filter((day) => day.date === date)
+  ).map((day) => ({ ...day, slots: calendarDaySlots(overview, day.date) }));
+  const allSlots = columns.flatMap((day) => day.slots);
+  const rows = calendarRows(allSlots);
+  const selected = selection
+    ? allSlots.find(
+        (slot) =>
+          slot.date === selection.date && slot.slotId === selection.slotId,
+      )
+    : calendarDaySlots(overview, date).find((slot) => slot.booking) ||
+      calendarDaySlots(overview, date)[0];
+  const detailDate = selected?.date || date;
+  const daySlots = calendarDaySlots(overview, detailDate);
+  const bookedCount = daySlots.filter((slot) => slot.booking).length;
+  const recurring =
+    overview?.weeklySlotPlan?.[
+      selected?.day || week.find((day) => day.date === date).day
+    ]?.ranges || [];
+  const changeDate = (value) => {
+    if (value) {
+      setDate(value);
+      setSelection(null);
+    }
+  };
   return (
-    <div className="space-y-6">
-      {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="availability-calendar">
+      <header className="availability-page-heading">
         <div>
-          <h2 className="text-2xl font-black text-white flex items-center gap-2">
-            <Clock className="w-6 h-6 text-brand-purple" />
-            <span>Influencer Slots & Availability Inspector</span>
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Real-time inspection of autogenerated 1-hour slots, available
-            windows, and booked appointments.
-          </p>
+          <h2>Availability</h2>
+          <p>View creator schedules and inspect individual sessions.</p>
         </div>
-
-        {/* Influencer Selector */}
-        <div className="flex items-center gap-3">
-          <label className="text-xs font-semibold text-slate-400">
-            Select Influencer:
+        <div className="availability-filters">
+          <label>
+            Influencer
+            <select
+              value={creatorId}
+              disabled={listLoading || !influencers.length}
+              onChange={(event) => {
+                setCreatorId(event.target.value);
+                setSelection(null);
+              }}
+            >
+              {influencers.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
           </label>
-          <select
-            value={selectedInfluencerId}
-            onChange={(e) => setSelectedInfluencerId(e.target.value)}
-            className="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-bold focus:outline-none focus:border-brand-purple"
-          >
-            {influencers.map((i) => (
-              <option key={i.id} value={i.id} className="bg-slate-900">
-                {i.name} ({i.category})
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {selectedInfluencer && (
-        <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <img
-              src={
-                selectedInfluencer.avatar ||
-                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
-              }
-              alt={selectedInfluencer.name}
-              className="w-14 h-14 rounded-2xl object-cover ring-2 ring-brand-purple/40"
+          <label>
+            Date
+            <input
+              type="date"
+              value={date}
+              onChange={(event) => changeDate(event.target.value)}
             />
-            <div>
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-white text-base">
-                  {selectedInfluencer.name}
-                </h3>
-                {selectedInfluencer.isVerified && <VerifiedBadge size="sm" />}
-              </div>
-              <p className="text-brand-purple text-xs font-semibold">
-                {selectedInfluencer.specialization}
-              </p>
-              <div className="text-xs text-slate-400 mt-0.5">
-                Fee:{' '}
-                <strong className="text-emerald-400">
-                  ${selectedInfluencer.hourlyRate}/hr
-                </strong>{' '}
-                • Category:{' '}
-                <strong className="text-slate-300">
-                  {selectedInfluencer.category}
-                </strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="text-right">
-              <span className="text-[10px] text-slate-500 uppercase block font-semibold">
-                Inspect Specific Date
-              </span>
-              <input
-                type="date"
-                value={inspectDate}
-                onChange={(e) => setInspectDate(e.target.value)}
-                className="bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono mt-1"
-              />
-            </div>
-          </div>
+          </label>
+          <button
+            type="button"
+            onClick={() => setReload((value) => value + 1)}
+            aria-label="Refresh availability"
+          >
+            <RefreshCw size={17} />
+          </button>
         </div>
+      </header>
+      {creator && (
+        <section className="availability-creator">
+          <div className="availability-identity">
+            <span className="availability-avatar">
+              {creator.name
+                ?.split(' ')
+                .map((word) => word[0])
+                .slice(0, 2)
+                .join('')}
+            </span>
+            <div>
+              <h3>
+                {creator.name}
+                {creator.isVerified && <VerifiedBadge size="sm" />}
+              </h3>
+              <p>{creator.specialization}</p>
+            </div>
+          </div>
+          <div className="availability-rate">
+            <strong>${creator.hourlyRate ?? 0} / hour</strong>
+            <p>{creator.category} · 60-minute sessions</p>
+          </div>
+        </section>
       )}
-
-      {loading ? (
-        <LogoLoader variant="inline" label="Loading slots overview..." />
+      {listError || error ? (
+        <div className="dashboard-error" role="alert">
+          {listError || error}
+          <button type="button" onClick={() => setReload((value) => value + 1)}>
+            Retry
+          </button>
+        </div>
+      ) : listLoading || (creatorId && loading) ? (
+        <LogoLoader variant="inline" label="Loading availability…" />
+      ) : !creator ? (
+        <div className="dashboard-empty">No influencers registered yet.</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* LEFT: DATE-SPECIFIC AVAILABLE VS BOOKED SLOTS INSPECTION */}
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="availability-layout">
+          <section
+            className="availability-schedule"
+            aria-label="Session calendar"
+          >
+            <header className="availability-calendar-heading">
               <div>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-brand-coral" />
-                  <span>
-                    Slots on {inspectDate} (
-                    {slotsOverview?.dateInspection?.dayName || 'Day'})
-                  </span>
+                <h3>
+                  {mode === 'week'
+                    ? `${dateLabel(week[0].date, { month: 'long', day: 'numeric' })} – ${dateLabel(week[6].date, { month: 'short', day: 'numeric', year: 'numeric' })}`
+                    : dateLabel(date, {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
                 </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Direct live view of Available Slots and Booked Slots.
-                </p>
+                <p>India Standard Time · UTC+05:30</p>
               </div>
-
-              <div className="flex items-center gap-2 text-xs">
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
-                  {slotsOverview?.dateInspection?.availableSlots?.length || 0}{' '}
-                  Available
-                </span>
-                <span className="px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 font-bold border border-rose-500/20">
-                  {slotsOverview?.dateInspection?.bookedSlots?.length || 0}{' '}
-                  Booked
-                </span>
-              </div>
-            </div>
-
-            {/* SECTION: AVAILABLE SLOTS */}
-            <div>
-              <h4 className="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4" />
-                <span>
-                  Available 1-Hour Slots (
-                  {slotsOverview?.dateInspection?.availableSlots?.length || 0})
-                </span>
-              </h4>
-
-              {slotsOverview?.dateInspection?.availableSlots?.length === 0 ? (
-                <div className="p-3 text-xs text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
-                  No available slots remaining for this date.
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {slotsOverview?.dateInspection?.availableSlots?.map((s) => (
-                    <div
-                      key={s.slotId}
-                      className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-medium text-center shadow-sm"
-                    >
-                      <div className="font-bold">{s.label}</div>
-                      <div className="text-[10px] text-emerald-400/80 mt-0.5 font-sans">
-                        Open for Booking
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* SECTION: BOOKED SLOTS */}
-            <div>
-              <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" />
-                <span>
-                  Already Booked Slots (
-                  {slotsOverview?.dateInspection?.bookedSlots?.length || 0})
-                </span>
-              </h4>
-
-              {slotsOverview?.dateInspection?.bookedSlots?.length === 0 ? (
-                <div className="p-3 text-xs text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
-                  No slots currently booked on this date.
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {slotsOverview?.dateInspection?.bookedSlots?.map((s) => (
-                    <div
-                      key={s.slotId}
-                      className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center justify-between gap-3"
-                    >
-                      <div>
-                        <div className="font-mono font-bold text-white text-xs">
-                          {s.label} ({s.slotId})
-                        </div>
-                        <div className="text-[11px] text-rose-300/80 mt-0.5">
-                          Booked by:{' '}
-                          <strong className="text-white">{s.bookedBy}</strong>
-                        </div>
-                        {s.topic && (
-                          <div className="text-[10px] text-slate-400 italic mt-0.5">
-                            "{s.topic}"
-                          </div>
-                        )}
-                      </div>
-
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/30 flex-shrink-0">
-                        Disabled in User Dropdown
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* RIGHT: WEEKLY 7-DAY SCHEDULE BREAKDOWN */}
-          <div className="p-6 rounded-3xl bg-slate-900 border border-slate-800 space-y-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2 pb-3 border-b border-slate-800">
-              <Clock className="w-5 h-5 text-brand-purple" />
-              <span>Weekly Day-Wise Generated Slot Blueprint</span>
-            </h3>
-
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-              {days.map((d) => {
-                const dayPlan = slotsOverview?.weeklySlotPlan?.[d];
-                const ranges = dayPlan?.ranges || [];
-                const genSlots = dayPlan?.generatedSlots || [];
-
-                return (
-                  <div
-                    key={d}
-                    className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800"
+              <div
+                className="availability-view-switch"
+                aria-label="Calendar view"
+              >
+                {['week', 'day'].map((view) => (
+                  <button
+                    type="button"
+                    key={view}
+                    aria-pressed={mode === view}
+                    onClick={() => {
+                      setMode(view);
+                      setSelection(null);
+                    }}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-white capitalize text-xs">
-                          {d}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {ranges.length === 0
-                            ? 'Unavailable'
-                            : `${ranges.map((r) => `${r.start} - ${r.end}`).join(', ')}`}
-                        </span>
-                      </div>
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                          genSlots.length > 0
-                            ? 'bg-indigo-500/20 text-indigo-300'
-                            : 'bg-slate-900 text-slate-500'
-                        }`}
-                      >
-                        {genSlots.length} slots
-                      </span>
-                    </div>
-
-                    {genSlots.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {genSlots.map((s) => (
-                          <span
-                            key={s.slotId}
-                            className="px-2 py-0.5 rounded bg-slate-900 text-slate-300 text-[10px] font-mono border border-slate-800"
-                          >
-                            {s.slotId}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                    {view === 'week' ? 'Week' : 'Day'}
+                  </button>
+                ))}
+              </div>
+            </header>
+            <div className="availability-date-nav">
+              <button
+                type="button"
+                aria-label={`Previous ${mode}`}
+                onClick={() =>
+                  changeDate(shiftCalendarDate(date, mode === 'week' ? -7 : -1))
+                }
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  changeDate(
+                    new Date(Date.now() + 19800000).toISOString().slice(0, 10),
+                  )
+                }
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                aria-label={`Next ${mode}`}
+                onClick={() =>
+                  changeDate(shiftCalendarDate(date, mode === 'week' ? 7 : 1))
+                }
+              >
+                <ChevronRight size={18} />
+              </button>
             </div>
-          </div>
+            <h4>
+              {dateLabel(detailDate, {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </h4>
+            <div className="availability-summary">
+              <span>{daySlots.length} total slots</span>
+              <span>{daySlots.length - bookedCount} available</span>
+              <span>{bookedCount} booked</span>
+            </div>
+            <div className="availability-grid-scroll">
+              <table
+                className={`availability-grid ${mode === 'day' ? 'is-day' : ''}`}
+              >
+                <caption className="sr-only">
+                  {mode} schedule in India Standard Time. Select a slot to
+                  inspect its details.
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">
+                      <span className="sr-only">Time</span>
+                    </th>
+                    {columns.map((day) => (
+                      <th scope="col" key={day.date}>
+                        <button
+                          type="button"
+                          aria-pressed={day.date === detailDate}
+                          onClick={() => changeDate(day.date)}
+                        >
+                          <span>
+                            {dateLabel(day.date, { weekday: 'short' })}
+                          </span>
+                          <strong>
+                            {dateLabel(day.date, { day: 'numeric' })}
+                          </strong>
+                        </button>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((minutes) => (
+                    <tr key={minutes}>
+                      <th scope="row">{timeLabel(minutes)}</th>
+                      {columns.map((day) => (
+                        <td key={day.date}>
+                          {day.slots
+                            .filter(
+                              (slot) =>
+                                calendarMinutes(slot.slotId) === minutes,
+                            )
+                            .map((slot) => (
+                              <button
+                                type="button"
+                                key={slot.slotId}
+                                className={`availability-slot ${slot.booking ? 'is-booked' : 'is-available'}`}
+                                aria-pressed={
+                                  selected?.date === slot.date &&
+                                  selected?.slotId === slot.slotId
+                                }
+                                aria-label={`${slot.booking ? 'Booked by ' + slot.booking.userName : 'Available'}: ${slot.label || slot.slotId}, ${slot.date} IST`}
+                                onClick={() =>
+                                  setSelection({
+                                    date: slot.date,
+                                    slotId: slot.slotId,
+                                  })
+                                }
+                              >
+                                {slot.booking
+                                  ? slot.booking.userName?.split(' ')[0] ||
+                                    'Booked'
+                                  : slot.slotId.split(' - ')[0]}
+                              </button>
+                            ))}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {!rows.length && (
+                <div className="availability-empty">
+                  <CalendarDays size={26} />
+                  <p>No slots scheduled for this {mode}.</p>
+                </div>
+              )}
+            </div>
+            <footer className="availability-legend">
+              <span>
+                <i className="available-dot" />
+                Available
+              </span>
+              <span>
+                <i className="booked-dot" />
+                Booked
+              </span>
+            </footer>
+          </section>
+          <aside
+            className="availability-details"
+            aria-label="Session details"
+            aria-live="polite"
+          >
+            <h3>Session details</h3>
+            {selected ? (
+              <>
+                <span
+                  className={`availability-state ${selected.booking ? 'is-booked' : 'is-available'}`}
+                >
+                  {selected.booking ? 'Booked' : 'Available'}
+                </span>
+                <h4>{selected.label || selected.slotId}</h4>
+                <p>
+                  {dateLabel(selected.date, {
+                    weekday: 'short',
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}{' '}
+                  · IST
+                </p>
+                {selected.booking ? (
+                  <>
+                    <dl>
+                      <dt>Client</dt>
+                      <dd>{selected.booking.userName}</dd>
+                      <dt>Topic</dt>
+                      <dd>
+                        {selected.booking.topic || 'General consultation'}
+                      </dd>
+                      <dt>Fee</dt>
+                      <dd>${selected.booking.price ?? 0}</dd>
+                      <dt>Meeting</dt>
+                      <dd>
+                        {selected.booking.meetingType === 'video'
+                          ? 'Video session'
+                          : 'In person'}
+                      </dd>
+                    </dl>
+                  </>
+                ) : (
+                  <p className="availability-open-note">
+                    This slot is available in the creator’s schedule.
+                  </p>
+                )}
+                <div className="availability-recurring">
+                  <span>
+                    <Clock size={14} />
+                    Recurring availability
+                  </span>
+                  <strong>{selected.day}</strong>
+                  {recurring.length ? (
+                    recurring.map((range, index) => (
+                      <p key={index}>
+                        {range.start} – {range.end} IST
+                      </p>
+                    ))
+                  ) : (
+                    <p>No recurring availability.</p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <p>Select a slot in the calendar to view its details.</p>
+            )}
+          </aside>
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
@@ -47,6 +48,11 @@ export default function BookingsView() {
   });
 
   const totalRevenue = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
+
+  const bookingPagination = usePagination(
+    filtered,
+    `${statusFilter}:${searchTerm}`,
+  );
 
   return (
     <div className="space-y-6">
@@ -116,75 +122,67 @@ export default function BookingsView() {
           No bookings found.
         </div>
       ) : (
-        <div className="space-y-3">
-          {filtered.map((b) => (
-            <div
-              key={b.id}
-              className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
-            >
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-purple text-white flex items-center justify-center font-bold text-base flex-shrink-0">
-                  <Clock className="w-6 h-6" />
-                </div>
-
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs text-slate-400">Client:</span>
-                    <strong className="text-white text-sm">{b.userName}</strong>
-                    <span className="text-xs text-slate-500">
-                      ({b.userEmail})
-                    </span>
-                    <span className="text-slate-600">→</span>
-                    <span className="text-xs text-slate-400">Creator:</span>
-                    <strong className="text-brand-purple text-sm">
-                      {b.influencerName}
-                    </strong>
-
-                    <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      {b.status}
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-slate-300 font-medium mt-1">
-                    Topic: <span className="text-slate-100">{b.topic}</span>
-                  </p>
-
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-2">
-                    <span>
-                      Date: <strong className="text-white">{b.date}</strong> (
-                      {b.dayOfWeek})
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Time Slot:{' '}
-                      <strong className="text-indigo-300 font-mono">
-                        {b.slotLabel || b.slot}
-                      </strong>
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Meeting:{' '}
-                      <strong className="text-slate-200 capitalize">
-                        {b.meetingType}
-                      </strong>
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Fee:{' '}
-                      <strong className="text-emerald-400 font-bold">
-                        ${b.price}
-                      </strong>
-                    </span>
-                    <span>•</span>
-                    <span>
-                      Booking ID:{' '}
-                      <code className="text-slate-500 text-[11px]">{b.id}</code>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="record-list">
+          <div className="admin-records-table-wrap">
+            <table className="dashboard-table admin-records-table">
+              <caption className="sr-only">Booked sessions</caption>
+              <thead>
+                <tr>
+                  {[
+                    'Sr. No.',
+                    'Booking',
+                    'Client',
+                    'Creator',
+                    'Topic',
+                    'Date',
+                    'Time (IST)',
+                    'Meeting',
+                    'Status',
+                    'Fee',
+                  ].map((label) => (
+                    <th scope="col" key={label}>
+                      {label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {bookingPagination.items.map((b, index) => (
+                  <tr key={b.id}>
+                    <td className="record-serial-cell">
+                      {bookingPagination.start + index}
+                    </td>
+                    <td>
+                      <code className="record-id" title={b.id}>
+                        {b.id}
+                      </code>
+                    </td>
+                    <td>
+                      <strong>{b.userName}</strong>
+                      <small>{b.userEmail}</small>
+                    </td>
+                    <td>{b.influencerName}</td>
+                    <td className="record-description">{b.topic || '—'}</td>
+                    <td>
+                      {b.date}
+                      <small className="capitalize">{b.dayOfWeek}</small>
+                    </td>
+                    <td className="whitespace-nowrap">
+                      {b.slotLabel || b.slot}
+                    </td>
+                    <td className="capitalize">{b.meetingType}</td>
+                    <td>
+                      <span className={`booking-status ${b.status}`}>
+                        {b.status}
+                      </span>
+                    </td>
+                    <td>${b.price ?? 0}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination pagination={bookingPagination} label="bookings" />
         </div>
       )}
     </div>

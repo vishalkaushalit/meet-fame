@@ -1,3 +1,7 @@
+import {
+  registrationErrors,
+  certificateError,
+} from '../../../shared/registrationValidation.js';
 import express from 'express';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import bcrypt from 'bcryptjs';
@@ -32,6 +36,10 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    const issue = certificateError({ ...file, size: 0 });
+    cb(issue ? new Error(issue) : null, !issue);
+  },
 });
 
 // Helper to sign JWT
@@ -45,7 +53,17 @@ function generateToken(payload) {
  */
 router.post(
   '/register-influencer',
-  upload.single('certificateFile'),
+  (req, res, next) =>
+    upload.single('certificateFile')(req, res, (error) => {
+      if (!error) return next();
+      const issue =
+        error.code === 'LIMIT_FILE_SIZE'
+          ? 'Certificate must be 10 MB or smaller.'
+          : 'Upload a PDF, PNG, or JPG certificate.';
+      return res
+        .status(400)
+        .json({ error: issue, fields: { certificateFile: issue } });
+    }),
   async (req, res) => {
     try {
       const {
@@ -61,15 +79,18 @@ router.post(
         availability,
       } = req.body;
 
-      if (!name || !email || !password || !phone) {
+      const fields = registrationErrors(
+        { ...req.body, certificateFile: req.file },
+        'influencer',
+      );
+      if (Object.keys(fields).length)
         return res
           .status(400)
-          .json({ error: 'Name, email, phone, and password are required' });
-      }
+          .json({ error: Object.values(fields)[0], fields });
 
       const data = db.read();
       const existing = data.influencers.find(
-        (i) => i.email.toLowerCase() === email.toLowerCase(),
+        (i) => i.email.trim().toLowerCase() === email.trim().toLowerCase(),
       );
       if (existing) {
         return res
@@ -106,9 +127,9 @@ router.post(
       const salt = bcrypt.genSaltSync(10);
       const newInfluencer = {
         id: `inf_${Date.now()}`,
-        name,
-        email: email.toLowerCase(),
-        phone,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
         password: bcrypt.hashSync(password, salt),
         role: 'influencer',
         specialization: specialization || 'Content Creator & Expert',
@@ -157,15 +178,13 @@ router.post(
 router.post('/register-user', (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
-    if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ error: 'Name, email, and password are required' });
-    }
+    const fields = registrationErrors(req.body, 'user');
+    if (Object.keys(fields).length)
+      return res.status(400).json({ error: Object.values(fields)[0], fields });
 
     const data = db.read();
     const existing = data.users.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase(),
+      (u) => u.email.trim().toLowerCase() === email.trim().toLowerCase(),
     );
     if (existing) {
       return res
@@ -176,9 +195,9 @@ router.post('/register-user', (req, res) => {
     const salt = bcrypt.genSaltSync(10);
     const newUser = {
       id: `usr_${Date.now()}`,
-      name,
-      email: email.toLowerCase(),
-      phone: phone || '',
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      phone: phone?.trim() || '',
       password: bcrypt.hashSync(password, salt),
       role: 'user',
       status: 'approved', // Active user
@@ -229,7 +248,7 @@ router.post('/register-admin', (req, res) => {
 
     const data = db.read();
     const existing = data.admins.find(
-      (a) => a.email.toLowerCase() === email.toLowerCase(),
+      (a) => a.email.trim().toLowerCase() === email.trim().toLowerCase(),
     );
     if (existing) {
       return res.status(400).json({ error: 'Admin already exists' });
@@ -239,7 +258,7 @@ router.post('/register-admin', (req, res) => {
     const newAdmin = {
       id: `adm_${Date.now()}`,
       name,
-      email: email.toLowerCase(),
+      email: email.trim().toLowerCase(),
       phone: phone || '',
       password: bcrypt.hashSync(password, salt),
       role: 'admin',
@@ -285,7 +304,7 @@ router.post('/login', (req, res) => {
     // Check Influencer Login
     if (targetRole === 'influencer') {
       const influencer = data.influencers.find(
-        (i) => i.email.toLowerCase() === email.toLowerCase(),
+        (i) => i.email.trim().toLowerCase() === email.trim().toLowerCase(),
       );
       if (!influencer) {
         return res
@@ -350,7 +369,7 @@ router.post('/login', (req, res) => {
     // Check User Login
     if (targetRole === 'user') {
       const user = data.users.find(
-        (u) => u.email.toLowerCase() === email.toLowerCase(),
+        (u) => u.email.trim().toLowerCase() === email.trim().toLowerCase(),
       );
       if (!user) {
         return res
@@ -403,7 +422,7 @@ router.post('/login', (req, res) => {
     // Check Admin Login
     if (targetRole === 'admin') {
       const admin = data.admins.find(
-        (a) => a.email.toLowerCase() === email.toLowerCase(),
+        (a) => a.email.trim().toLowerCase() === email.trim().toLowerCase(),
       );
       if (!admin) {
         return res.status(401).json({ error: 'Admin credentials not found' });

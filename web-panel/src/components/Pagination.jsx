@@ -1,0 +1,56 @@
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { paginate, paginationNumbers } from '../../../shared/pagination';
+export function usePagination(items, resetKey = '') {
+  const [state, setState] = useState({ key: resetKey, page: 1 });
+  const result = paginate(items, state.key === resetKey ? state.page : 1);
+  return { ...result, setPage: (page) => setState({ key: resetKey, page }) };
+}
+export default function Pagination({ pagination, label = 'records' }) {
+  const { page, pages, total, start, end, setPage } = pagination;
+  if (total === 0) return null;
+  return (
+    <nav className="record-pagination" aria-label={`${label} pagination`}>
+      <span role="status">
+        {start}–{end} of {total} {label}
+      </span>
+      <div>
+        <button
+          type="button"
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          aria-label={`Previous page of ${label}`}
+        >
+          <ChevronLeft size={15} />
+          Previous
+        </button>
+        {paginationNumbers(page, pages).map((number) =>
+          typeof number === 'number' ? (
+            <button
+              key={number}
+              type="button"
+              aria-label={`Page ${number} of ${label}`}
+              aria-current={page === number ? 'page' : undefined}
+              onClick={() => setPage(number)}
+            >
+              {number}
+            </button>
+          ) : (
+            <span key={number} aria-hidden="true">
+              …
+            </span>
+          ),
+        )}
+        <button
+          type="button"
+          disabled={page === pages}
+          onClick={() => setPage(page + 1)}
+          aria-label={`Next page of ${label}`}
+        >
+          Next
+          <ChevronRight size={15} />
+        </button>
+      </div>
+    </nav>
+  );
+}

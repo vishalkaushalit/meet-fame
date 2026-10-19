@@ -1,0 +1,478 @@
+.creator-dashboard {
+  max-width: 1500px;
+  padding-top: 34px;
+  padding-bottom: 40px;
+  --creator-line: #334155;
+  --creator-surface: #111827;
+  --creator-muted: #94a3b8;
+  --creator-text: #f1f5f9;
+  --creator-accent: #a78bfa;
+  --creator-soft: #231e3a;
+  color: var(--creator-text);
+}
+.creator-summary {
+  border-radius: 18px;
+  margin-bottom: 20px;
+  padding: 28px 32px;
+  border-color: var(--creator-line);
+  background: linear-gradient(115deg, #111827 45%, #201c38);
+  box-shadow: 0 8px 32px #0001;
+}
+.creator-summary-content {
+  gap: 28px;
+}
+.creator-avatar {
+  width: 104px;
+  height: 104px;
+  border-radius: 20px;
+}
+.creator-name {
+  flex-wrap: wrap;
+}
+.creator-name h1 {
+  font-size: 25px;
+  font-weight: 700;
+}
+.creator-metrics {
+  align-self: stretch;
+  flex-shrink: 0;
+}
+.creator-metrics > div {
+  min-width: 145px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  background: var(--creator-surface);
+  border-color: var(--creator-line);
+}
+.creator-metrics > div > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--creator-muted);
+}
+.creator-metrics svg {
+  color: var(--creator-accent);
+}
+.creator-metrics > div > div {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.creator-tabs {
+  background: var(--creator-surface);
+  border: 1px solid var(--creator-line);
+  border-radius: 16px;
+  padding: 6px;
+  margin-bottom: 24px;
+  gap: 14px;
+  min-height: 62px;
+}
+.creator-tabs > button {
+  padding: 14px 28px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 12px;
+  flex-shrink: 0;
+  color: var(--creator-muted);
+}
+.creator-tabs > button[aria-selected='true'] {
+  background: linear-gradient(100deg, #9565f5, #6535f5);
+  color: white;
+  box-shadow: 0 4px 12px #7c3aed26;
+}
+.creator-tabs > button > svg {
+  width: 21px;
+  height: 21px;
+}
+.creator-tabs > button:focus-visible {
+  outline: 2px solid var(--creator-accent);
+  outline-offset: -2px;
+}
+.creator-appointments {
+  border-radius: 18px;
+  background: var(--creator-surface);
+  border-color: var(--creator-line);
+  box-shadow: 0 12px 36px #00000008;
+  padding: 28px 24px;
+}
+.creator-appointments h3 {
+  font-size: 22px;
+  font-weight: 600;
+}
+.creator-appointments h3 > svg {
+  width: 28px;
+  height: 28px;
+}
+.creator-appointments > div > div > p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.creator-appointment {
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 1.05fr) minmax(260px, 1.6fr) minmax(115px, 0.6fr)
+    auto;
+  gap: 24px;
+  align-items: center;
+  border: 1px solid var(--creator-line);
+  border-radius: 14px;
+  padding: 22px;
+  background: var(--creator-surface);
+}
+.creator-client {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-right: 1px solid var(--creator-line);
+  padding-right: 22px;
+  min-height: 80px;
+  min-width: 0;
+}
+.creator-client-avatar {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--creator-soft);
+  color: var(--creator-accent);
+  font-size: 23px;
+  flex-shrink: 0;
+}
+.creator-client h4 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.creator-client p {
+  font-size: 11px;
+  color: var(--creator-muted);
+  margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.creator-topic {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.creator-topic > svg {
+  color: var(--creator-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.creator-topic span,
+.creator-fee span {
+  display: block;
+  color: var(--creator-muted);
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+.creator-topic strong {
+  font-size: 12px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.creator-session-time {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 14px;
+  color: var(--creator-muted);
+  font-size: 11px;
+}
+.creator-session-time > span {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.creator-session-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.creator-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 99px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #6ee7b7;
+  background: #064e3b66;
+  border: 1px solid #10b98144;
+}
+.creator-status-cancelled,
+.creator-status-blocked,
+.creator-status-rejected {
+  color: #fda4af;
+  background: #88133744;
+  border-color: #f43f5e44;
+}
+.creator-status-completed {
+  color: #93c5fd;
+  background: #1e3a8a44;
+  border-color: #3b82f644;
+}
+.creator-status-pending_review {
+  color: #fcd34d;
+  background: #78350f44;
+  border-color: #f59e0b44;
+}
+.creator-fee {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--creator-muted);
+}
+.creator-fee strong {
+  color: #34d399;
+  font-size: 15px;
+  font-weight: 600;
+}
+.creator-session-actions {
+  border-left: 1px solid var(--creator-line);
+  padding-left: 24px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.creator-session-actions button {
+  min-height: 42px;
+  font-size: 11px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.creator-session-actions button:first-child:not(.creator-chat-button) {
+  background: linear-gradient(100deg, #9565f5, #6535f5);
+  color: white;
+}
+.creator-chat-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #a78bfa;
+  color: var(--creator-accent);
+  background: transparent;
+  font-weight: 600;
+}
+.creator-session-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  margin-top: 14px;
+  border-radius: 12px;
+  background: var(--creator-soft);
+  color: var(--creator-accent);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.creator-session-note svg {
+  flex-shrink: 0;
+}
+html[data-theme='light'] .creator-dashboard {
+  --creator-line: #dce3ff;
+  --creator-surface: #fff;
+  --creator-muted: #596c94;
+  --creator-text: #101b40;
+  --creator-accent: #6d28d9;
+  --creator-soft: #f1edff;
+  background: radial-gradient(ellipse at 70% 0, #f1eeff66, transparent 65%);
+}
+html[data-theme='light'] .creator-dashboard .creator-summary {
+  background: linear-gradient(110deg, #fff 45%, #eeeaff);
+  border-color: var(--creator-line);
+}
+html[data-theme='light'] .creator-dashboard .creator-metrics > div {
+  background: #ffffffdc;
+  border-color: #d4dafe;
+  box-shadow: 0 6px 18px #6359c508;
+}
+html[data-theme='light'] .creator-dashboard .creator-appointments,
+html[data-theme='light'] .creator-dashboard .creator-appointment {
+  background: #fff;
+  border-color: var(--creator-line);
+}
+html[data-theme='light']
+  .creator-dashboard
+  .creator-tabs
+  > button[aria-selected='true'] {
+  background: linear-gradient(100deg, #9565f5, #6535f5);
+  color: #fff;
+}
+html[data-theme='light'] .creator-status {
+  color: #047857;
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+html[data-theme='light'] .creator-status-cancelled,
+html[data-theme='light'] .creator-status-blocked,
+html[data-theme='light'] .creator-status-rejected {
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+html[data-theme='light'] .creator-status-completed {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+html[data-theme='light'] .creator-status-pending_review {
+  color: #854d0e;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+html[data-theme='light'] .creator-fee strong {
+  color: #047857;
+}
+@media (max-width: 1280px) {
+  .creator-metrics > div {
+    min-width: 110px;
+    padding: 16px 12px;
+  }
+  .creator-appointment {
+    grid-template-columns: minmax(180px, 1fr) minmax(240px, 1.5fr) 120px;
+    gap: 18px;
+  }
+  .creator-session-actions {
+    grid-column: 1/-1;
+    border-left: 0;
+    border-top: 1px solid var(--creator-line);
+    padding: 16px 0 0;
+    min-height: 0;
+  }
+  .creator-summary-content {
+    flex-wrap: wrap;
+  }
+  .creator-tabs > button {
+    padding-inline: 20px;
+  }
+}
+@media (max-width: 767px) {
+  .creator-dashboard {
+    padding-top: 20px;
+  }
+  .creator-summary {
+    padding: 22px 18px;
+  }
+  .creator-avatar {
+    width: 76px;
+    height: 76px;
+  }
+  .creator-name h1 {
+    font-size: 21px;
+  }
+  .creator-metrics {
+    width: 100%;
+    gap: 8px;
+  }
+  .creator-metrics > div {
+    min-width: 0;
+    flex: 1;
+    padding: 14px 8px;
+  }
+  .creator-metrics > div > span {
+    font-size: 9px;
+    gap: 5px;
+  }
+  .creator-metrics > div > div {
+    font-size: 24px;
+  }
+  .creator-tabs {
+    gap: 4px;
+  }
+  .creator-tabs > button {
+    font-size: 11px;
+    padding: 12px;
+  }
+  .creator-appointments {
+    padding: 22px 16px;
+  }
+  .creator-appointments h3 {
+    font-size: 18px;
+  }
+  .creator-appointment {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+  .creator-client {
+    border-right: 0;
+    border-bottom: 1px solid var(--creator-line);
+    padding: 0 0 14px;
+    min-height: 0;
+  }
+  .creator-session-meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .creator-session-actions {
+    grid-column: auto;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding-top: 14px;
+  }
+  .creator-session-actions > button {
+    flex: 1;
+  }
+  .creator-session-note {
+    padding: 12px;
+    font-size: 10px;
+  }
+}
+
+.creator-site-header > div {
+  max-width: 1500px;
+}
+html[data-theme='light'] .creator-site-header {
+  background: #ffffffed;
+  border-color: #dce3ff;
+}
+html[data-theme='light'] .creator-site-header .uppercase {
+  background: #f1edff;
+  color: #5b21b6;
+  border-color: #e4dcff;
+  font-size: 10px;
+  letter-spacing: 0;
+  padding: 8px 16px;
+}
+
+.user-bookings {
+  --creator-line: #334155;
+  --creator-surface: #111827;
+  --creator-muted: #94a3b8;
+  --creator-text: #f1f5f9;
+  --creator-accent: #a78bfa;
+  --creator-soft: #231e3a;
+  color: var(--creator-text);
+}
+html[data-theme='light'] .user-bookings {
+  --creator-line: #dce3ff;
+  --creator-surface: #fff;
+  --creator-muted: #596c94;
+  --creator-text: #101b40;
+  --creator-accent: #6d28d9;
+  --creator-soft: #f1edff;
+  background: #fff;
+  border-color: var(--creator-line);
+}
+html[data-theme='light'] .user-bookings .creator-appointment {
+  background: #fff;
+  border-color: var(--creator-line);
+}

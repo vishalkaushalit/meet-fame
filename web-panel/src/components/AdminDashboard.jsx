@@ -1,3 +1,4 @@
+import { adminPath, navigateAdmin } from '../routes';
 import ThemeToggle from './ThemeToggle';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
@@ -86,8 +87,12 @@ const initials = (name) =>
     .join('')
     .toUpperCase();
 
-export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
-  const [activeTab, setActiveTab] = useState('overview');
+export default function AdminDashboard({
+  admin,
+  onLogout,
+  onProfileUpdated,
+  activeTab = 'overview',
+}) {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
@@ -149,7 +154,8 @@ export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
   }, [activeTab, load]);
 
   const navigate = (id) => {
-    setActiveTab(id);
+    navigateAdmin(id);
+    setProfileMenuOpen(false);
     setMobileOpen(false);
   };
   const current = navigation.find((item) => item.id === activeTab);
@@ -241,16 +247,28 @@ export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
           <p className="nav-caption">WORKSPACE</p>
           <nav aria-label="Dashboard navigation">
             {navigation.map((item) => (
-              <button
+              <a
                 key={item.id}
-                onClick={() => navigate(item.id)}
+                href={adminPath(item.id)}
+                onClick={(event) => {
+                  if (
+                    event.button !== 0 ||
+                    event.metaKey ||
+                    event.ctrlKey ||
+                    event.shiftKey ||
+                    event.altKey
+                  )
+                    return;
+                  event.preventDefault();
+                  navigate(item.id);
+                }}
                 className={`nav-item ${activeTab === item.id ? 'selected' : ''}`}
                 aria-current={activeTab === item.id ? 'page' : undefined}
               >
                 <item.icon size={19} />
                 <span>{item.label}</span>
                 {item.id === 'approvals' && pending > 0 && <b>{pending}</b>}
-              </button>
+              </a>
             ))}
           </nav>
           <div className="sidebar-bottom">
@@ -308,93 +326,99 @@ export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
             <span>/</span>
             <strong>{current.label}</strong>
           </div>
-          <ThemeToggle />
-          <div
-            className="admin-profile-menu"
-            ref={profileMenu}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget))
-                setProfileMenuOpen(false);
-            }}
-          >
-            <button
-              type="button"
-              ref={profileTrigger}
-              className="admin-profile profile-menu-trigger"
-              aria-label="Admin account options"
-              aria-expanded={profileMenuOpen}
-              aria-controls="admin-profile-options"
-              onClick={() => setProfileMenuOpen((open) => !open)}
+          <div className="dashboard-header-actions">
+            <ThemeToggle />
+            <div
+              className="admin-profile-menu"
+              ref={profileMenu}
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget))
+                  setProfileMenuOpen(false);
+              }}
             >
-              <span className="profile-avatar">{initials(admin?.name)}</span>
-              <div>
-                <strong>{admin?.name || 'Administrator'}</strong>
-                <small>Super admin</small>
-              </div>
-              <ChevronDown size={15} aria-hidden="true" />
-            </button>
-            {profileMenuOpen && (
-              <div
-                id="admin-profile-options"
-                className="profile-dropdown"
+              <button
+                type="button"
+                ref={profileTrigger}
+                className="admin-profile profile-menu-trigger"
                 aria-label="Admin account options"
+                aria-expanded={profileMenuOpen}
+                aria-controls="admin-profile-options"
+                onClick={() => setProfileMenuOpen((open) => !open)}
               >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileMenuOpen(false);
-                    setProfileOpen(true);
-                  }}
+                <span className="profile-avatar">{initials(admin?.name)}</span>
+                <div>
+                  <strong>{admin?.name || 'Administrator'}</strong>
+                  <small>Super admin</small>
+                </div>
+                <ChevronDown size={15} aria-hidden="true" />
+              </button>
+              {profileMenuOpen && (
+                <div
+                  id="admin-profile-options"
+                  className="profile-dropdown"
+                  aria-label="Admin account options"
                 >
-                  <UserRound size={16} aria-hidden="true" />
-                  Profile
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProfileMenuOpen(false);
-                    setEditProfileOpen(true);
-                  }}
-                >
-                  <Pencil size={16} aria-hidden="true" />
-                  Edit profile
-                </button>
-                <button
-                  type="button"
-                  className="profile-logout"
-                  onClick={() => {
-                    setProfileMenuOpen(false);
-                    onLogout();
-                  }}
-                >
-                  <LogOut size={16} aria-hidden="true" />
-                  Sign out
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setProfileOpen(true);
+                    }}
+                  >
+                    <UserRound size={16} aria-hidden="true" />
+                    Profile
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setEditProfileOpen(true);
+                    }}
+                  >
+                    <Pencil size={16} aria-hidden="true" />
+                    Edit profile
+                  </button>
+                  <button
+                    type="button"
+                    className="profile-logout"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      onLogout();
+                    }}
+                  >
+                    <LogOut size={16} aria-hidden="true" />
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
         <main className="dashboard-main">
-          <div className="dashboard-page-heading">
-            <div>
-              <p className="eyebrow">MEETFAME ADMIN</p>
-              <h1>
-                {activeTab === 'overview' ? 'Platform overview' : current.label}
-              </h1>
-              <p>{current.description}</p>
+          {activeTab !== 'slots' && (
+            <div className="dashboard-page-heading">
+              <div>
+                <p className="eyebrow">MEETFAME ADMIN</p>
+                <h1>
+                  {activeTab === 'overview'
+                    ? 'Platform overview'
+                    : current.label}
+                </h1>
+                <p>{current.description}</p>
+              </div>
+              <button
+                className="dashboard-button"
+                onClick={load}
+                disabled={refreshing}
+              >
+                <RefreshCw
+                  size={15}
+                  className={refreshing ? 'refresh-spinning' : ''}
+                />
+                {refreshing ? 'Refreshing…' : 'Refresh data'}
+              </button>
             </div>
-            <button
-              className="dashboard-button"
-              onClick={load}
-              disabled={refreshing}
-            >
-              <RefreshCw
-                size={15}
-                className={refreshing ? 'refresh-spinning' : ''}
-              />
-              {refreshing ? 'Refreshing…' : 'Refresh data'}
-            </button>
-          </div>
+          )}
           {profileNotice && (
             <p role="status" className="mb-4 text-xs text-emerald-400">
               {profileNotice}
@@ -616,7 +640,9 @@ export default function AdminDashboard({ admin, onLogout, onProfileUpdated }) {
               </div>
             </>
           ) : (
-            <div className="dashboard-detail">
+            <div
+              className={`dashboard-detail ${activeTab === 'slots' ? 'dashboard-detail-no-heading' : ''}`}
+            >
               {activeTab === 'announcements' && <AnnouncementsView />}
               {activeTab === 'approvals' && <ApprovalsView />}
               {activeTab === 'slots' && <SlotsInspectorView />}

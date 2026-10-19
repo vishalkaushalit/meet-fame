@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 
 export default function LandingPage({
-  onOpenAuth,
   onBookInfluencer,
   onOpenChat,
   featuredInfluencers = [],
@@ -59,19 +58,19 @@ export default function LandingPage({
           {/* Auth Actions */}
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <button
-              onClick={() => onOpenAuth('user', 'login')}
-              className="py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"
+            <a
+              href="/login"
+              className="website-sign-in py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"
             >
               Sign In
-            </button>
+            </a>
 
-            <button
-              onClick={() => onOpenAuth('influencer', 'register')}
+            <a
+              href="/influencer/signup"
               className="py-2.5 px-5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
             >
               Join as Influencer
-            </button>
+            </a>
           </div>
         </div>
       </header>
@@ -108,21 +107,21 @@ export default function LandingPage({
 
           {/* Hero CTAs */}
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button
-              onClick={() => onOpenAuth('user', 'register')}
+            <a
+              href="/signup"
               className="w-full sm:w-auto py-3.5 px-8 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2"
             >
               <span>Explore Verified Influencers</span>
               <ArrowRight className="w-4 h-4" />
-            </button>
+            </a>
 
-            <button
-              onClick={() => onOpenAuth('influencer', 'register')}
+            <a
+              href="/influencer/signup"
               className="w-full sm:w-auto py-3.5 px-8 rounded-2xl font-bold text-sm text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 transition-all flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-brand-coral" />
               <span>Register as Influencer</span>
-            </button>
+            </a>
           </div>
 
           {/* 4 Brand Pillars (From the Logo Design Document!) */}
@@ -196,12 +195,12 @@ export default function LandingPage({
               </p>
             </div>
 
-            <button
-              onClick={() => onOpenAuth('user', 'login')}
+            <a
+              href="/login"
               className="mt-4 md:mt-0 text-xs font-bold text-brand-purple hover:text-brand-pink flex items-center gap-1 transition-colors"
             >
               <span>View all creators &rarr;</span>
-            </button>
+            </a>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

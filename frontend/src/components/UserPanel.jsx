@@ -1,3 +1,5 @@
+import Pagination, { usePagination } from './Pagination';
+import './creator-dashboard.css';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -15,6 +17,7 @@ import {
   ArrowRight,
   CheckCircle,
   Video,
+  Info,
 } from 'lucide-react';
 
 export default function UserPanel({
@@ -96,6 +99,12 @@ export default function UserPanel({
       window.removeEventListener('focus', refresh);
     };
   }, [user?.id, activeTab]);
+
+  const bookingPagination = usePagination(myBookings);
+  const creatorPagination = usePagination(
+    influencers,
+    `${selectedCategory}:${searchQuery}`,
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
@@ -207,12 +216,15 @@ export default function UserPanel({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {influencers.map((inf) => (
+              {creatorPagination.items.map((inf, index) => (
                 <div
                   key={inf.id}
                   className="rounded-3xl bg-slate-900 border border-slate-800 hover:border-brand-purple/40 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 group"
                 >
                   <div>
+                    <span className="record-serial">
+                      Sr. No. {creatorPagination.start + index}
+                    </span>
                     {/* Header: Avatar, Name, Verified Badge, Category */}
                     <div className="flex items-start gap-4 mb-4">
                       <div className="relative flex-shrink-0">
@@ -280,35 +292,30 @@ export default function UserPanel({
                       className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-1.5"
                     >
                       <Clock className="w-3.5 h-3.5" />
-                      <span>Book 1-Hour Slot</span>
-                    </button>
-
-                    <button
-                      onClick={() => onOpenChat(inf, 'influencer')}
-                      className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors border border-slate-700"
-                      title="Chat with Influencer"
-                    >
-                      <MessageSquare className="w-4 h-4" />
+                      <span>Book Slot</span>
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           )}
+          {!loading && (
+            <Pagination pagination={creatorPagination} label="influencers" />
+          )}
         </div>
       )}
 
       {/* TAB 2: MY BOOKINGS */}
       {activeTab === 'my-bookings' && (
-        <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
+        <div className="user-bookings creator-appointments p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-purple" />
-                <span>My Booked Consultations</span>
+                <span>My Bookings</span>
               </h3>
               <p className="text-slate-400 text-xs mt-1">
-                Your upcoming and confirmed 1-hour sessions with influencers.
+                Manage your sessions and connect with your influencers.
               </p>
             </div>
           </div>
@@ -339,73 +346,92 @@ export default function UserPanel({
             </div>
           ) : (
             <div className="space-y-3">
-              {myBookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="p-4 md:p-5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-brand-indigo to-brand-purple text-white flex items-center justify-center font-bold text-base flex-shrink-0">
-                      <Clock className="w-6 h-6" />
-                    </div>
-
+              {bookingPagination.items.map((b, index) => (
+                <article key={b.id} className="creator-appointment">
+                  <div className="creator-client">
+                    <span
+                      className="record-serial"
+                      aria-label={`Serial number ${bookingPagination.start + index}`}
+                    >
+                      Sr. No. {bookingPagination.start + index}
+                    </span>
+                    <span className="creator-client-avatar" aria-hidden="true">
+                      {b.influencerName?.charAt(0) || 'I'}
+                    </span>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm">
-                          {b.influencerName}
-                        </h4>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          {b.status}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-300 font-medium mt-1">
-                        Topic: <span className="text-white">{b.topic}</span>
+                      <h4>{b.influencerName}</h4>
+                      <p>
+                        Influencer ·{' '}
+                        {b.meetingType === 'video'
+                          ? 'Video session'
+                          : 'In-person session'}
                       </p>
-                      <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                        <span>
-                          Date: <strong className="text-white">{b.date}</strong>{' '}
-                          ({b.dayOfWeek})
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Time Slot:{' '}
-                          <strong className="text-brand-purple font-mono">
-                            {b.slotLabel || b.slot}
-                          </strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Type:{' '}
-                          <strong className="text-indigo-400 uppercase">
-                            {b.meetingType}
-                          </strong>
-                        </span>
+                    </div>
+                  </div>
+                  <div className="creator-session-info">
+                    <div className="creator-topic">
+                      <MessageSquare size={17} aria-hidden="true" />
+                      <div>
+                        <span>Topic</span>
+                        <strong>{b.topic || '1-on-1 session'}</strong>
+                      </div>
+                    </div>
+                    <div className="creator-session-time">
+                      <span>
+                        <Calendar size={16} aria-hidden="true" />
+                        {b.date}{' '}
+                        <span className="capitalize">({b.dayOfWeek})</span>
+                      </span>
+                      <span>
+                        <Clock size={16} aria-hidden="true" />
+                        {b.slotLabel || b.slot} <small>IST</small>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="creator-session-meta">
+                    <span
+                      className={`creator-status creator-status-${b.status}`}
+                    >
+                      <CheckCircle size={13} aria-hidden="true" />
+                      {b.status}
+                    </span>
+                    <div className="creator-fee">
+                      <DollarSign size={16} aria-hidden="true" />
+                      <div>
+                        <span>Fee</span>
+                        <strong>${b.price ?? 0}</strong>
                       </div>
                     </div>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+                  <div className="creator-session-actions">
                     {b.status === 'confirmed' && b.meetingType === 'video' && (
                       <JoinCallButton booking={b} onJoinCall={onJoinCall} />
                     )}
                     <button
+                      className="creator-chat-button"
                       onClick={() =>
-                        onOpenChat &&
-                        onOpenChat(
+                        onOpenChat?.(
                           { id: b.influencerId, name: b.influencerName },
                           'influencer',
                         )
                       }
-                      className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 transition-colors"
                     >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      <span>Chat with {b.influencerName}</span>
+                      <MessageSquare size={17} aria-hidden="true" />
+                      Chat with Influencer
                     </button>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}
+          {!loadingBookings && (
+            <Pagination pagination={bookingPagination} label="bookings" />
+          )}
+          <p className="creator-session-note">
+            <Info size={18} aria-hidden="true" />
+            You can join the meeting at the scheduled time or chat with the
+            influencer for any updates.
+          </p>
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
@@ -166,6 +167,9 @@ export default function ApprovalsView() {
     }
   };
 
+  const creatorPagination = usePagination(influencers, statusFilter);
+  const userPagination = usePagination(users, statusFilter);
+
   return (
     <div className="space-y-6">
       {/* View Header */}
@@ -255,225 +259,234 @@ export default function ApprovalsView() {
             No influencers match the "{statusFilter}" filter.
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {influencers.map((inf) => {
-              const isPending = inf.status === 'pending_review';
-              const isApproved = inf.status === 'approved';
-              const isRejected = inf.status === 'rejected';
-
-              return (
-                <div
-                  key={inf.id}
-                  className="p-5 md:p-6 rounded-3xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
-                >
-                  {/* Left: Info */}
-                  <div className="flex items-start gap-4">
-                    <img
-                      src={
-                        inf.avatar ||
-                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
-                      }
-                      alt={inf.name}
-                      className="w-16 h-16 rounded-2xl object-cover ring-2 ring-slate-800 flex-shrink-0"
-                    />
-
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-white text-base">
-                          {inf.name}
-                        </h3>
-                        {inf.isVerified && <VerifiedBadge size="sm" />}
-
-                        {/* Status Badge */}
-                        <span
-                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            isApproved
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                              : isPending
-                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse'
-                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                          }`}
-                        >
-                          {inf.status?.replace('_', ' ')}
-                        </span>
-                      </div>
-
-                      <p className="text-brand-purple text-xs font-semibold mt-0.5">
-                        {inf.specialization}
-                      </p>
-
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mt-1.5">
-                        <span>
-                          Email:{' '}
-                          <strong className="text-white">{inf.email}</strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Phone:{' '}
-                          <strong className="text-white">{inf.phone}</strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Category:{' '}
-                          <strong className="text-indigo-300">
-                            {inf.category}
-                          </strong>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          Fee:{' '}
-                          <strong className="text-emerald-400">
-                            ${inf.hourlyRate}/hr
-                          </strong>
-                        </span>
-                      </div>
-
-                      {inf.status === 'blocked' && (
-                        <p className="text-xs text-rose-300 mt-2 whitespace-pre-wrap break-words">
-                          Blocking remark:{' '}
-                          {inf.statusReason || 'No remark recorded'}
-                        </p>
-                      )}
-                      {/* Certification Section */}
-                      {inf.certification && (
-                        <div className="mt-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs">
-                          <div className="flex items-center gap-2">
-                            <FileCheck className="w-4 h-4 text-[#0095F6]" />
-                            <span className="text-slate-300">
-                              Credential:{' '}
-                              <strong>
-                                {inf.certification.title ||
-                                  'Specialization Certificate'}
+          <div className="record-list">
+            <div className="admin-records-table-wrap">
+              <table className="dashboard-table admin-records-table approval-creators-table">
+                <caption className="sr-only">Influencer applications</caption>
+                <thead>
+                  <tr>
+                    {[
+                      'Sr. No.',
+                      'Influencer',
+                      'Contact',
+                      'Category',
+                      'Rate',
+                      'Status',
+                      'Certification',
+                      'Blocking remark',
+                      'Actions',
+                    ].map((label) => (
+                      <th scope="col" key={label}>
+                        {label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {creatorPagination.items.map((inf, index) => {
+                    const isPending = inf.status === 'pending_review';
+                    const isApproved = inf.status === 'approved';
+                    const isRejected = inf.status === 'rejected';
+                    return (
+                      <tr key={inf.id}>
+                        <td className="record-serial-cell">
+                          {creatorPagination.start + index}
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={
+                                inf.avatar ||
+                                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&q=80'
+                              }
+                              alt=""
+                              className="w-10 h-10 rounded-xl object-cover shrink-0"
+                            />
+                            <div>
+                              <strong className="flex items-center gap-2">
+                                {inf.name}
+                                {inf.isVerified && <VerifiedBadge size="sm" />}
                               </strong>
-                            </span>
-                            {inf.certification.fileUrl && (
-                              <a
-                                href={inf.certification.fileUrl}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-[11px] text-brand-purple hover:underline flex items-center gap-1"
-                              >
-                                <span>Preview Document</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            )}
+                              <small>{inf.specialization}</small>
+                            </div>
                           </div>
+                        </td>
+                        <td>
+                          {inf.email}
+                          <small>{inf.phone || '—'}</small>
+                        </td>
+                        <td>{inf.category}</td>
+                        <td className="whitespace-nowrap">
+                          ${inf.hourlyRate ?? 0}/hr
+                        </td>
+                        <td>
+                          {' '}
+                          <span
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                              isApproved
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : isPending
+                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse'
+                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                            }`}
+                          >
+                            {inf.status?.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="record-certification">
+                          {' '}
+                          {inf.certification && (
+                            <div className="mt-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs">
+                              <div className="flex items-center gap-2">
+                                <FileCheck className="w-4 h-4 text-[#0095F6]" />
+                                <span className="text-slate-300">
+                                  Credential:{' '}
+                                  <strong>
+                                    {inf.certification.title ||
+                                      'Specialization Certificate'}
+                                  </strong>
+                                </span>
+                                {inf.certification.fileUrl && (
+                                  <a
+                                    href={inf.certification.fileUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[11px] text-brand-purple hover:underline flex items-center gap-1"
+                                  >
+                                    <span>Preview Document</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
 
-                          {/* Certificate verified status */}
-                          <div className="flex items-center gap-2">
-                            {inf.isVerified ? (
+                              {/* Certificate verified status */}
+                              <div className="flex items-center gap-2">
+                                {inf.isVerified ? (
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyCertificate(
+                                        inf.id,
+                                        inf.name,
+                                        false,
+                                      )
+                                    }
+                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-bold"
+                                  >
+                                    Revoke Blue Badge
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyCertificate(
+                                        inf.id,
+                                        inf.name,
+                                        true,
+                                      )
+                                    }
+                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm"
+                                  >
+                                    <VerifiedBadge size="sm" />
+                                    <span>Verify Certificate</span>
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {!inf.certification && '—'}
+                        </td>
+                        <td className="record-description">
+                          {inf.status === 'blocked'
+                            ? inf.statusReason || 'No remark recorded'
+                            : '—'}
+                        </td>
+                        <td>
+                          {' '}
+                          <div className="approval-actions flex items-center gap-2 self-start lg:self-center">
+                            <button
+                              type="button"
+                              className="user-view-button approval-icon-button"
+                              title="View details"
+                              aria-label={`View details for ${inf.name}`}
+                              onClick={() =>
+                                setViewingAccount({
+                                  ...inf,
+                                  role: 'influencer',
+                                })
+                              }
+                            >
+                              <Eye size={16} aria-hidden="true" />
+                            </button>
+                            {isPending && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleApproveInfluencer(inf.id, inf.name)
+                                  }
+                                  className="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                  <span>Approve Application</span>
+                                </button>
+
+                                <button
+                                  onClick={() => setRejectingItem(inf)}
+                                  className="px-4 py-2.5 rounded-xl font-bold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                  <span>Decline</span>
+                                </button>
+                              </>
+                            )}
+
+                            {isApproved && (
+                              <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                                <CheckCircle className="w-4 h-4" />
+                                <span>Active for Login</span>
+                              </span>
+                            )}
+
+                            {inf.status !== 'blocked' && (
+                              <button
+                                onClick={() => openBlock(inf, 'influencer')}
+                                title="Block influencer"
+                                aria-label={`Block ${inf.name}`}
+                                className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"
+                              >
+                                <Ban size={16} aria-hidden="true" />
+                              </button>
+                            )}
+                            {inf.status === 'blocked' && (
                               <button
                                 onClick={() =>
-                                  handleVerifyCertificate(
-                                    inf.id,
-                                    inf.name,
-                                    false,
-                                  )
+                                  handleApproveInfluencer(inf.id, inf.name)
                                 }
-                                className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-bold"
+                                title="Unblock influencer"
+                                aria-label={`Unblock ${inf.name}`}
+                                className="approval-icon-button rounded-xl bg-emerald-600 text-white"
                               >
-                                Revoke Blue Badge
+                                <LockOpen size={16} aria-hidden="true" />
                               </button>
-                            ) : (
+                            )}
+
+                            {isRejected && (
                               <button
                                 onClick={() =>
-                                  handleVerifyCertificate(
-                                    inf.id,
-                                    inf.name,
-                                    true,
-                                  )
+                                  handleApproveInfluencer(inf.id, inf.name)
                                 }
-                                className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm"
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
                               >
-                                <VerifiedBadge size="sm" />
-                                <span>Verify Certificate</span>
+                                Re-Approve
                               </button>
                             )}
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right: Actions */}
-                  <div className="approval-actions flex items-center gap-2 self-start lg:self-center">
-                    <button
-                      type="button"
-                      className="user-view-button approval-icon-button"
-                      title="View details"
-                      aria-label={`View details for ${inf.name}`}
-                      onClick={() =>
-                        setViewingAccount({ ...inf, role: 'influencer' })
-                      }
-                    >
-                      <Eye size={16} aria-hidden="true" />
-                    </button>
-                    {isPending && (
-                      <>
-                        <button
-                          onClick={() =>
-                            handleApproveInfluencer(inf.id, inf.name)
-                          }
-                          className="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Approve Application</span>
-                        </button>
-
-                        <button
-                          onClick={() => setRejectingItem(inf)}
-                          className="px-4 py-2.5 rounded-xl font-bold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
-                        >
-                          <XCircle className="w-4 h-4" />
-                          <span>Decline</span>
-                        </button>
-                      </>
-                    )}
-
-                    {isApproved && (
-                      <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Active for Login</span>
-                      </span>
-                    )}
-
-                    {inf.status !== 'blocked' && (
-                      <button
-                        onClick={() => openBlock(inf, 'influencer')}
-                        title="Block influencer"
-                        aria-label={`Block ${inf.name}`}
-                        className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"
-                      >
-                        <Ban size={16} aria-hidden="true" />
-                      </button>
-                    )}
-                    {inf.status === 'blocked' && (
-                      <button
-                        onClick={() =>
-                          handleApproveInfluencer(inf.id, inf.name)
-                        }
-                        title="Unblock influencer"
-                        aria-label={`Unblock ${inf.name}`}
-                        className="approval-icon-button rounded-xl bg-emerald-600 text-white"
-                      >
-                        <LockOpen size={16} aria-hidden="true" />
-                      </button>
-                    )}
-
-                    {isRejected && (
-                      <button
-                        onClick={() =>
-                          handleApproveInfluencer(inf.id, inf.name)
-                        }
-                        className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
-                      >
-                        Re-Approve
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <Pagination pagination={creatorPagination} label="influencers" />
           </div>
         )
       ) : /* USER QUEUE */
@@ -482,82 +495,111 @@ export default function ApprovalsView() {
           No users found.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3">
-          {users.map((u) => (
-            <div
-              key={u.id}
-              className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-sm">
-                  {u.name?.charAt(0) || 'U'}
-                </div>
-                <div>
-                  <h4 className="font-bold text-white text-sm">{u.name}</h4>
-                  <p className="text-xs text-slate-400">
-                    {u.email} • {u.phone || 'No phone'}
-                  </p>
-                  {u.status === 'blocked' && (
-                    <p className="text-xs text-rose-300 mt-2 whitespace-pre-wrap break-words">
-                      Blocking remark: {u.statusReason || 'No remark recorded'}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  type="button"
-                  className="user-view-button approval-icon-button"
-                  title="View details"
-                  aria-label={`View details for ${u.name}`}
-                  onClick={() => setViewingAccount({ ...u, role: 'user' })}
-                >
-                  <Eye size={16} aria-hidden="true" />
-                </button>
-                <span
-                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                    u.status === 'approved'
-                      ? 'bg-emerald-500/10 text-emerald-400'
-                      : u.status === 'blocked'
-                        ? 'bg-rose-500/10 text-rose-400'
-                        : 'bg-amber-500/10 text-amber-400'
-                  }`}
-                >
-                  {u.status}
-                </span>
-
-                {u.status !== 'blocked' && (
-                  <button
-                    onClick={() => openBlock(u, 'user')}
-                    disabled={updatingUser === u.id}
-                    className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50"
-                  >
-                    {updatingUser === u.id ? (
-                      <span>Saving…</span>
-                    ) : (
-                      'Block User'
-                    )}
-                  </button>
-                )}
-                {u.status !== 'approved' && (
-                  <button
-                    onClick={() => handleUserStatus(u, 'approved')}
-                    disabled={updatingUser === u.id}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
-                  >
-                    {updatingUser === u.id ? (
-                      <span>Saving…</span>
-                    ) : u.status === 'blocked' ? (
-                      'Unblock User'
-                    ) : (
-                      'Approve User'
-                    )}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+        <div className="record-list">
+          <div className="approval-users-table-wrap">
+            <table className="dashboard-table approval-users-table">
+              <caption className="sr-only">
+                Registered users and account access
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Sr. No.</th>
+                  <th scope="col">User</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Blocking remark</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userPagination.items.map((u, index) => (
+                  <tr key={u.id}>
+                    <td className="record-serial-cell">
+                      {userPagination.start + index}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 shrink-0 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-sm"
+                          aria-hidden="true"
+                        >
+                          {u.name?.charAt(0) || 'U'}
+                        </div>
+                        <strong>{u.name}</strong>
+                      </div>
+                    </td>
+                    <td>{u.email}</td>
+                    <td>{u.phone || '—'}</td>
+                    <td>
+                      {' '}
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                          u.status === 'approved'
+                            ? 'bg-emerald-500/10 text-emerald-400'
+                            : u.status === 'blocked'
+                              ? 'bg-rose-500/10 text-rose-400'
+                              : 'bg-amber-500/10 text-amber-400'
+                        }`}
+                      >
+                        {u.status.replace(/_/g, ' ')}
+                      </span>
+                    </td>
+                    <td className="approval-blocking-remark">
+                      {u.status === 'blocked'
+                        ? u.statusReason || 'No remark recorded'
+                        : '—'}
+                    </td>
+                    <td>
+                      <div className="approval-user-actions">
+                        {' '}
+                        <button
+                          type="button"
+                          className="user-view-button approval-icon-button"
+                          title="View details"
+                          aria-label={`View details for ${u.name}`}
+                          onClick={() =>
+                            setViewingAccount({ ...u, role: 'user' })
+                          }
+                        >
+                          <Eye size={16} aria-hidden="true" />
+                        </button>
+                        {u.status !== 'blocked' && (
+                          <button
+                            onClick={() => openBlock(u, 'user')}
+                            disabled={updatingUser === u.id}
+                            className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50"
+                          >
+                            {updatingUser === u.id ? (
+                              <span>Saving…</span>
+                            ) : (
+                              'Block User'
+                            )}
+                          </button>
+                        )}
+                        {u.status !== 'approved' && (
+                          <button
+                            onClick={() => handleUserStatus(u, 'approved')}
+                            disabled={updatingUser === u.id}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
+                          >
+                            {updatingUser === u.id ? (
+                              <span>Saving…</span>
+                            ) : u.status === 'blocked' ? (
+                              'Unblock User'
+                            ) : (
+                              'Approve User'
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <Pagination pagination={userPagination} label="users" />
         </div>
       )}
 

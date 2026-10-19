@@ -467,8 +467,8 @@
   white-space: nowrap;
 }
 .dashboard-table th {
-  font-size: 9px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   color: #8893a6;
   letter-spacing: 0.03em;
   background: #171c27;
@@ -510,7 +510,7 @@
   color: #c6b0ed;
 }
 .booking-amount {
-  color: #e1e6f0 !important;
+  color: #e1e6f0;
   font-weight: 600;
 }
 .booking-status {
@@ -1242,4 +1242,197 @@
   color: #cbd5e1;
   background: #242a37;
   border-color: #3a4354;
+}
+
+.dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  min-width: 0;
+}
+.dashboard-topbar {
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .dashboard-header-actions {
+    gap: 8px;
+  }
+  .breadcrumb {
+    gap: 8px;
+  }
+}
+
+.approval-users-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.approval-users-table {
+  width: 100%;
+  min-width: 900px;
+}
+.approval-users-table th {
+  white-space: nowrap;
+  text-align: left;
+}
+.approval-users-table td {
+  vertical-align: middle;
+}
+.approval-users-table .approval-blocking-remark {
+  max-width: 240px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.approval-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.approval-user-actions .user-view-button {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.admin-records-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.admin-records-table {
+  width: 100%;
+  min-width: 1000px;
+}
+.admin-records-table th {
+  white-space: nowrap;
+  text-align: left;
+}
+.admin-records-table td {
+  vertical-align: middle;
+  font-size: 12px;
+}
+.admin-records-table small {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+.admin-records-table .record-id {
+  display: block;
+  max-width: 180px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: 10px;
+}
+.admin-records-table .record-description {
+  min-width: 180px;
+  max-width: 260px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.approval-creators-table {
+  min-width: 1500px;
+}
+.approval-creators-table .record-certification {
+  min-width: 280px;
+}
+.record-certification > div {
+  margin: 0;
+  padding: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.record-certification > div > div {
+  flex-wrap: wrap;
+}
+.approval-creators-table .approval-actions {
+  flex-wrap: wrap;
+  min-width: 240px;
+  max-width: 350px;
+}
+.approval-creators-table .user-view-button {
+  margin: 0;
+}
+.weekly-slots-table {
+  min-width: 600px;
+}
+.weekly-slots-table td:last-child {
+  min-width: 200px;
+}
+
+/* Keep navigation focus inside its rounded boundary and scroll container. */
+.dashboard-shell .nav-item:focus {
+  outline: none;
+}
+.dashboard-shell .nav-item:focus-visible {
+  outline: 2px solid #b79ae9;
+  outline-offset: -3px;
+}
+html[data-theme='light'] .dashboard-shell .nav-item:focus-visible {
+  outline-color: #7c3aed;
+}
+
+.slots-inspection-heading {
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.slots-inspection-heading > div:first-child {
+  min-width: 0;
+}
+.slots-inspection-heading > div:last-child {
+  flex-shrink: 0;
+}
+.slots-inspection-heading h3 {
+  line-height: 1.6;
+}
+.slots-inspection-heading h3 > svg {
+  flex-shrink: 0;
+}
+.slots-inspection-heading > div:last-child > span {
+  white-space: nowrap;
+}
+.slot-inspection-table {
+  min-width: 440px;
+}
+.slot-inspection-table th,
+.slot-inspection-table td {
+  padding: 12px 14px;
+}
+.slot-inspection-table .slot-booking-description {
+  min-width: 160px;
+  max-width: 240px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.slot-inspection-table td:first-child {
+  width: 65px;
+}
+
+.time-slot-badge {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 5px 9px;
+  border-radius: 7px;
+  border: 1px solid #5b4880;
+  background: #27213c;
+  color: #ddd6fe;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+html[data-theme='light'] .time-slot-badge {
+  background: #ede9fe;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+
+.dashboard-detail.dashboard-detail-no-heading {
+  border-top: 0;
+  padding-top: 0;
 }

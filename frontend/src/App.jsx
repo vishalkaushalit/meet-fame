@@ -4,7 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import LandingPage from './components/LandingPage';
 import InfluencerPanel from './components/InfluencerPanel';
 import UserPanel from './components/UserPanel';
-import AuthModal from './components/AuthModal';
+import AuthPage from './components/AuthPage';
+import { authPath, matchAuthRoute, navigate } from './authRoutes';
 import BookingModal from './components/BookingModal';
 import ChatModal from './components/ChatModal';
 import StatusAlertModal from './components/StatusAlertModal';
@@ -21,9 +22,16 @@ function AppContent() {
 
   // Modals state
   const [callBooking, setCallBooking] = useState(null);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [authRole, setAuthRole] = useState('user');
-  const [authTab, setAuthTab] = useState('login');
+  const [path, setPath] = useState(() => window.location.pathname);
+  const authRoute = matchAuthRoute(path);
+  useEffect(() => {
+    const updatePath = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', updatePath);
+    return () => window.removeEventListener('popstate', updatePath);
+  }, []);
+  useEffect(() => {
+    if (user && authRoute) navigate('/', { replace: true });
+  }, [user, path]);
 
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [selectedInfluencer, setSelectedInfluencer] = useState(null);
@@ -48,9 +56,7 @@ function AppContent() {
   }, []);
 
   const handleOpenAuth = (r = 'user', tab = 'login') => {
-    setAuthRole(r);
-    setAuthTab(tab);
-    setAuthModalOpen(true);
+    navigate(authPath(r, tab));
   };
 
   const handleBookInfluencer = (influencer) => {
@@ -73,12 +79,22 @@ function AppContent() {
   };
 
   if (loading) return <LogoLoader />;
+  if (authRoute)
+    return (
+      <AuthPage
+        key={`${authRoute.role}:${authRoute.tab}`}
+        role={authRoute.role}
+        tab={authRoute.tab}
+      />
+    );
 
   return (
     <div className="min-h-screen bg-[#0A0F1D] text-slate-100 selection:bg-brand-purple selection:text-white flex flex-col">
       {/* If logged in, show app top bar */}
       {user && (
-        <header className="sticky top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800">
+        <header
+          className={`${role === 'influencer' ? 'creator-site-header ' : ''}sticky top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800`}
+        >
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 h-20 py-4 flex items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <Logo size="header" className="shrink-0" />
@@ -147,7 +163,6 @@ function AppContent() {
       <main className="flex-1">
         {!user ? (
           <LandingPage
-            onOpenAuth={handleOpenAuth}
             onBookInfluencer={handleBookInfluencer}
             onOpenChat={handleOpenChat}
             featuredInfluencers={featured}
@@ -175,12 +190,6 @@ function AppContent() {
         />
       )}
       {/* Modals & Dialogs */}
-      <AuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        initialRole={authRole}
-        initialTab={authTab}
-      />
 
       <BookingModal
         onBookingSuccess={() =>

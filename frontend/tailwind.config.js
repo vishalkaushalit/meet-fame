@@ -25,8 +25,10 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Outfit', 'sans-serif'],
-        display: ['Outfit', '"Plus Jakarta Sans"', 'sans-serif'],
+        sans: ['Poppins'],
+        display: ['Poppins'],
+        mono: ['Poppins'],
+        serif: ['Poppins'],
       },
       backgroundImage: {
         'brand-gradient':

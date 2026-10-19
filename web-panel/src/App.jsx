@@ -1,12 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AdminLogin from './components/AdminLogin';
 import LogoLoader from './components/LogoLoader';
 import AdminDashboard from './components/AdminDashboard';
 import { adminApi } from './api';
+import { matchAdminPage, navigateAdmin } from './routes';
 
 export default function App() {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [path, setPath] = useState(() => window.location.pathname);
+  const requestedPage = useRef(null);
+  const page = matchAdminPage(path);
+  useEffect(() => {
+    const update = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', update);
+    return () => window.removeEventListener('popstate', update);
+  }, []);
+  useEffect(() => {
+    if (loading) return;
+    if (!admin && page !== 'login') {
+      if (page) requestedPage.current = page;
+      navigateAdmin(null, { replace: true });
+    } else if (admin && (!page || page === 'login')) {
+      navigateAdmin(requestedPage.current || 'overview', { replace: true });
+      requestedPage.current = null;
+    }
+  }, [admin, loading, page]);
 
   useEffect(() => {
     async function verifyAdminSession() {
@@ -40,7 +59,9 @@ export default function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('meetfame_admin_token');
+    requestedPage.current = null;
     setAdmin(null);
+    navigateAdmin(null, { replace: true });
   };
 
   if (loading) return <LogoLoader label="Loading admin workspace…" />;
@@ -51,6 +72,7 @@ export default function App() {
         <AdminLogin onLoginSuccess={handleLoginSuccess} />
       ) : (
         <AdminDashboard
+          activeTab={page && page !== 'login' ? page : 'overview'}
           admin={admin}
           onLogout={handleLogout}
           onProfileUpdated={setAdmin}

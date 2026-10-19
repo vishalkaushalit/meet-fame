@@ -1,0 +1,56 @@
+.admin-login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 0 24px 24px;
+}
+.admin-login-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;
+  height: 76px;
+  margin: 0 auto;
+  flex-shrink: 0;
+}
+.admin-login-toolbar > a {
+  font-size: 12px;
+  color: #a78bfa;
+}
+.admin-login-toolbar > a:hover {
+  text-decoration: underline;
+}
+.admin-login-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+}
+.admin-login-brand > a {
+  align-items: center;
+}
+.admin-login-brand img {
+  width: 170px;
+  max-width: 100%;
+}
+html[data-theme='light'] .admin-login-page {
+  background: #f5f7fc;
+}
+html[data-theme='light'] .admin-login-toolbar > a {
+  color: #6d28d9;
+}
+@media (max-width: 480px) {
+  .admin-login-page {
+    padding-inline: 16px;
+  }
+  .admin-login-toolbar {
+    height: 64px;
+  }
+  .admin-login-main {
+    align-items: flex-start;
+    padding-top: 16px;
+  }
+}
