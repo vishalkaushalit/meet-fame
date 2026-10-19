@@ -1,6 +1,7 @@
 import express from 'express';
 import { notifyBooking } from '../notifications.js';
 import { requireSession } from '../middleware/session.js';
+import { bookingWindow } from '../../../shared/bookingTime.js';
 import { db } from '../db.js';
 import { generateDaySlots, getDayNameFromDate } from '../slotUtils.js';
 
@@ -40,7 +41,11 @@ router.get('/slots', (req, res) => {
     );
     const bookedSlotIds = new Set(bookedOnDate.map(b => b.slot));
 
-    const slotsWithBookingStatus = generatedSlots.map(slot => {
+    const now = Date.now();
+    const slotsWithBookingStatus = generatedSlots.filter(slot => {
+      const window = bookingWindow({ date, slot: slot.slotId });
+      return window && window.start > now;
+    }).map(slot => {
       const isBooked = bookedSlotIds.has(slot.slotId);
       const existingBooking = isBooked ? bookedOnDate.find(b => b.slot === slot.slotId) : null;
       return {
@@ -55,6 +60,7 @@ router.get('/slots', (req, res) => {
     });
 
     return res.json({
+      serverNow: now,
       influencerId: influencer.id,
       influencerName: influencer.name,
       date,
@@ -101,6 +107,12 @@ router.post('/', requireSession, (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+
+    const window = bookingWindow({ date, slot });
+    if (!window) return res.status(400).json({ error: 'Invalid booking date or time slot.' });
+    if (window.start <= Date.now()) return res.status(409).json({ error: 'This time slot has already started. Please select a future slot (IST).' });
+    const configuredSlots = generateDaySlots(influencer.availability?.[getDayNameFromDate(date)] || []);
+    if (!configuredSlots.some(item => item.slotId === slot)) return res.status(400).json({ error: 'This slot is not in the influencer schedule.' });
 
     // Double check slot availability on this date
     const existingBooking = data.bookings.find(b => 

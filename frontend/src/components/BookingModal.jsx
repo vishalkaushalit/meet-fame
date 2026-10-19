@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
+import { bookingWindow } from '../../../shared/bookingTime';
 import VerifiedBadge from './VerifiedBadge';
 import {
   X,
@@ -31,6 +32,19 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
   };
 
   const [slotsData, setSlotsData] = useState(null);
+  const [clock, setClock] = useState(null);
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    if (!isOpen) return;
+    const timer = setInterval(() => setTick(value => value + 1), 1000);
+    return () => clearInterval(timer);
+  }, [isOpen]);
+  const serverTime = clock ? clock.serverNow + (performance.now() - clock.receivedAt) : Date.now();
+  const visibleSlots = (slotsData?.slots || []).filter(slot => {
+    const window = bookingWindow({ date, slot: slot.slot });
+    return window && window.start > serverTime;
+  });
+
   const [selectedSlot, setSelectedSlot] = useState('');
   const [topic, setTopic] = useState('1-on-1 Strategy & Mentorship Session');
   const [meetingType, setMeetingType] = useState('video');
@@ -52,6 +66,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
       try {
         const res = await api.bookings.getSlots(influencer.id, date);
         if (!active) return;
+        setClock({ serverNow: res.serverNow || Date.now(), receivedAt: performance.now() });
         setSlotsData(res);
         // Find first available slot
         const firstAvailable = res.slots?.find(s => !s.isBooked);
@@ -69,6 +84,11 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
     return () => { active = false; };
   }, [influencer?.id, date, isOpen]);
 
+  useEffect(() => {
+    if (!slotsData || !selectedSlot) return;
+    if (!visibleSlots.some(slot => slot.slot === selectedSlot && !slot.isBooked)) setSelectedSlot('');
+  }, [tick, slotsData, selectedSlot, date]);
+
   if (!isOpen || !influencer) return null;
 
   const handleBook = async (e) => {
@@ -77,7 +97,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
       setError('Please log in as a user to book an appointment.');
       return;
     }
-    if (!selectedSlot) {
+    if (!selectedSlot || !visibleSlots.some(slot => slot.slot === selectedSlot && !slot.isBooked)) {
       setError('Please select an available 1-hour time slot.');
       return;
     }
@@ -201,7 +221,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                   Select 1-Hour Slot
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  {slotsData ? `${slotsData.availableSlotsCount} of ${slotsData.totalSlots} available` : ''}
+                  {slotsData ? `${visibleSlots.filter(slot => !slot.isBooked).length} of ${visibleSlots.length} available · IST` : ''}
                 </span>
               </label>
 
@@ -209,9 +229,9 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                 <div className="py-4 text-center text-xs text-slate-400 bg-slate-950 rounded-xl border border-slate-800">
                   Checking auto-generated slots & availability...
                 </div>
-              ) : slotsData?.slots?.length === 0 ? (
+              ) : slotsData && visibleSlots.length === 0 ? (
                 <div className="p-4 text-center text-xs text-amber-400 bg-amber-500/10 rounded-xl border border-amber-500/20">
-                  Influencer has no slots configured for {slotsData.dayOfWeek}s. Please pick another date.
+                  No upcoming slots remain for this date (IST). Please pick another date.
                 </div>
               ) : (
                 <>
@@ -222,7 +242,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-purple mb-3"
                   >
                     <option value="" disabled>-- Select a 1-Hour Time Slot --</option>
-                    {slotsData?.slots?.map((slotItem) => (
+                    {visibleSlots.map((slotItem) => (
                       <option
                         key={slotItem.slot}
                         value={slotItem.slot}
@@ -236,7 +256,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
 
                   {/* Interactive Visual Slots Grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {slotsData?.slots?.map((s) => {
+                    {visibleSlots.map((s) => {
                       const isSelected = selectedSlot === s.slot;
                       return (
                         <button
