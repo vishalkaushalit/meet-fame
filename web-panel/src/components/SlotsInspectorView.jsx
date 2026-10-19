@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
 import VerifiedBadge from './VerifiedBadge';
@@ -126,7 +127,7 @@ export default function SlotsInspectorView() {
       )}
 
       {loading ? (
-        <div className="py-16 text-center text-xs text-slate-400">Loading slots overview...</div>
+        <LogoLoader variant="inline" label="Loading slots overview..." />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* LEFT: DATE-SPECIFIC AVAILABLE VS BOOKED SLOTS INSPECTION */}

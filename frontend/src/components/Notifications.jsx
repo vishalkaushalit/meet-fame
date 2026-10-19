@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Bell, CalendarClock, X, CheckCheck } from 'lucide-react';
@@ -62,7 +63,7 @@ export default function Notifications() {
         <header><div><strong>Notifications</strong><small>Bookings & 15-minute reminders</small></div><button type="button" aria-label="Close notifications" onClick={() => setOpen(false)}><X size={18} /></button></header>
         <div className="notification-tools"><span>{unread} unread</span><button disabled={saving || !unread} onClick={() => mark()}><CheckCheck size={14} />Mark all read</button></div>
         {error && <p role="alert" className="notification-error">{error} <button onClick={() => refresh.current?.()}>Retry</button></p>}
-        <div className="notification-feed">{loading ? <p role="status" className="notification-empty">Loading notifications…</p> : !items.length && !error ? <p className="notification-empty">No notifications yet. Meeting reminders appear 15 minutes before your session.</p> : items.map(item => <article key={item.id} className={item.readAt ? '' : 'is-unread'}><h3>{item.title}</h3><p>{item.message}</p><div className="notification-actions"><button onClick={viewBookings}>View booking</button>{!item.readAt && <button disabled={saving} onClick={() => mark(item.id)}>Mark read</button>}</div><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</time></article>)}</div>
+        <div className="notification-feed">{loading ? <LogoLoader variant="inline" label="Loading notifications…" /> : !items.length && !error ? <p className="notification-empty">No notifications yet. Meeting reminders appear 15 minutes before your session.</p> : items.map(item => <article key={item.id} className={item.readAt ? '' : 'is-unread'}><h3>{item.title}</h3><p>{item.message}</p><div className="notification-actions"><button onClick={viewBookings}>View booking</button>{!item.readAt && <button disabled={saving} onClick={() => mark(item.id)}>Mark read</button>}</div><time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</time></article>)}</div>
       </section>}
     </div>
     {banner && createPortal(<aside className="meeting-reminder-banner" role="status"><CalendarClock size={22} aria-hidden="true" /><div><strong>Upcoming session</strong><p>{banner.message}</p><button onClick={viewBookings}>View booking</button></div><button className="reminder-dismiss" aria-label="Dismiss meeting reminder" onClick={() => setBanner(null)}><X size={18} /></button></aside>,document.body)}

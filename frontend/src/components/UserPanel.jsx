@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
@@ -154,10 +155,11 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                  aria-pressed={selectedCategory === cat}
+                  className={`px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-inset ${
                     selectedCategory === cat
-                      ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-sm'
-                      : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-gradient-to-r from-brand-indigo to-brand-purple border-transparent text-white shadow-sm'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
                   }`}
                 >
                   {cat}
@@ -168,7 +170,7 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
           {/* Influencer Grid */}
           {loading ? (
-            <div className="py-16 text-center text-xs text-slate-400">Loading verified influencers...</div>
+            <LogoLoader variant="inline" label="Loading verified influencers..." />
           ) : influencers.length === 0 ? (
             <div className="py-16 text-center text-slate-400 bg-slate-900 rounded-3xl border border-slate-800">
               <p className="text-sm font-semibold">No influencers found matching your criteria.</p>
@@ -271,7 +273,7 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
           {bookingsError && <div role="alert" className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl">{bookingsError}<button className="ml-3 underline" onClick={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}>Retry</button></div>}
           {loadingBookings ? (
-            <div className="py-12 text-center text-xs text-slate-400">Loading bookings...</div>
+            <LogoLoader variant="inline" label="Loading bookings..." />
           ) : bookingsError && myBookings.length === 0 ? null : myBookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
               You haven't booked any sessions yet. Browse creators to schedule your first 1-hour slot!

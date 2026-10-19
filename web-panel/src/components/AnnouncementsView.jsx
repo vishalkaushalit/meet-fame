@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import { adminApi } from '../api';
@@ -25,6 +26,6 @@ export default function AnnouncementsView() {
     <label className="block text-xs text-slate-300">Title<input required maxLength={100} disabled={sending} value={title} onChange={event => setTitle(event.target.value)} className={field} /></label>
     <label className="block text-xs text-slate-300">Announcement<textarea required maxLength={2000} rows={6} disabled={sending} value={message} onChange={event => setMessage(event.target.value)} className={field} /></label>
     {notice && <p role="status" className="text-xs text-emerald-400">{notice}</p>}{error && <p role="alert" className="text-xs text-rose-400">{error}</p>}
-    <button disabled={sending || !title.trim() || !message.trim()} className="dashboard-button disabled:opacity-50"><Send size={15} />{sending ? 'Sending…' : 'Send announcement'}</button>
+    <button disabled={sending || !title.trim() || !message.trim()} className="dashboard-button disabled:opacity-50"><Send size={15} />{sending ? <LogoLoader variant="button" label="Sending…" /> : 'Send announcement'}</button>
   </form>;
 }

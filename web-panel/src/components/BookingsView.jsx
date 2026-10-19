@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
 import {
@@ -106,7 +107,7 @@ export default function BookingsView() {
 
       {/* Bookings Table / Cards */}
       {loading ? (
-        <div className="py-16 text-center text-xs text-slate-400">Loading bookings...</div>
+        <LogoLoader variant="inline" label="Loading bookings..." />
       ) : filtered.length === 0 ? (
         <div className="py-16 text-center text-slate-500 bg-slate-900 rounded-3xl border border-slate-800 text-xs">
           No bookings found.

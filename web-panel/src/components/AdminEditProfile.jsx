@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Save } from 'lucide-react';
@@ -32,6 +33,6 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
     <label className="block text-xs text-slate-300 mb-4">Phone<input type="tel" autoComplete="tel" maxLength={40} value={phone} disabled={saving} onChange={event => setPhone(event.target.value)} className={field} /></label>
     <p className="text-xs text-slate-400 mb-4">Use your updated email the next time you sign in.</p>
     {error && <p role="alert" className="text-xs text-rose-400 mb-4">{error}</p>}
-    <footer className="flex justify-end gap-3 mt-5"><button type="button" disabled={saving} onClick={onClose} className="px-3 py-2 text-xs text-slate-400">Cancel</button><button type="submit" disabled={saving || !name.trim() || !email.trim()} className="dashboard-button"><Save size={15} />{saving ? 'Saving…' : 'Save changes'}</button></footer>
+    <footer className="flex justify-end gap-3 mt-5"><button type="button" disabled={saving} onClick={onClose} className="px-3 py-2 text-xs text-slate-400">Cancel</button><button type="submit" disabled={saving || !name.trim() || !email.trim()} className="dashboard-button"><Save size={15} />{saving ? <LogoLoader variant="button" label="Saving…" /> : 'Save changes'}</button></footer>
   </form></dialog>, document.body);
 }

@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
 import AccountDetailsDialog from './AccountDetailsDialog';
@@ -211,7 +212,7 @@ export default function ApprovalsView() {
 
       {/* QUEUE CONTENT */}
       {loading ? (
-        <div className="py-16 text-center text-xs text-slate-400">Loading registrations...</div>
+        <LogoLoader variant="inline" label="Loading registrations..." />
       ) : activeTab === 'influencers' ? (
         influencers.length === 0 ? (
           <div className="py-16 text-center text-slate-500 bg-slate-900 rounded-3xl border border-slate-800 text-xs">
@@ -396,7 +397,7 @@ export default function ApprovalsView() {
                   {u.status !== 'blocked' && (
                     <button onClick={() => openBlock(u, 'user')} disabled={updatingUser === u.id}
                       className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50">
-                      {updatingUser === u.id ? 'Saving…' : 'Block User'}
+                      {updatingUser === u.id ? <LogoLoader variant="button" label="Saving…" /> : 'Block User'}
                     </button>
                   )}
                   {u.status !== 'approved' && (
@@ -405,7 +406,7 @@ export default function ApprovalsView() {
                       disabled={updatingUser === u.id}
                       className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
                     >
-                      {updatingUser === u.id ? 'Saving…' : u.status === 'blocked' ? 'Unblock User' : 'Approve User'}
+                      {updatingUser === u.id ? <LogoLoader variant="button" label="Saving…" /> : u.status === 'blocked' ? 'Unblock User' : 'Approve User'}
                     </button>
                   )}
                 </div>

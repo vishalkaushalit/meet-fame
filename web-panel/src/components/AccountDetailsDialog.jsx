@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import { dayRanges } from '../../../shared/availability';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -61,7 +62,7 @@ export default function AccountDetailsDialog({ account, onClose }) {
     <section ref={dialog} role="dialog" aria-modal="true" aria-labelledby="account-details-title" className="account-details-dialog">
       <header><div><p>ACCOUNT DETAILS</p><h2 id="account-details-title">{details?.name || account.name || 'Account details'}</h2></div><button ref={close} type="button" aria-label="Close account details" onClick={onClose}><X size={20} /></button></header>
       <div className="account-details-body">
-        {error ? <div role="alert" className="account-details-error"><p>{error}</p><button onClick={() => setRetry(value => value + 1)}>Retry</button></div> : !details ? <p role="status">Loading account details…</p> : <>
+        {error ? <div role="alert" className="account-details-error"><p>{error}</p><button onClick={() => setRetry(value => value + 1)}>Retry</button></div> : !details ? <LogoLoader variant="inline" label="Loading account details…" /> : <>
           <dl className="account-details-fields">{fields.map(([title, value]) => <div key={title}><dt>{title}</dt><dd>{title === 'Status' ? <span className={`account-status-badge ${['active','approved'].includes(details.status) ? 'status-approved' : details.status === 'pending_review' ? 'status-pending' : ['blocked','rejected'].includes(details.status) ? 'status-blocked' : 'status-neutral'}`}>{text(value)}</span> : text(value)}</dd></div>)}</dl>
           {details.statusReason && <section><h3>{details.status === 'blocked' ? 'Blocking remark' : 'Admin remark'}</h3><p>{details.statusReason}</p></section>}
           {details.role === 'influencer' && <>

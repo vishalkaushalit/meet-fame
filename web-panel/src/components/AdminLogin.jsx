@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState } from 'react';
 import Logo from './Logo';
 import { adminApi } from '../api';
@@ -102,7 +103,7 @@ export default function AdminLogin({ onLoginSuccess }) {
             disabled={loading}
             className="w-full py-3 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-2 transition-all active:scale-[0.99]"
           >
-            {loading ? 'Authenticating...' : 'Sign In to Command Center'}
+            {loading ? <LogoLoader variant="button" label="Authenticating…" /> : 'Sign In to Command Center'}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

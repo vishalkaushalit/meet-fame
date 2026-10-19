@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
@@ -226,9 +227,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
               </label>
 
               {loadingSlots ? (
-                <div className="py-4 text-center text-xs text-slate-400 bg-slate-950 rounded-xl border border-slate-800">
-                  Checking auto-generated slots & availability...
-                </div>
+                <LogoLoader variant="inline" label="Checking auto-generated slots & availability..." />
               ) : slotsData && visibleSlots.length === 0 ? (
                 <div className="p-4 text-center text-xs text-amber-400 bg-amber-500/10 rounded-xl border border-amber-500/20">
                   No slots are configured for this date. Please pick another date.
@@ -347,7 +346,7 @@ export default function BookingModal({ influencer, isOpen, onClose, onBookingSuc
                 disabled={submitting || !selectedSlot || loadingSlots}
                 className="py-3 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center gap-2 text-sm"
               >
-                {submitting ? 'Confirming...' : 'Confirm & Book Slot'}
+                {submitting ? <LogoLoader variant="button" label="Confirming…" /> : 'Confirm & Book Slot'}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

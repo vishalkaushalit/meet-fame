@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import { normalizeAvailability, dayRanges } from '../../../shared/availability';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -518,7 +519,7 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
             className="w-full py-3.5 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
           >
             {loading ? (
-              <span>Processing...</span>
+              <LogoLoader variant="button" label="Processing…" />
             ) : isRegister ? (
               <>
                 <span>Complete {role === 'influencer' ? 'Influencer' : 'User'} Registration</span>

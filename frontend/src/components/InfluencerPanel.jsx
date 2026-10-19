@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import { normalizeAvailability, dayRanges } from '../../../shared/availability';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -306,7 +307,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 className="py-2.5 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md flex items-center gap-2 self-start md:self-auto disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                <span>{savingSlots ? 'Saving...' : 'Save Availability & Generate Slots'}</span>
+                <span>{savingSlots ? <LogoLoader variant="button" label="Saving…" /> : 'Save Availability & Generate Slots'}</span>
               </button>
             </div>
 
@@ -457,7 +458,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
           {bookingsError && <div role="alert" className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl">{bookingsError}<button className="ml-3 underline" onClick={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}>Retry</button></div>}
           {loadingBookings ? (
-            <div className="py-12 text-center text-xs text-slate-400">Loading appointments...</div>
+            <LogoLoader variant="inline" label="Loading appointments..." />
           ) : bookingsError && bookings.length === 0 ? null : bookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
               No sessions booked yet. Once clients book your slots, they will appear here!
@@ -614,7 +615,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               className="py-3 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md disabled:opacity-40 flex items-center gap-2"
             >
               <Upload className="w-4 h-4" />
-              <span>{certUploading ? 'Submitting...' : 'Submit Certificate for Verification'}</span>
+              <span>{certUploading ? <LogoLoader variant="button" label="Submitting…" /> : 'Submit Certificate for Verification'}</span>
             </button>
           </form>
         </div>

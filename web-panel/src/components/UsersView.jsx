@@ -1,3 +1,4 @@
+import LogoLoader from './LogoLoader';
 import React, { useEffect, useState } from 'react';
 import { Search, Users, AlertCircle, Eye, Ban, Check, LockOpen, LoaderCircle } from 'lucide-react';
 import { adminApi } from '../api';
@@ -71,7 +72,7 @@ export default function UsersView({ refreshKey = 0 }) {
     </div>
     {notice && <p className="users-notice" role="status">{notice}</p>}
     {error && <div className="dashboard-error" role="alert"><AlertCircle size={17} /><span>{error}</span><button onClick={() => setReload(value => value + 1)}>Retry</button></div>}
-    {loading ? <div className="dashboard-empty" role="status">Loading accounts…</div> : error && !users.length ? null : <>
+    {loading ? <LogoLoader variant="inline" label="Loading accounts…" /> : error && !users.length ? null : <>
       <div className="dashboard-table-wrap"><table className="dashboard-table"><thead><tr><th scope="col">User</th><th scope="col">Role</th><th scope="col">Contact</th><th scope="col">Joined</th><th scope="col">Status</th><th scope="col">Blocking remark</th><th scope="col">Actions</th></tr></thead><tbody>{visible.map(user => <tr key={`${user.role}:${user.id}`}>
         <td><div className="booking-person"><span className="booking-avatar">{user.name?.charAt(0)?.toUpperCase() || 'U'}</span><div><strong>{user.name || 'Unnamed user'}</strong><small>{user.id}</small></div></div></td>
         <td><span className="booking-status account-role">{label(user.role)}</span></td>
