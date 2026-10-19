@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLogin from './components/AdminLogin';
+import LogoLoader from './components/LogoLoader';
 import AdminDashboard from './components/AdminDashboard';
 import { adminApi } from './api';
 
@@ -42,13 +43,7 @@ export default function App() {
     setAdmin(null);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center text-xs text-slate-500">
-        Loading MeetFame Command Center...
-      </div>
-    );
-  }
+  if (loading) return <LogoLoader label="Loading admin workspace…" />;
 
   return (
     <div>

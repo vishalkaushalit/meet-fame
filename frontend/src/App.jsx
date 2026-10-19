@@ -8,6 +8,7 @@ import BookingModal from './components/BookingModal';
 import ChatModal from './components/ChatModal';
 import StatusAlertModal from './components/StatusAlertModal';
 import Logo from './components/Logo';
+import LogoLoader from './components/LogoLoader';
 import Notifications from './components/Notifications';
 import VideoCall from './components/VideoCall';
 import VerifiedBadge from './components/VerifiedBadge';
@@ -15,7 +16,7 @@ import { api } from './api';
 import { LogOut, User, Sparkles, ExternalLink } from 'lucide-react';
 
 function AppContent() {
-  const { user, role, logout } = useAuth();
+  const { user, role, logout, loading } = useAuth();
 
   // Modals state
   const [callBooking, setCallBooking] = useState(null);
@@ -69,6 +70,8 @@ function AppContent() {
     setChatTargetRole(targetR);
     setChatModalOpen(true);
   };
+
+  if (loading) return <LogoLoader />;
 
   return (
     <div className="min-h-screen bg-[#0A0F1D] text-slate-100 selection:bg-brand-purple selection:text-white flex flex-col">
