@@ -11,7 +11,7 @@ router.get('/:conversationId', (req, res) => {
     const { conversationId } = req.params;
     const data = db.read();
     const messages = data.messages
-      .filter(m => m.conversationId === conversationId)
+      .filter((m) => m.conversationId === conversationId)
       .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
     return res.json({ messages });
@@ -33,7 +33,7 @@ router.post('/send', (req, res) => {
       influencerName,
       senderId,
       senderRole,
-      text
+      text,
     } = req.body;
 
     if (!senderId || !text) {
@@ -53,7 +53,7 @@ router.post('/send', (req, res) => {
       senderId,
       senderRole: senderRole || 'user',
       text: text.trim(),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     data.messages.push(newMsg);

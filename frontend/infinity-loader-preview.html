@@ -1,19 +1,135 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MeetFame ribbon loader preview</title><style>html,body{margin:0;font-family:system-ui,sans-serif}*{box-sizing:border-box}.logo-loader-screen{min-height:100vh;min-height:100dvh;background:#0a0f1d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px}.logo-loader-stage{position:relative;width:160px;height:140px}.logo-loader-art{position:absolute;left:50%;top:50%;width:80px;transform:translate(-50%,-50%)}.logo-loader-art svg{display:block;width:100%;height:auto}.logo-loader-screen p{font-size:11px;color:#94a3b8;margin:0}
-</style></head><body><div class="logo-loader-screen" role="status" aria-label="Loading MeetFame"><div class="logo-loader-stage" aria-hidden="true"><div class="logo-loader-art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 230" fill="none">
-  <style>
-    .ribbon-trace{stroke-dasharray:72 28;animation:ribbon-trace 1.8s linear infinite}
-    @keyframes ribbon-trace{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
-    @media(prefers-reduced-motion:reduce){.ribbon-trace{animation:none;stroke-dasharray:100 0;stroke-dashoffset:0}}
-  </style>
-  <defs>
-    <linearGradient id="ribbon" x1="25" y1="145" x2="275" y2="125" gradientUnits="userSpaceOnUse"><stop stop-color="#3430f5"/><stop offset=".43" stop-color="#8434ef"/><stop offset=".72" stop-color="#ec3a9a"/><stop offset="1" stop-color="#ff7650"/></linearGradient>
-    <linearGradient id="left-head" x1="55" y1="17" x2="95" y2="66" gradientUnits="userSpaceOnUse"><stop stop-color="#4433ff"/><stop offset="1" stop-color="#9c35f5"/></linearGradient>
-    <linearGradient id="right-head" x1="204" y1="4" x2="246" y2="53" gradientUnits="userSpaceOnUse"><stop stop-color="#ff4774"/><stop offset="1" stop-color="#ff8b45"/></linearGradient>
-  </defs>
-  <circle cx="78" cy="43" r="26" fill="url(#left-head)"/>
-  <circle cx="224" cy="29" r="26" fill="url(#right-head)"/>
-  <path id="infinity-ribbon" class="ribbon-trace" pathLength="100" d="M150 143C121 98 103 82 74 90C20 105 15 161 48 185C77 207 103 186 126 158L174 100C197 71 228 79 250 103C281 138 267 181 238 191C207 202 184 180 164 155L150 143Z" stroke="url(#ribbon)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-
-
-</div></div></div></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MeetFame ribbon loader preview</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .logo-loader-screen {
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: #0a0f1d;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 24px;
+      }
+      .logo-loader-stage {
+        position: relative;
+        width: 160px;
+        height: 140px;
+      }
+      .logo-loader-art {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 80px;
+        transform: translate(-50%, -50%);
+      }
+      .logo-loader-art svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .logo-loader-screen p {
+        font-size: 11px;
+        color: #94a3b8;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo-loader-screen" role="status" aria-label="Loading MeetFame">
+      <div class="logo-loader-stage" aria-hidden="true">
+        <div class="logo-loader-art">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 300 230"
+            fill="none"
+          >
+            <style>
+              .ribbon-trace {
+                stroke-dasharray: 72 28;
+                animation: ribbon-trace 1.8s linear infinite;
+              }
+              @keyframes ribbon-trace {
+                from {
+                  stroke-dashoffset: 0;
+                }
+                to {
+                  stroke-dashoffset: -100;
+                }
+              }
+              @media (prefers-reduced-motion: reduce) {
+                .ribbon-trace {
+                  animation: none;
+                  stroke-dasharray: 100 0;
+                  stroke-dashoffset: 0;
+                }
+              }
+            </style>
+            <defs>
+              <linearGradient
+                id="ribbon"
+                x1="25"
+                y1="145"
+                x2="275"
+                y2="125"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#3430f5" />
+                <stop offset=".43" stop-color="#8434ef" />
+                <stop offset=".72" stop-color="#ec3a9a" />
+                <stop offset="1" stop-color="#ff7650" />
+              </linearGradient>
+              <linearGradient
+                id="left-head"
+                x1="55"
+                y1="17"
+                x2="95"
+                y2="66"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#4433ff" />
+                <stop offset="1" stop-color="#9c35f5" />
+              </linearGradient>
+              <linearGradient
+                id="right-head"
+                x1="204"
+                y1="4"
+                x2="246"
+                y2="53"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stop-color="#ff4774" />
+                <stop offset="1" stop-color="#ff8b45" />
+              </linearGradient>
+            </defs>
+            <circle cx="78" cy="43" r="26" fill="url(#left-head)" />
+            <circle cx="224" cy="29" r="26" fill="url(#right-head)" />
+            <path
+              id="infinity-ribbon"
+              class="ribbon-trace"
+              pathLength="100"
+              d="M150 143C121 98 103 82 74 90C20 105 15 161 48 185C77 207 103 186 126 158L174 100C197 71 228 79 250 103C281 138 267 181 238 191C207 202 184 180 164 155L150 143Z"
+              stroke="url(#ribbon)"
+              stroke-width="22"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

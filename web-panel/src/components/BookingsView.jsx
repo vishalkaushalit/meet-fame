@@ -11,7 +11,7 @@ import {
   Video,
   Users,
   Search,
-  CheckCircle2
+  CheckCircle2,
 } from 'lucide-react';
 
 export default function BookingsView() {
@@ -35,7 +35,7 @@ export default function BookingsView() {
     loadBookings();
   }, [statusFilter]);
 
-  const filtered = bookings.filter(b => {
+  const filtered = bookings.filter((b) => {
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
     return (
@@ -58,7 +58,8 @@ export default function BookingsView() {
             <span>All Platform Bookings</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Global record of all 1-hour sessions, consultations, and attendee bookings.
+            Global record of all 1-hour sessions, consultations, and attendee
+            bookings.
           </p>
         </div>
 
@@ -70,7 +71,9 @@ export default function BookingsView() {
           </div>
           <div className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs">
             <span className="text-slate-400">Total Volume: </span>
-            <strong className="text-emerald-400 font-mono">${totalRevenue}</strong>
+            <strong className="text-emerald-400 font-mono">
+              ${totalRevenue}
+            </strong>
           </div>
         </div>
       </div>
@@ -128,10 +131,14 @@ export default function BookingsView() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-slate-400">Client:</span>
                     <strong className="text-white text-sm">{b.userName}</strong>
-                    <span className="text-xs text-slate-500">({b.userEmail})</span>
+                    <span className="text-xs text-slate-500">
+                      ({b.userEmail})
+                    </span>
                     <span className="text-slate-600">→</span>
                     <span className="text-xs text-slate-400">Creator:</span>
-                    <strong className="text-brand-purple text-sm">{b.influencerName}</strong>
+                    <strong className="text-brand-purple text-sm">
+                      {b.influencerName}
+                    </strong>
 
                     <span className="ml-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                       {b.status}
@@ -143,15 +150,36 @@ export default function BookingsView() {
                   </p>
 
                   <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 mt-2">
-                    <span>Date: <strong className="text-white">{b.date}</strong> ({b.dayOfWeek})</span>
+                    <span>
+                      Date: <strong className="text-white">{b.date}</strong> (
+                      {b.dayOfWeek})
+                    </span>
                     <span>•</span>
-                    <span>Time Slot: <strong className="text-indigo-300 font-mono">{b.slotLabel || b.slot}</strong></span>
+                    <span>
+                      Time Slot:{' '}
+                      <strong className="text-indigo-300 font-mono">
+                        {b.slotLabel || b.slot}
+                      </strong>
+                    </span>
                     <span>•</span>
-                    <span>Meeting: <strong className="text-slate-200 capitalize">{b.meetingType}</strong></span>
+                    <span>
+                      Meeting:{' '}
+                      <strong className="text-slate-200 capitalize">
+                        {b.meetingType}
+                      </strong>
+                    </span>
                     <span>•</span>
-                    <span>Fee: <strong className="text-emerald-400 font-bold">${b.price}</strong></span>
+                    <span>
+                      Fee:{' '}
+                      <strong className="text-emerald-400 font-bold">
+                        ${b.price}
+                      </strong>
+                    </span>
                     <span>•</span>
-                    <span>Booking ID: <code className="text-slate-500 text-[11px]">{b.id}</code></span>
+                    <span>
+                      Booking ID:{' '}
+                      <code className="text-slate-500 text-[11px]">{b.id}</code>
+                    </span>
                   </div>
                 </div>
               </div>

@@ -30,10 +30,14 @@ function copyDirRecursive(src, dest) {
 }
 
 try {
-  console.log('🚀 Starting MeetFame Unified Single-Project Build for Vercel...');
+  console.log(
+    '🚀 Starting MeetFame Unified Single-Project Build for Vercel...',
+  );
 
   // 1. Build Frontend
-  console.log('📦 Building frontend (Public Landing, User Portal & Influencer Dashboard)...');
+  console.log(
+    '📦 Building frontend (Public Landing, User Portal & Influencer Dashboard)...',
+  );
   run('npm --prefix frontend install');
   run('npm --prefix frontend run build');
 

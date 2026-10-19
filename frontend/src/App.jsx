@@ -89,7 +89,10 @@ function AppContent() {
             <div className="flex shrink-0 items-center gap-2 sm:gap-4">
               <Notifications key={`${user.role}:${user.id}`} />
               <a
-                href={import.meta.env.VITE_ADMIN_PANEL_URL || (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')}
+                href={
+                  import.meta.env.VITE_ADMIN_PANEL_URL ||
+                  (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')
+                }
                 target="_blank"
                 rel="noreferrer"
                 className="hidden lg:flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors"
@@ -101,16 +104,23 @@ function AppContent() {
 
               <div className="flex min-w-0 items-center gap-2 sm:gap-3 lg:pl-4 lg:border-l border-slate-800">
                 <img
-                  src={user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
+                  src={
+                    user.avatar ||
+                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'
+                  }
                   alt={user.name}
                   className="w-9 h-9 shrink-0 rounded-xl object-cover ring-1 ring-slate-700"
                 />
                 <div className="hidden sm:block min-w-0 max-w-[160px] xl:max-w-[220px] text-left text-xs">
                   <div className="font-bold text-white flex min-w-0 items-center gap-1">
-                    <span className="truncate" title={user.name}>{user.name}</span>
+                    <span className="truncate" title={user.name}>
+                      {user.name}
+                    </span>
                     {user.isVerified && <VerifiedBadge size="sm" />}
                   </div>
-                  <div className="mt-1 text-[10px] leading-4 text-slate-400 capitalize">{user.role}</div>
+                  <div className="mt-1 text-[10px] leading-4 text-slate-400 capitalize">
+                    {user.role}
+                  </div>
                 </div>
 
                 <button
@@ -138,7 +148,10 @@ function AppContent() {
             featuredInfluencers={featured}
           />
         ) : role === 'influencer' ? (
-          <InfluencerPanel onOpenChat={handleOpenChat} onJoinCall={setCallBooking} />
+          <InfluencerPanel
+            onOpenChat={handleOpenChat}
+            onJoinCall={setCallBooking}
+          />
         ) : (
           <UserPanel
             onBookInfluencer={handleBookInfluencer}
@@ -148,7 +161,14 @@ function AppContent() {
         )}
       </main>
 
-      {user && callBooking && <VideoCall key={`${user.id}:${callBooking.id}`} booking={callBooking} role={role} onClose={() => setCallBooking(null)} />}
+      {user && callBooking && (
+        <VideoCall
+          key={`${user.id}:${callBooking.id}`}
+          booking={callBooking}
+          role={role}
+          onClose={() => setCallBooking(null)}
+        />
+      )}
       {/* Modals & Dialogs */}
       <AuthModal
         isOpen={authModalOpen}
@@ -158,7 +178,9 @@ function AppContent() {
       />
 
       <BookingModal
-        onBookingSuccess={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}
+        onBookingSuccess={() =>
+          window.dispatchEvent(new Event('meetfame-bookings-updated'))
+        }
         isOpen={bookingModalOpen}
         influencer={selectedInfluencer}
         onClose={() => setBookingModalOpen(false)}

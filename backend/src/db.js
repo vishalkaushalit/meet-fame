@@ -24,8 +24,8 @@ function getInitialData() {
         password: adminPasswordHash,
         phone: '+1 555-0199',
         role: 'admin',
-        createdAt: new Date().toISOString()
-      }
+        createdAt: new Date().toISOString(),
+      },
     ],
     users: [
       {
@@ -36,8 +36,9 @@ function getInitialData() {
         phone: '+1 555-0142',
         role: 'user',
         status: 'approved',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-        createdAt: new Date().toISOString()
+        avatar:
+          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+        createdAt: new Date().toISOString(),
       },
       {
         id: 'usr_2',
@@ -47,8 +48,9 @@ function getInitialData() {
         phone: '+1 555-0188',
         role: 'user',
         status: 'approved',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-        createdAt: new Date().toISOString()
+        avatar:
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+        createdAt: new Date().toISOString(),
       },
       {
         id: 'usr_3',
@@ -58,9 +60,10 @@ function getInitialData() {
         phone: '+1 555-0177',
         role: 'user',
         status: 'pending_review',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-        createdAt: new Date().toISOString()
-      }
+        avatar:
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
+        createdAt: new Date().toISOString(),
+      },
     ],
     influencers: [
       {
@@ -74,7 +77,8 @@ function getInitialData() {
         category: 'Technology & AI',
         bio: 'Ex-Google AI lead, Forbes 30u30, angel investor in 40+ AI startups. Helping founders scale & ship transformative products.',
         hourlyRate: 250,
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+        avatar:
+          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
         status: 'approved', // 'pending_review', 'approved', 'rejected'
         isVerified: true, // Instagram style verified badge
         certificateStatus: 'verified', // 'none', 'pending', 'verified', 'rejected'
@@ -82,32 +86,24 @@ function getInitialData() {
           title: 'Stanford Executive AI & Venture Architecture',
           fileName: 'stanford_ai_fellowship.pdf',
           fileUrl: '/uploads/sample_cert.pdf',
-          uploadedAt: '2026-10-10T12:00:00Z'
+          uploadedAt: '2026-10-10T12:00:00Z',
         },
         availability: {
           monday: [
             { start: '09:00', end: '12:00' },
-            { start: '17:00', end: '20:00' }
+            { start: '17:00', end: '20:00' },
           ],
-          tuesday: [
-            { start: '10:00', end: '14:00' }
-          ],
+          tuesday: [{ start: '10:00', end: '14:00' }],
           wednesday: [
             { start: '09:00', end: '12:00' },
-            { start: '16:00', end: '19:00' }
+            { start: '16:00', end: '19:00' },
           ],
-          thursday: [
-            { start: '11:00', end: '15:00' }
-          ],
-          friday: [
-            { start: '09:00', end: '13:00' }
-          ],
-          saturday: [
-            { start: '10:00', end: '12:00' }
-          ],
-          sunday: []
+          thursday: [{ start: '11:00', end: '15:00' }],
+          friday: [{ start: '09:00', end: '13:00' }],
+          saturday: [{ start: '10:00', end: '12:00' }],
+          sunday: [],
         },
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       },
       {
         id: 'inf_2',
@@ -120,7 +116,8 @@ function getInitialData() {
         category: 'Health & Fitness',
         bio: 'MD & Neuro-nutritionist. Featured on Huberman Lab & Rogan. I design science-backed protocols for peak human performance.',
         hourlyRate: 300,
-        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+        avatar:
+          'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
         status: 'approved',
         isVerified: true,
         certificateStatus: 'verified',
@@ -128,29 +125,21 @@ function getInitialData() {
           title: 'Harvard Medical Longevity & Metabolic Medicine Board',
           fileName: 'harvard_med_board.pdf',
           fileUrl: '/uploads/sample_cert.pdf',
-          uploadedAt: '2026-10-11T14:30:00Z'
+          uploadedAt: '2026-10-11T14:30:00Z',
         },
         availability: {
           monday: [
             { start: '08:00', end: '11:00' },
-            { start: '14:00', end: '17:00' }
+            { start: '14:00', end: '17:00' },
           ],
-          tuesday: [
-            { start: '09:00', end: '13:00' }
-          ],
-          wednesday: [
-            { start: '10:00', end: '15:00' }
-          ],
-          thursday: [
-            { start: '08:00', end: '12:00' }
-          ],
-          friday: [
-            { start: '13:00', end: '16:00' }
-          ],
+          tuesday: [{ start: '09:00', end: '13:00' }],
+          wednesday: [{ start: '10:00', end: '15:00' }],
+          thursday: [{ start: '08:00', end: '12:00' }],
+          friday: [{ start: '13:00', end: '16:00' }],
           saturday: [],
-          sunday: []
+          sunday: [],
         },
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       },
       {
         id: 'inf_3',
@@ -163,7 +152,8 @@ function getInitialData() {
         category: 'Fashion & Lifestyle',
         bio: 'Creative director for top luxury fashion houses in Paris & Milan. 2.4M followers. Mentoring next-gen creators on brand partnerships.',
         hourlyRate: 200,
-        avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80',
+        avatar:
+          'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=400&q=80',
         status: 'approved',
         isVerified: false,
         certificateStatus: 'pending', // Pending admin certificate review
@@ -171,31 +161,21 @@ function getInitialData() {
           title: 'Parsons School of Design Master Accreditation',
           fileName: 'parsons_master_cert.pdf',
           fileUrl: '/uploads/sample_cert.pdf',
-          uploadedAt: '2026-10-14T09:15:00Z'
+          uploadedAt: '2026-10-14T09:15:00Z',
         },
         availability: {
           monday: [
             { start: '10:00', end: '13:00' },
-            { start: '15:00', end: '18:00' }
+            { start: '15:00', end: '18:00' },
           ],
-          tuesday: [
-            { start: '11:00', end: '16:00' }
-          ],
-          wednesday: [
-            { start: '13:00', end: '17:00' }
-          ],
-          thursday: [
-            { start: '10:00', end: '14:00' }
-          ],
-          friday: [
-            { start: '10:00', end: '14:00' }
-          ],
-          saturday: [
-            { start: '12:00', end: '15:00' }
-          ],
-          sunday: []
+          tuesday: [{ start: '11:00', end: '16:00' }],
+          wednesday: [{ start: '13:00', end: '17:00' }],
+          thursday: [{ start: '10:00', end: '14:00' }],
+          friday: [{ start: '10:00', end: '14:00' }],
+          saturday: [{ start: '12:00', end: '15:00' }],
+          sunday: [],
         },
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       },
       {
         id: 'inf_4',
@@ -208,7 +188,8 @@ function getInitialData() {
         category: 'Business & Finance',
         bio: 'Built & exited 2 SaaS ventures ($60M ARR). Investing in pre-seed software businesses across North America & APAC.',
         hourlyRate: 350,
-        avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
+        avatar:
+          'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
         status: 'pending_review', // Pending review for demoing approval workflow!
         isVerified: false,
         certificateStatus: 'pending',
@@ -216,30 +197,22 @@ function getInitialData() {
           title: 'Wharton FinTech Fellow Certification',
           fileName: 'wharton_fintech_cert.pdf',
           fileUrl: '/uploads/sample_cert.pdf',
-          uploadedAt: '2026-10-15T08:00:00Z'
+          uploadedAt: '2026-10-15T08:00:00Z',
         },
         availability: {
           monday: [
             { start: '09:00', end: '12:00' },
-            { start: '14:00', end: '17:00' }
+            { start: '14:00', end: '17:00' },
           ],
-          tuesday: [
-            { start: '09:00', end: '12:00' }
-          ],
-          wednesday: [
-            { start: '14:00', end: '18:00' }
-          ],
-          thursday: [
-            { start: '09:00', end: '13:00' }
-          ],
-          friday: [
-            { start: '10:00', end: '15:00' }
-          ],
+          tuesday: [{ start: '09:00', end: '12:00' }],
+          wednesday: [{ start: '14:00', end: '18:00' }],
+          thursday: [{ start: '09:00', end: '13:00' }],
+          friday: [{ start: '10:00', end: '15:00' }],
           saturday: [],
-          sunday: []
+          sunday: [],
         },
-        createdAt: new Date().toISOString()
-      }
+        createdAt: new Date().toISOString(),
+      },
     ],
     bookings: [
       {
@@ -258,7 +231,7 @@ function getInitialData() {
         meetingType: 'video',
         status: 'confirmed',
         price: 250,
-        createdAt: '2026-10-14T10:00:00Z'
+        createdAt: '2026-10-14T10:00:00Z',
       },
       {
         id: 'bk_2',
@@ -276,7 +249,7 @@ function getInitialData() {
         meetingType: 'video',
         status: 'confirmed',
         price: 250,
-        createdAt: '2026-10-14T15:20:00Z'
+        createdAt: '2026-10-14T15:20:00Z',
       },
       {
         id: 'bk_3',
@@ -294,8 +267,8 @@ function getInitialData() {
         meetingType: 'video',
         status: 'confirmed',
         price: 300,
-        createdAt: '2026-10-15T09:00:00Z'
-      }
+        createdAt: '2026-10-15T09:00:00Z',
+      },
     ],
     messages: [
       {
@@ -308,7 +281,7 @@ function getInitialData() {
         senderId: 'usr_1',
         senderRole: 'user',
         text: 'Hi Marcus! Excited for our upcoming Monday slot at 9 AM. I have sent over our pitch deck and system architecture.',
-        timestamp: '2026-10-14T10:15:00Z'
+        timestamp: '2026-10-14T10:15:00Z',
       },
       {
         id: 'msg_2',
@@ -320,7 +293,7 @@ function getInitialData() {
         senderId: 'inf_1',
         senderRole: 'influencer',
         text: 'Hey Alex! Got the deck. Looking forward to breaking down your multi-agent architecture and distribution flywheels. See you Monday!',
-        timestamp: '2026-10-14T10:45:00Z'
+        timestamp: '2026-10-14T10:45:00Z',
       },
       {
         id: 'msg_3',
@@ -332,7 +305,7 @@ function getInitialData() {
         senderId: 'usr_2',
         senderRole: 'user',
         text: 'Hello Marcus, would it be possible to focus specifically on SAFE valuation caps during our 5 PM call?',
-        timestamp: '2026-10-15T08:30:00Z'
+        timestamp: '2026-10-15T08:30:00Z',
       },
       {
         id: 'msg_4',
@@ -344,9 +317,9 @@ function getInitialData() {
         senderId: 'inf_1',
         senderRole: 'influencer',
         text: 'Absolutely David. Have your cap table models open and we will run sensitivity scenarios live.',
-        timestamp: '2026-10-15T09:05:00Z'
-      }
-    ]
+        timestamp: '2026-10-15T09:05:00Z',
+      },
+    ],
   };
 }
 
@@ -369,10 +342,14 @@ class Database {
     try {
       const data = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(data);
-      for (const creator of parsed.influencers || []) creator.availability = normalizeAvailability(creator.availability);
+      for (const creator of parsed.influencers || [])
+        creator.availability = normalizeAvailability(creator.availability);
       return parsed;
     } catch (err) {
-      console.error('Error reading database file, resetting to initial seed:', err);
+      console.error(
+        'Error reading database file, resetting to initial seed:',
+        err,
+      );
       const initial = getInitialData();
       this.write(initial);
       return initial;
@@ -382,13 +359,15 @@ class Database {
   write(data) {
     const context = databaseContext.getStore();
     if (context) {
-      for (const creator of data.influencers || []) creator.availability = normalizeAvailability(creator.availability);
+      for (const creator of data.influencers || [])
+        creator.availability = normalizeAvailability(creator.availability);
       context.state = structuredClone(data);
       context.dirty = true;
       return true;
     }
     try {
-      for (const creator of data.influencers || []) creator.availability = normalizeAvailability(creator.availability);
+      for (const creator of data.influencers || [])
+        creator.availability = normalizeAvailability(creator.availability);
       const tempPath = `${DB_FILE}.tmp`;
       fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
       fs.renameSync(tempPath, DB_FILE);

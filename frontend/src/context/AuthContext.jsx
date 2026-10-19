@@ -5,9 +5,11 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem('meetfame_token') || null);
+  const [token, setToken] = useState(
+    () => localStorage.getItem('meetfame_token') || null,
+  );
   const [loading, setLoading] = useState(true);
-  
+
   // Status modal / popup state (for under-review or status alerts)
   const [statusAlert, setStatusAlert] = useState(null);
 
@@ -44,11 +46,22 @@ export function AuthProvider({ children }) {
       return res;
     } catch (err) {
       // Prompt requirement: "When the admin approves the influencer request only then the influencer will be active for login otherwise a popup is shown that the account is under selected status by the admin."
-      if (err.status === 'pending_review' || err.status === 'rejected' || err.status === 'blocked') {
+      if (
+        err.status === 'pending_review' ||
+        err.status === 'rejected' ||
+        err.status === 'blocked'
+      ) {
         setStatusAlert({
-          title: err.status === 'pending_review' ? 'Account Under Review' : err.status === 'blocked' ? 'Account Blocked' : 'Account Status Notice',
-          message: err.message || 'Your account is under review by the admin. You will be able to access your dashboard once approved.',
-          status: err.status
+          title:
+            err.status === 'pending_review'
+              ? 'Account Under Review'
+              : err.status === 'blocked'
+                ? 'Account Blocked'
+                : 'Account Status Notice',
+          message:
+            err.message ||
+            'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+          status: err.status,
         });
       }
       throw err;
@@ -70,8 +83,10 @@ export function AuthProvider({ children }) {
     // Prompt rule: "While registration the first msg is shown to influencer is your account is under review"
     setStatusAlert({
       title: 'Registration Submitted',
-      message: res.message || 'Your account is under review by the admin. You will be able to access your dashboard once approved.',
-      status: 'pending_review'
+      message:
+        res.message ||
+        'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+      status: 'pending_review',
     });
     return res;
   };
@@ -83,7 +98,7 @@ export function AuthProvider({ children }) {
   };
 
   const updateUserProfile = (updated) => {
-    setUser(prev => ({ ...prev, ...updated }));
+    setUser((prev) => ({ ...prev, ...updated }));
   };
 
   return (
@@ -99,7 +114,7 @@ export function AuthProvider({ children }) {
         registerUser,
         registerInfluencer,
         logout,
-        updateUserProfile
+        updateUserProfile,
       }}
     >
       {children}

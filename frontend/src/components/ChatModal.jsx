@@ -4,7 +4,12 @@ import { api } from '../api';
 import VerifiedBadge from './VerifiedBadge';
 import { X, Send, MessageSquare, Clock, User, Sparkles } from 'lucide-react';
 
-export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'influencer' }) {
+export default function ChatModal({
+  isOpen,
+  onClose,
+  targetUser,
+  targetRole = 'influencer',
+}) {
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -12,11 +17,12 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
   const messagesEndRef = useRef(null);
 
   // Conversation ID format: `${userId}_${influencerId}`
-  const conversationId = user && targetUser
-    ? (user.role === 'user'
+  const conversationId =
+    user && targetUser
+      ? user.role === 'user'
         ? `${user.id}_${targetUser.id}`
-        : `${targetUser.id}_${user.id}`)
-    : null;
+        : `${targetUser.id}_${user.id}`
+      : null;
 
   useEffect(() => {
     if (!conversationId || !isOpen) return;
@@ -53,7 +59,8 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
     const userId = user.role === 'user' ? user.id : targetUser.id;
     const userName = user.role === 'user' ? user.name : targetUser.name;
     const influencerId = user.role === 'influencer' ? user.id : targetUser.id;
-    const influencerName = user.role === 'influencer' ? user.name : targetUser.name;
+    const influencerName =
+      user.role === 'influencer' ? user.name : targetUser.name;
 
     try {
       const res = await api.chat.sendMessage({
@@ -64,10 +71,10 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
         influencerName,
         senderId: user.id,
         senderRole: user.role,
-        text
+        text,
       });
 
-      setMessages(prev => [...prev, res.message]);
+      setMessages((prev) => [...prev, res.message]);
     } catch (err) {
       console.error('Failed to send message:', err);
     }
@@ -80,17 +87,24 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
         <div className="p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <img
-              src={targetUser.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}
+              src={
+                targetUser.avatar ||
+                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+              }
               alt={targetUser.name}
               className="w-10 h-10 rounded-full object-cover ring-2 ring-brand-purple/30"
             />
             <div>
               <div className="flex items-center gap-1.5">
-                <h4 className="font-bold text-white text-sm">{targetUser.name}</h4>
+                <h4 className="font-bold text-white text-sm">
+                  {targetUser.name}
+                </h4>
                 {targetUser.isVerified && <VerifiedBadge size="sm" />}
               </div>
               <p className="text-[11px] text-slate-400">
-                {targetRole === 'influencer' ? (targetUser.specialization || 'Influencer') : 'Client'}
+                {targetRole === 'influencer'
+                  ? targetUser.specialization || 'Influencer'
+                  : 'Client'}
               </p>
             </div>
           </div>
@@ -108,16 +122,22 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
           {messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500">
               <MessageSquare className="w-10 h-10 mb-2 opacity-40 text-brand-purple" />
-              <p className="text-xs font-semibold text-slate-400">Start the conversation</p>
+              <p className="text-xs font-semibold text-slate-400">
+                Start the conversation
+              </p>
               <p className="text-[11px] text-slate-500 max-w-xs mt-1">
-                Discuss session goals, share attachments, or ask questions ahead of your 1-hour time slot.
+                Discuss session goals, share attachments, or ask questions ahead
+                of your 1-hour time slot.
               </p>
             </div>
           ) : (
             messages.map((m) => {
               const isMe = m.senderId === user.id;
               return (
-                <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div
+                  key={m.id}
+                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                >
                   <div
                     className={`max-w-[78%] rounded-2xl p-3 text-xs leading-relaxed shadow-md ${
                       isMe
@@ -126,8 +146,13 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
                     }`}
                   >
                     <p>{m.text}</p>
-                    <div className={`text-[9px] mt-1 text-right ${isMe ? 'text-indigo-200' : 'text-slate-400'}`}>
-                      {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <div
+                      className={`text-[9px] mt-1 text-right ${isMe ? 'text-indigo-200' : 'text-slate-400'}`}
+                    >
+                      {new Date(m.timestamp).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
                     </div>
                   </div>
                 </div>
@@ -138,7 +163,10 @@ export default function ChatModal({ isOpen, onClose, targetUser, targetRole = 'i
         </div>
 
         {/* Input bar */}
-        <form onSubmit={handleSend} className="p-3 bg-slate-950/90 border-t border-slate-800 flex items-center gap-2">
+        <form
+          onSubmit={handleSend}
+          className="p-3 bg-slate-950/90 border-t border-slate-800 flex items-center gap-2"
+        >
           <input
             type="text"
             value={inputText}

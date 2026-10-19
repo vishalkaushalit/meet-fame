@@ -10,7 +10,8 @@ import { uploadToStorage } from '../blobStorage.js';
 
 const router = express.Router();
 // Read at request time: server environment configuration loads after route imports.
-const getJwtSecret = () => process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
+const getJwtSecret = () =>
+  process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,12 +26,12 @@ const storage = multer.diskStorage({
     const ext = path.extname(file.originalname);
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-  }
+  },
 });
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 // Helper to sign JWT
@@ -42,92 +43,112 @@ function generateToken(payload) {
  * INFLUENCER REGISTRATION
  * Enter name, email, phone number, specialization, certification, category, availability
  */
-router.post('/register-influencer', upload.single('certificateFile'), async (req, res) => {
-  try {
-    const {
-      name,
-      email,
-      phone,
-      password,
-      specialization,
-      category,
-      bio,
-      hourlyRate,
-      certificateTitle,
-      availability
-    } = req.body;
-
-    if (!name || !email || !password || !phone) {
-      return res.status(400).json({ error: 'Name, email, phone, and password are required' });
-    }
-
-    const data = db.read();
-    const existing = data.influencers.find(i => i.email.toLowerCase() === email.toLowerCase());
-    if (existing) {
-      return res.status(400).json({ error: 'An influencer with this email already exists' });
-    }
-
-    let parsedAvailability = {};
+router.post(
+  '/register-influencer',
+  upload.single('certificateFile'),
+  async (req, res) => {
     try {
-      parsedAvailability = typeof availability === 'string' ? JSON.parse(availability) : (availability || {});
-    } catch {
-      parsedAvailability = {};
-    }
+      const {
+        name,
+        email,
+        phone,
+        password,
+        specialization,
+        category,
+        bio,
+        hourlyRate,
+        certificateTitle,
+        availability,
+      } = req.body;
 
-    let fileUrl = '/uploads/sample_cert.pdf';
-    if (req.file) {
-      fileUrl = await uploadToStorage(req.file, 'cert');
-    }
-
-    const certData = {
-      title: certificateTitle || 'Specialization Certificate',
-      fileName: req.file ? req.file.originalname : (certificateTitle ? 'certificate_declared.pdf' : null),
-      fileUrl: fileUrl,
-      uploadedAt: new Date().toISOString()
-    };
-
-    const salt = bcrypt.genSaltSync(10);
-    const newInfluencer = {
-      id: `inf_${Date.now()}`,
-      name,
-      email: email.toLowerCase(),
-      phone,
-      password: bcrypt.hashSync(password, salt),
-      role: 'influencer',
-      specialization: specialization || 'Content Creator & Expert',
-      category: category || 'General',
-      bio: bio || 'Passionate professional connecting with community and clients.',
-      hourlyRate: Number(hourlyRate) || 150,
-      avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80`,
-      status: 'pending_review', // Important: initially under review
-      isVerified: false,
-      certificateStatus: (req.file || certificateTitle) ? 'pending' : 'none',
-      certification: (req.file || certificateTitle) ? certData : null,
-      availability: normalizeAvailability(parsedAvailability),
-      createdAt: new Date().toISOString()
-    };
-
-    data.influencers.push(newInfluencer);
-    db.write(data);
-
-    // Prompt rule: "While registration the first msg is shown to influencer is your account is under review"
-    return res.status(201).json({
-      success: true,
-      status: 'pending_review',
-      message: 'Your account is under review by the admin. You will be able to access your dashboard once approved.',
-      influencer: {
-        id: newInfluencer.id,
-        name: newInfluencer.name,
-        email: newInfluencer.email,
-        role: 'influencer',
-        status: newInfluencer.status
+      if (!name || !email || !password || !phone) {
+        return res
+          .status(400)
+          .json({ error: 'Name, email, phone, and password are required' });
       }
-    });
-  } catch (err) {
-    console.error('Error registering influencer:', err);
-    return res.status(500).json({ error: 'Failed to register influencer' });
-  }
-});
+
+      const data = db.read();
+      const existing = data.influencers.find(
+        (i) => i.email.toLowerCase() === email.toLowerCase(),
+      );
+      if (existing) {
+        return res
+          .status(400)
+          .json({ error: 'An influencer with this email already exists' });
+      }
+
+      let parsedAvailability = {};
+      try {
+        parsedAvailability =
+          typeof availability === 'string'
+            ? JSON.parse(availability)
+            : availability || {};
+      } catch {
+        parsedAvailability = {};
+      }
+
+      let fileUrl = '/uploads/sample_cert.pdf';
+      if (req.file) {
+        fileUrl = await uploadToStorage(req.file, 'cert');
+      }
+
+      const certData = {
+        title: certificateTitle || 'Specialization Certificate',
+        fileName: req.file
+          ? req.file.originalname
+          : certificateTitle
+            ? 'certificate_declared.pdf'
+            : null,
+        fileUrl: fileUrl,
+        uploadedAt: new Date().toISOString(),
+      };
+
+      const salt = bcrypt.genSaltSync(10);
+      const newInfluencer = {
+        id: `inf_${Date.now()}`,
+        name,
+        email: email.toLowerCase(),
+        phone,
+        password: bcrypt.hashSync(password, salt),
+        role: 'influencer',
+        specialization: specialization || 'Content Creator & Expert',
+        category: category || 'General',
+        bio:
+          bio ||
+          'Passionate professional connecting with community and clients.',
+        hourlyRate: Number(hourlyRate) || 150,
+        avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80`,
+        status: 'pending_review', // Important: initially under review
+        isVerified: false,
+        certificateStatus: req.file || certificateTitle ? 'pending' : 'none',
+        certification: req.file || certificateTitle ? certData : null,
+        availability: normalizeAvailability(parsedAvailability),
+        createdAt: new Date().toISOString(),
+      };
+
+      data.influencers.push(newInfluencer);
+      db.write(data);
+
+      // Prompt rule: "While registration the first msg is shown to influencer is your account is under review"
+      return res.status(201).json({
+        success: true,
+        status: 'pending_review',
+        message:
+          'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+        influencer: {
+          id: newInfluencer.id,
+          name: newInfluencer.name,
+          email: newInfluencer.email,
+          role: 'influencer',
+          status: newInfluencer.status,
+        },
+      });
+    } catch (err) {
+      console.error('Error registering influencer:', err);
+      return res.status(500).json({ error: 'Failed to register influencer' });
+    }
+  },
+);
 
 /**
  * USER REGISTRATION
@@ -137,13 +158,19 @@ router.post('/register-user', (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Name, email, and password are required' });
+      return res
+        .status(400)
+        .json({ error: 'Name, email, and password are required' });
     }
 
     const data = db.read();
-    const existing = data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const existing = data.users.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase(),
+    );
     if (existing) {
-      return res.status(400).json({ error: 'A user with this email already exists' });
+      return res
+        .status(400)
+        .json({ error: 'A user with this email already exists' });
     }
 
     const salt = bcrypt.genSaltSync(10);
@@ -155,14 +182,19 @@ router.post('/register-user', (req, res) => {
       password: bcrypt.hashSync(password, salt),
       role: 'user',
       status: 'approved', // Active user
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
-      createdAt: new Date().toISOString()
+      avatar:
+        'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80',
+      createdAt: new Date().toISOString(),
     };
 
     data.users.push(newUser);
     db.write(data);
 
-    const token = generateToken({ id: newUser.id, role: 'user', email: newUser.email });
+    const token = generateToken({
+      id: newUser.id,
+      role: 'user',
+      email: newUser.email,
+    });
     return res.status(201).json({
       success: true,
       message: 'User registration successful',
@@ -174,8 +206,8 @@ router.post('/register-user', (req, res) => {
         phone: newUser.phone,
         role: 'user',
         status: newUser.status,
-        avatar: newUser.avatar
-      }
+        avatar: newUser.avatar,
+      },
     });
   } catch (err) {
     console.error('Error registering user:', err);
@@ -190,11 +222,15 @@ router.post('/register-admin', (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     if (!name || !email || !password) {
-      return res.status(400).json({ error: 'Name, email, and password are required' });
+      return res
+        .status(400)
+        .json({ error: 'Name, email, and password are required' });
     }
 
     const data = db.read();
-    const existing = data.admins.find(a => a.email.toLowerCase() === email.toLowerCase());
+    const existing = data.admins.find(
+      (a) => a.email.toLowerCase() === email.toLowerCase(),
+    );
     if (existing) {
       return res.status(400).json({ error: 'Admin already exists' });
     }
@@ -207,17 +243,26 @@ router.post('/register-admin', (req, res) => {
       phone: phone || '',
       password: bcrypt.hashSync(password, salt),
       role: 'admin',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     data.admins.push(newAdmin);
     db.write(data);
 
-    const token = generateToken({ id: newAdmin.id, role: 'admin', email: newAdmin.email });
+    const token = generateToken({
+      id: newAdmin.id,
+      role: 'admin',
+      email: newAdmin.email,
+    });
     return res.status(201).json({
       success: true,
       token,
-      user: { id: newAdmin.id, name: newAdmin.name, email: newAdmin.email, role: 'admin' }
+      user: {
+        id: newAdmin.id,
+        name: newAdmin.name,
+        email: newAdmin.email,
+        role: 'admin',
+      },
     });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to register admin' });
@@ -239,9 +284,13 @@ router.post('/login', (req, res) => {
 
     // Check Influencer Login
     if (targetRole === 'influencer') {
-      const influencer = data.influencers.find(i => i.email.toLowerCase() === email.toLowerCase());
+      const influencer = data.influencers.find(
+        (i) => i.email.toLowerCase() === email.toLowerCase(),
+      );
       if (!influencer) {
-        return res.status(401).json({ error: 'No influencer account found with this email' });
+        return res
+          .status(401)
+          .json({ error: 'No influencer account found with this email' });
       }
 
       const match = bcrypt.compareSync(password, influencer.password);
@@ -253,7 +302,14 @@ router.post('/login', (req, res) => {
       if (influencer.status === 'blocked') {
         const reason = influencer.statusReason || 'Please contact support.';
         const message = `Your account has been blocked by an administrator. Reason: ${reason}`;
-        return res.status(403).json({ success: false, status: 'blocked', role: 'influencer', reason, error: message, message });
+        return res.status(403).json({
+          success: false,
+          status: 'blocked',
+          role: 'influencer',
+          reason,
+          error: message,
+          message,
+        });
       }
 
       if (influencer.status === 'pending_review') {
@@ -261,7 +317,8 @@ router.post('/login', (req, res) => {
           success: false,
           status: 'pending_review',
           role: 'influencer',
-          message: 'Your account is under review by the admin. You will be able to access your dashboard once approved.'
+          message:
+            'Your account is under review by the admin. You will be able to access your dashboard once approved.',
         });
       }
 
@@ -270,27 +327,35 @@ router.post('/login', (req, res) => {
           success: false,
           status: 'rejected',
           role: 'influencer',
-          message: influencer.statusReason 
+          message: influencer.statusReason
             ? `Your account application was declined: ${influencer.statusReason}`
-            : 'Your account has been rejected by the admin. Please contact support.'
+            : 'Your account has been rejected by the admin. Please contact support.',
         });
       }
 
       // Approved! Generate token and return dashboard access
-      const token = generateToken({ id: influencer.id, role: 'influencer', email: influencer.email });
+      const token = generateToken({
+        id: influencer.id,
+        role: 'influencer',
+        email: influencer.email,
+      });
       const { password: _, ...safeInfluencer } = influencer;
       return res.json({
         success: true,
         token,
-        user: safeInfluencer
+        user: safeInfluencer,
       });
     }
 
     // Check User Login
     if (targetRole === 'user') {
-      const user = data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const user = data.users.find(
+        (u) => u.email.toLowerCase() === email.toLowerCase(),
+      );
       if (!user) {
-        return res.status(401).json({ error: 'No user account found with this email' });
+        return res
+          .status(401)
+          .json({ error: 'No user account found with this email' });
       }
 
       const match = bcrypt.compareSync(password, user.password);
@@ -299,10 +364,18 @@ router.post('/login', (req, res) => {
       }
 
       if (['blocked', 'rejected'].includes(user.status)) {
-        const message = user.status === 'blocked'
-          ? `Your account has been blocked by an administrator. Reason: ${user.statusReason || 'Please contact support.'}`
-          : 'Your account has been rejected by an administrator. Please contact support.';
-        return res.status(403).json({ success: false, status: user.status, role: 'user', reason: user.statusReason || '', error: message, message });
+        const message =
+          user.status === 'blocked'
+            ? `Your account has been blocked by an administrator. Reason: ${user.statusReason || 'Please contact support.'}`
+            : 'Your account has been rejected by an administrator. Please contact support.';
+        return res.status(403).json({
+          success: false,
+          status: user.status,
+          role: 'user',
+          reason: user.statusReason || '',
+          error: message,
+          message,
+        });
       }
 
       if (user.status === 'pending_review') {
@@ -310,22 +383,28 @@ router.post('/login', (req, res) => {
           success: false,
           status: 'pending_review',
           role: 'user',
-          message: 'Your user account is currently under review by the admin.'
+          message: 'Your user account is currently under review by the admin.',
         });
       }
 
-      const token = generateToken({ id: user.id, role: 'user', email: user.email });
+      const token = generateToken({
+        id: user.id,
+        role: 'user',
+        email: user.email,
+      });
       const { password: _, ...safeUser } = user;
       return res.json({
         success: true,
         token,
-        user: safeUser
+        user: safeUser,
       });
     }
 
     // Check Admin Login
     if (targetRole === 'admin') {
-      const admin = data.admins.find(a => a.email.toLowerCase() === email.toLowerCase());
+      const admin = data.admins.find(
+        (a) => a.email.toLowerCase() === email.toLowerCase(),
+      );
       if (!admin) {
         return res.status(401).json({ error: 'Admin credentials not found' });
       }
@@ -335,16 +414,22 @@ router.post('/login', (req, res) => {
         return res.status(401).json({ error: 'Invalid admin credentials' });
       }
 
-      const token = generateToken({ id: admin.id, role: 'admin', email: admin.email });
+      const token = generateToken({
+        id: admin.id,
+        role: 'admin',
+        email: admin.email,
+      });
       const { password: _, ...safeAdmin } = admin;
       return res.json({
         success: true,
         token,
-        user: safeAdmin
+        user: safeAdmin,
       });
     }
 
-    return res.status(400).json({ error: 'Please specify a valid role (admin, user, or influencer)' });
+    return res.status(400).json({
+      error: 'Please specify a valid role (admin, user, or influencer)',
+    });
   } catch (err) {
     console.error('Login error:', err);
     return res.status(500).json({ error: 'Internal login error' });
@@ -367,19 +452,25 @@ router.get('/me', (req, res) => {
     let account = null;
 
     if (decoded.role === 'admin') {
-      account = data.admins.find(a => a.id === decoded.id);
+      account = data.admins.find((a) => a.id === decoded.id);
     } else if (decoded.role === 'influencer') {
-      account = data.influencers.find(i => i.id === decoded.id);
+      account = data.influencers.find((i) => i.id === decoded.id);
     } else if (decoded.role === 'user') {
-      account = data.users.find(u => u.id === decoded.id);
+      account = data.users.find((u) => u.id === decoded.id);
     }
 
     if (!account) {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    if (['user', 'influencer'].includes(decoded.role) && ['blocked', 'rejected', 'pending_review'].includes(account.status)) {
-      return res.status(403).json({ error: 'Account access is restricted by an administrator.', status: account.status });
+    if (
+      ['user', 'influencer'].includes(decoded.role) &&
+      ['blocked', 'rejected', 'pending_review'].includes(account.status)
+    ) {
+      return res.status(403).json({
+        error: 'Account access is restricted by an administrator.',
+        status: account.status,
+      });
     }
 
     const { password: _, ...safeAccount } = account;

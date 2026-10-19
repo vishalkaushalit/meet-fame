@@ -14,16 +14,21 @@ import {
   DollarSign,
   ArrowRight,
   CheckCircle,
-  Video
+  Video,
 } from 'lucide-react';
 
-export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) {
+export default function UserPanel({
+  onBookInfluencer,
+  onOpenChat,
+  onJoinCall,
+}) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-bookings'
   useEffect(() => {
     const showBookings = () => setActiveTab('my-bookings');
     window.addEventListener('meetfame-show-bookings', showBookings);
-    return () => window.removeEventListener('meetfame-show-bookings', showBookings);
+    return () =>
+      window.removeEventListener('meetfame-show-bookings', showBookings);
   }, []);
   const [influencers, setInfluencers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -39,7 +44,7 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
     'Technology & AI',
     'Health & Fitness',
     'Fashion & Lifestyle',
-    'Business & Finance'
+    'Business & Finance',
   ];
 
   // Fetch approved influencers
@@ -67,17 +72,29 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
       if (showLoading) setLoadingBookings(true);
       try {
         const result = await api.bookings.getMyBookings({ userId: user.id });
-        if (active) { setMyBookings(result.bookings || []); setBookingsError(''); }
+        if (active) {
+          setMyBookings(result.bookings || []);
+          setBookingsError('');
+        }
       } catch {
-        if (active) setBookingsError('Unable to load bookings. Please try again.');
-      } finally { if (active && showLoading) setLoadingBookings(false); }
+        if (active)
+          setBookingsError('Unable to load bookings. Please try again.');
+      } finally {
+        if (active && showLoading) setLoadingBookings(false);
+      }
     };
     const refresh = () => load();
     load(true);
     window.addEventListener('meetfame-bookings-updated', refresh);
     window.addEventListener('focus', refresh);
-    const timer = activeTab === 'my-bookings' ? setInterval(refresh, 15000) : null;
-    return () => { active = false; clearInterval(timer); window.removeEventListener('meetfame-bookings-updated', refresh); window.removeEventListener('focus', refresh); };
+    const timer =
+      activeTab === 'my-bookings' ? setInterval(refresh, 15000) : null;
+    return () => {
+      active = false;
+      clearInterval(timer);
+      window.removeEventListener('meetfame-bookings-updated', refresh);
+      window.removeEventListener('focus', refresh);
+    };
   }, [user?.id, activeTab]);
 
   return (
@@ -88,13 +105,18 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
         <div className="flex items-center gap-4 relative z-10">
           <img
-            src={user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'}
+            src={
+              user?.avatar ||
+              'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
+            }
             alt={user?.name}
             className="w-16 h-16 rounded-2xl object-cover ring-2 ring-brand-indigo/40"
           />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white">Hello, {user?.name || 'Explorer'}</h1>
+              <h1 className="text-2xl font-black text-white">
+                Hello, {user?.name || 'Explorer'}
+              </h1>
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                 User
               </span>
@@ -170,11 +192,18 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
           {/* Influencer Grid */}
           {loading ? (
-            <LogoLoader variant="inline" label="Loading verified influencers..." />
+            <LogoLoader
+              variant="inline"
+              label="Loading verified influencers..."
+            />
           ) : influencers.length === 0 ? (
             <div className="py-16 text-center text-slate-400 bg-slate-900 rounded-3xl border border-slate-800">
-              <p className="text-sm font-semibold">No influencers found matching your criteria.</p>
-              <p className="text-xs text-slate-500 mt-1">Try selecting another category or clearing search.</p>
+              <p className="text-sm font-semibold">
+                No influencers found matching your criteria.
+              </p>
+              <p className="text-xs text-slate-500 mt-1">
+                Try selecting another category or clearing search.
+              </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,7 +217,10 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
                     <div className="flex items-start gap-4 mb-4">
                       <div className="relative flex-shrink-0">
                         <img
-                          src={inf.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
+                          src={
+                            inf.avatar ||
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+                          }
                           alt={inf.name}
                           className="w-16 h-16 rounded-2xl object-cover ring-2 ring-brand-purple/30 group-hover:ring-brand-purple transition-all"
                         />
@@ -201,7 +233,9 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3 className="font-bold text-white text-base truncate">{inf.name}</h3>
+                          <h3 className="font-bold text-white text-base truncate">
+                            {inf.name}
+                          </h3>
                           {inf.isVerified && <VerifiedBadge size="sm" />}
                         </div>
                         <p className="text-brand-purple text-xs font-semibold mt-0.5 truncate">
@@ -221,12 +255,20 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
                     {/* Rate & Slots metadata */}
                     <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 mb-5 text-xs">
                       <div>
-                        <span className="text-[10px] text-slate-500 uppercase block font-semibold">1-Hour Session</span>
-                        <span className="font-black text-emerald-400 text-sm">${inf.hourlyRate || 150}</span>
+                        <span className="text-[10px] text-slate-500 uppercase block font-semibold">
+                          1-Hour Session
+                        </span>
+                        <span className="font-black text-emerald-400 text-sm">
+                          ${inf.hourlyRate || 150}
+                        </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-slate-500 uppercase block font-semibold">Availability</span>
-                        <span className="font-semibold text-slate-300 text-xs">{inf.totalWeeklySlots || 12} slots/week</span>
+                        <span className="text-[10px] text-slate-500 uppercase block font-semibold">
+                          Availability
+                        </span>
+                        <span className="font-semibold text-slate-300 text-xs">
+                          {inf.totalWeeklySlots || 12} slots/week
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -271,12 +313,29 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
             </div>
           </div>
 
-          {bookingsError && <div role="alert" className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl">{bookingsError}<button className="ml-3 underline" onClick={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}>Retry</button></div>}
+          {bookingsError && (
+            <div
+              role="alert"
+              className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl"
+            >
+              {bookingsError}
+              <button
+                className="ml-3 underline"
+                onClick={() =>
+                  window.dispatchEvent(new Event('meetfame-bookings-updated'))
+                }
+              >
+                Retry
+              </button>
+            </div>
+          )}
           {loadingBookings ? (
             <LogoLoader variant="inline" label="Loading bookings..." />
-          ) : bookingsError && myBookings.length === 0 ? null : myBookings.length === 0 ? (
+          ) : bookingsError &&
+            myBookings.length === 0 ? null : myBookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              You haven't booked any sessions yet. Browse creators to schedule your first 1-hour slot!
+              You haven't booked any sessions yet. Browse creators to schedule
+              your first 1-hour slot!
             </div>
           ) : (
             <div className="space-y-3">
@@ -292,7 +351,9 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm">{b.influencerName}</h4>
+                        <h4 className="font-bold text-white text-sm">
+                          {b.influencerName}
+                        </h4>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                           {b.status}
                         </span>
@@ -301,19 +362,40 @@ export default function UserPanel({ onBookInfluencer, onOpenChat, onJoinCall }) 
                         Topic: <span className="text-white">{b.topic}</span>
                       </p>
                       <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                        <span>Date: <strong className="text-white">{b.date}</strong> ({b.dayOfWeek})</span>
+                        <span>
+                          Date: <strong className="text-white">{b.date}</strong>{' '}
+                          ({b.dayOfWeek})
+                        </span>
                         <span>•</span>
-                        <span>Time Slot: <strong className="text-brand-purple font-mono">{b.slotLabel || b.slot}</strong></span>
+                        <span>
+                          Time Slot:{' '}
+                          <strong className="text-brand-purple font-mono">
+                            {b.slotLabel || b.slot}
+                          </strong>
+                        </span>
                         <span>•</span>
-                        <span>Type: <strong className="text-indigo-400 uppercase">{b.meetingType}</strong></span>
+                        <span>
+                          Type:{' '}
+                          <strong className="text-indigo-400 uppercase">
+                            {b.meetingType}
+                          </strong>
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-                    {b.status === 'confirmed' && b.meetingType === 'video' && <JoinCallButton booking={b} onJoinCall={onJoinCall} />}
+                    {b.status === 'confirmed' && b.meetingType === 'video' && (
+                      <JoinCallButton booking={b} onJoinCall={onJoinCall} />
+                    )}
                     <button
-                      onClick={() => onOpenChat && onOpenChat({ id: b.influencerId, name: b.influencerName }, 'influencer')}
+                      onClick={() =>
+                        onOpenChat &&
+                        onOpenChat(
+                          { id: b.influencerId, name: b.influencerName },
+                          'influencer',
+                        )
+                      }
                       className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 transition-colors"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />

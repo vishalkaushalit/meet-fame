@@ -17,7 +17,7 @@ import {
   ExternalLink,
   ChevronRight,
   Filter,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 
 export default function ApprovalsView() {
@@ -38,14 +38,16 @@ export default function ApprovalsView() {
 
   // Rejection modal
   const [rejectingItem, setRejectingItem] = useState(null);
-  const [rejectReason, setRejectReason] = useState('Missing required professional credentials.');
+  const [rejectReason, setRejectReason] = useState(
+    'Missing required professional credentials.',
+  );
 
   const loadData = async () => {
     setLoading(true);
     try {
       const [infRes, userRes] = await Promise.all([
         adminApi.influencers.getAll(statusFilter),
-        adminApi.users.getAll(statusFilter)
+        adminApi.users.getAll(statusFilter),
       ]);
       setInfluencers(infRes.influencers || []);
       setUsers(userRes.users || []);
@@ -64,7 +66,9 @@ export default function ApprovalsView() {
   const handleApproveInfluencer = async (id, name) => {
     try {
       await adminApi.influencers.updateStatus(id, 'approved');
-      setActionMessage(`Approved ${name}! They can now log in to their Influencer Dashboard.`);
+      setActionMessage(
+        `Approved ${name}! They can now log in to their Influencer Dashboard.`,
+      );
       loadData();
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err) {
@@ -76,7 +80,11 @@ export default function ApprovalsView() {
   const handleConfirmRejectInfluencer = async () => {
     if (!rejectingItem) return;
     try {
-      await adminApi.influencers.updateStatus(rejectingItem.id, 'rejected', rejectReason);
+      await adminApi.influencers.updateStatus(
+        rejectingItem.id,
+        'rejected',
+        rejectReason,
+      );
       setActionMessage(`Declined ${rejectingItem.name}.`);
       setRejectingItem(null);
       loadData();
@@ -89,11 +97,15 @@ export default function ApprovalsView() {
   // Handle Certificate Verification (Instagram Style Blue Badge)
   const handleVerifyCertificate = async (id, name, grant) => {
     try {
-      await adminApi.influencers.verifyCertificate(id, grant, grant ? 'verified' : 'rejected');
+      await adminApi.influencers.verifyCertificate(
+        id,
+        grant,
+        grant ? 'verified' : 'rejected',
+      );
       setActionMessage(
         grant
           ? `Verified ${name}'s certificate! Instagram-style Blue Badge awarded.`
-          : `Revoked certificate verification for ${name}.`
+          : `Revoked certificate verification for ${name}.`,
       );
       loadData();
       setTimeout(() => setActionMessage(''), 4000);
@@ -108,12 +120,16 @@ export default function ApprovalsView() {
     setActionMessage('');
     try {
       await adminApi.users.updateStatus(user.id, status);
-      setActionMessage(status === 'blocked'
-        ? `${user.name} has been blocked from logging in.`
-        : `${user.name} can now log in.`);
+      setActionMessage(
+        status === 'blocked'
+          ? `${user.name} has been blocked from logging in.`
+          : `${user.name} can now log in.`,
+      );
       await loadData();
     } catch (err) {
-      setActionError(err.error || 'Unable to update this user. Please try again.');
+      setActionError(
+        err.error || 'Unable to update this user. Please try again.',
+      );
     } finally {
       setUpdatingUser(null);
     }
@@ -131,13 +147,20 @@ export default function ApprovalsView() {
     setBlocking(true);
     setBlockError('');
     try {
-      const api = blockingItem.role === 'influencer' ? adminApi.influencers : adminApi.users;
+      const api =
+        blockingItem.role === 'influencer'
+          ? adminApi.influencers
+          : adminApi.users;
       await api.updateStatus(blockingItem.id, 'blocked', blockReason.trim());
-      setActionMessage(`${blockingItem.name} has been blocked. They will see your remark when logging in.`);
+      setActionMessage(
+        `${blockingItem.name} has been blocked. They will see your remark when logging in.`,
+      );
       setBlockingItem(null);
       await loadData();
     } catch (err) {
-      setBlockError(err.error || 'Unable to block this account. Please try again.');
+      setBlockError(
+        err.error || 'Unable to block this account. Please try again.',
+      );
     } finally {
       setBlocking(false);
     }
@@ -153,29 +176,39 @@ export default function ApprovalsView() {
             <span>Registration & Certificate Approvals</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Review applicant credentials. Influencers can only log in once approved by admin.
+            Review applicant credentials. Influencers can only log in once
+            approved by admin.
           </p>
         </div>
 
         {/* Filter Pills */}
         <div className="flex items-center gap-2">
-          {['all', 'pending_review', 'approved', 'rejected', 'blocked'].map(s => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
-                statusFilter === s
-                  ? 'bg-brand-purple text-white shadow-md'
-                  : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              {s.replace('_', ' ')}
-            </button>
-          ))}
+          {['all', 'pending_review', 'approved', 'rejected', 'blocked'].map(
+            (s) => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+                  statusFilter === s
+                    ? 'bg-brand-purple text-white shadow-md'
+                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
+                }`}
+              >
+                {s.replace('_', ' ')}
+              </button>
+            ),
+          )}
         </div>
       </div>
 
-      {actionError && <div role="alert" className="p-3 rounded-xl bg-rose-500/10 text-rose-400 text-xs">{actionError}</div>}
+      {actionError && (
+        <div
+          role="alert"
+          className="p-3 rounded-xl bg-rose-500/10 text-rose-400 text-xs"
+        >
+          {actionError}
+        </div>
+      )}
       {actionMessage && (
         <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium flex items-center gap-2">
           <CheckCircle className="w-4 h-4 flex-shrink-0" />
@@ -186,7 +219,10 @@ export default function ApprovalsView() {
       {/* Tabs: Influencer Queue vs User Queue */}
       <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
         <button
-          onClick={() => { setActiveTab('influencers'); setStatusFilter('all'); }}
+          onClick={() => {
+            setActiveTab('influencers');
+            setStatusFilter('all');
+          }}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
             activeTab === 'influencers'
               ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
@@ -233,48 +269,82 @@ export default function ApprovalsView() {
                   {/* Left: Info */}
                   <div className="flex items-start gap-4">
                     <img
-                      src={inf.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'}
+                      src={
+                        inf.avatar ||
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80'
+                      }
                       alt={inf.name}
                       className="w-16 h-16 rounded-2xl object-cover ring-2 ring-slate-800 flex-shrink-0"
                     />
 
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-white text-base">{inf.name}</h3>
+                        <h3 className="font-bold text-white text-base">
+                          {inf.name}
+                        </h3>
                         {inf.isVerified && <VerifiedBadge size="sm" />}
-                        
+
                         {/* Status Badge */}
-                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          isApproved
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                            : isPending
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse'
-                            : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                        }`}>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            isApproved
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : isPending
+                                ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse'
+                                : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                          }`}
+                        >
                           {inf.status?.replace('_', ' ')}
                         </span>
                       </div>
 
-                      <p className="text-brand-purple text-xs font-semibold mt-0.5">{inf.specialization}</p>
+                      <p className="text-brand-purple text-xs font-semibold mt-0.5">
+                        {inf.specialization}
+                      </p>
 
                       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mt-1.5">
-                        <span>Email: <strong className="text-white">{inf.email}</strong></span>
+                        <span>
+                          Email:{' '}
+                          <strong className="text-white">{inf.email}</strong>
+                        </span>
                         <span>•</span>
-                        <span>Phone: <strong className="text-white">{inf.phone}</strong></span>
+                        <span>
+                          Phone:{' '}
+                          <strong className="text-white">{inf.phone}</strong>
+                        </span>
                         <span>•</span>
-                        <span>Category: <strong className="text-indigo-300">{inf.category}</strong></span>
+                        <span>
+                          Category:{' '}
+                          <strong className="text-indigo-300">
+                            {inf.category}
+                          </strong>
+                        </span>
                         <span>•</span>
-                        <span>Fee: <strong className="text-emerald-400">${inf.hourlyRate}/hr</strong></span>
+                        <span>
+                          Fee:{' '}
+                          <strong className="text-emerald-400">
+                            ${inf.hourlyRate}/hr
+                          </strong>
+                        </span>
                       </div>
 
-                      {inf.status === 'blocked' && <p className="text-xs text-rose-300 mt-2 whitespace-pre-wrap break-words">Blocking remark: {inf.statusReason || 'No remark recorded'}</p>}
+                      {inf.status === 'blocked' && (
+                        <p className="text-xs text-rose-300 mt-2 whitespace-pre-wrap break-words">
+                          Blocking remark:{' '}
+                          {inf.statusReason || 'No remark recorded'}
+                        </p>
+                      )}
                       {/* Certification Section */}
                       {inf.certification && (
                         <div className="mt-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs">
                           <div className="flex items-center gap-2">
                             <FileCheck className="w-4 h-4 text-[#0095F6]" />
                             <span className="text-slate-300">
-                              Credential: <strong>{inf.certification.title || 'Specialization Certificate'}</strong>
+                              Credential:{' '}
+                              <strong>
+                                {inf.certification.title ||
+                                  'Specialization Certificate'}
+                              </strong>
                             </span>
                             {inf.certification.fileUrl && (
                               <a
@@ -293,14 +363,26 @@ export default function ApprovalsView() {
                           <div className="flex items-center gap-2">
                             {inf.isVerified ? (
                               <button
-                                onClick={() => handleVerifyCertificate(inf.id, inf.name, false)}
+                                onClick={() =>
+                                  handleVerifyCertificate(
+                                    inf.id,
+                                    inf.name,
+                                    false,
+                                  )
+                                }
                                 className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-bold"
                               >
                                 Revoke Blue Badge
                               </button>
                             ) : (
                               <button
-                                onClick={() => handleVerifyCertificate(inf.id, inf.name, true)}
+                                onClick={() =>
+                                  handleVerifyCertificate(
+                                    inf.id,
+                                    inf.name,
+                                    true,
+                                  )
+                                }
                                 className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm"
                               >
                                 <VerifiedBadge size="sm" />
@@ -315,11 +397,23 @@ export default function ApprovalsView() {
 
                   {/* Right: Actions */}
                   <div className="approval-actions flex items-center gap-2 self-start lg:self-center">
-                    <button type="button" className="user-view-button approval-icon-button" title="View details" aria-label={`View details for ${inf.name}`} onClick={() => setViewingAccount({ ...inf, role: 'influencer' })}><Eye size={16} aria-hidden="true" /></button>
+                    <button
+                      type="button"
+                      className="user-view-button approval-icon-button"
+                      title="View details"
+                      aria-label={`View details for ${inf.name}`}
+                      onClick={() =>
+                        setViewingAccount({ ...inf, role: 'influencer' })
+                      }
+                    >
+                      <Eye size={16} aria-hidden="true" />
+                    </button>
                     {isPending && (
                       <>
                         <button
-                          onClick={() => handleApproveInfluencer(inf.id, inf.name)}
+                          onClick={() =>
+                            handleApproveInfluencer(inf.id, inf.name)
+                          }
                           className="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
                         >
                           <CheckCircle className="w-4 h-4" />
@@ -343,12 +437,34 @@ export default function ApprovalsView() {
                       </span>
                     )}
 
-                    {inf.status !== 'blocked' && <button onClick={() => openBlock(inf, 'influencer')} title="Block influencer" aria-label={`Block ${inf.name}`} className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"><Ban size={16} aria-hidden="true" /></button>}
-                    {inf.status === 'blocked' && <button onClick={() => handleApproveInfluencer(inf.id, inf.name)} title="Unblock influencer" aria-label={`Unblock ${inf.name}`} className="approval-icon-button rounded-xl bg-emerald-600 text-white"><LockOpen size={16} aria-hidden="true" /></button>}
+                    {inf.status !== 'blocked' && (
+                      <button
+                        onClick={() => openBlock(inf, 'influencer')}
+                        title="Block influencer"
+                        aria-label={`Block ${inf.name}`}
+                        className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"
+                      >
+                        <Ban size={16} aria-hidden="true" />
+                      </button>
+                    )}
+                    {inf.status === 'blocked' && (
+                      <button
+                        onClick={() =>
+                          handleApproveInfluencer(inf.id, inf.name)
+                        }
+                        title="Unblock influencer"
+                        aria-label={`Unblock ${inf.name}`}
+                        className="approval-icon-button rounded-xl bg-emerald-600 text-white"
+                      >
+                        <LockOpen size={16} aria-hidden="true" />
+                      </button>
+                    )}
 
                     {isRejected && (
                       <button
-                        onClick={() => handleApproveInfluencer(inf.id, inf.name)}
+                        onClick={() =>
+                          handleApproveInfluencer(inf.id, inf.name)
+                        }
                         className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
                       >
                         Re-Approve
@@ -360,75 +476,154 @@ export default function ApprovalsView() {
             })}
           </div>
         )
+      ) : /* USER QUEUE */
+      users.length === 0 ? (
+        <div className="py-16 text-center text-slate-500 bg-slate-900 rounded-3xl border border-slate-800 text-xs">
+          No users found.
+        </div>
       ) : (
-        /* USER QUEUE */
-        users.length === 0 ? (
-          <div className="py-16 text-center text-slate-500 bg-slate-900 rounded-3xl border border-slate-800 text-xs">
-            No users found.
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3">
-            {users.map((u) => (
-              <div
-                key={u.id}
-                className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-sm">
-                    {u.name?.charAt(0) || 'U'}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-sm">{u.name}</h4>
-                    <p className="text-xs text-slate-400">{u.email} • {u.phone || 'No phone'}</p>
-                    {u.status === 'blocked' && <p className="text-xs text-rose-300 mt-2 whitespace-pre-wrap break-words">Blocking remark: {u.statusReason || 'No remark recorded'}</p>}
-                  </div>
+        <div className="grid grid-cols-1 gap-3">
+          {users.map((u) => (
+            <div
+              key={u.id}
+              className="p-4 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-sm">
+                  {u.name?.charAt(0) || 'U'}
                 </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <button type="button" className="user-view-button approval-icon-button" title="View details" aria-label={`View details for ${u.name}`} onClick={() => setViewingAccount({ ...u, role: 'user' })}><Eye size={16} aria-hidden="true" /></button>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                    u.status === 'approved'
-                      ? 'bg-emerald-500/10 text-emerald-400'
-                      : u.status === 'blocked' ? 'bg-rose-500/10 text-rose-400' : 'bg-amber-500/10 text-amber-400'
-                  }`}>
-                    {u.status}
-                  </span>
-
-                  {u.status !== 'blocked' && (
-                    <button onClick={() => openBlock(u, 'user')} disabled={updatingUser === u.id}
-                      className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50">
-                      {updatingUser === u.id ? <LogoLoader variant="button" label="Saving…" /> : 'Block User'}
-                    </button>
-                  )}
-                  {u.status !== 'approved' && (
-                    <button
-                      onClick={() => handleUserStatus(u, 'approved')}
-                      disabled={updatingUser === u.id}
-                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
-                    >
-                      {updatingUser === u.id ? <LogoLoader variant="button" label="Saving…" /> : u.status === 'blocked' ? 'Unblock User' : 'Approve User'}
-                    </button>
+                <div>
+                  <h4 className="font-bold text-white text-sm">{u.name}</h4>
+                  <p className="text-xs text-slate-400">
+                    {u.email} • {u.phone || 'No phone'}
+                  </p>
+                  {u.status === 'blocked' && (
+                    <p className="text-xs text-rose-300 mt-2 whitespace-pre-wrap break-words">
+                      Blocking remark: {u.statusReason || 'No remark recorded'}
+                    </p>
                   )}
                 </div>
               </div>
-            ))}
-          </div>
-        )
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  className="user-view-button approval-icon-button"
+                  title="View details"
+                  aria-label={`View details for ${u.name}`}
+                  onClick={() => setViewingAccount({ ...u, role: 'user' })}
+                >
+                  <Eye size={16} aria-hidden="true" />
+                </button>
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                    u.status === 'approved'
+                      ? 'bg-emerald-500/10 text-emerald-400'
+                      : u.status === 'blocked'
+                        ? 'bg-rose-500/10 text-rose-400'
+                        : 'bg-amber-500/10 text-amber-400'
+                  }`}
+                >
+                  {u.status}
+                </span>
+
+                {u.status !== 'blocked' && (
+                  <button
+                    onClick={() => openBlock(u, 'user')}
+                    disabled={updatingUser === u.id}
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50"
+                  >
+                    {updatingUser === u.id ? (
+                      <LogoLoader variant="button" label="Saving…" />
+                    ) : (
+                      'Block User'
+                    )}
+                  </button>
+                )}
+                {u.status !== 'approved' && (
+                  <button
+                    onClick={() => handleUserStatus(u, 'approved')}
+                    disabled={updatingUser === u.id}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
+                  >
+                    {updatingUser === u.id ? (
+                      <LogoLoader variant="button" label="Saving…" />
+                    ) : u.status === 'blocked' ? (
+                      'Unblock User'
+                    ) : (
+                      'Approve User'
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
-      {viewingAccount && <AccountDetailsDialog account={viewingAccount} onClose={() => setViewingAccount(null)} />}
+      {viewingAccount && (
+        <AccountDetailsDialog
+          account={viewingAccount}
+          onClose={() => setViewingAccount(null)}
+        />
+      )}
       {blockingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-          <form onSubmit={confirmBlock} role="dialog" aria-modal="true" aria-labelledby="block-title" className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border border-slate-700">
-            <h3 id="block-title" className="text-lg font-bold text-white">Block {blockingItem.name}</h3>
-            <p className="text-xs text-slate-400 mt-2 mb-4">This account will be unable to log in. Your remark will be shown to this person when they try to sign in.</p>
-            <label htmlFor="block-remark" className="block text-xs text-slate-300 mb-2">Reason for blocking (required)</label>
-            <textarea id="block-remark" autoFocus required maxLength={1000} rows={4} value={blockReason} disabled={blocking} onChange={event => setBlockReason(event.target.value)} className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white" />
-            <p className="text-xs text-slate-500 mt-1">{blockReason.length}/1000 characters</p>
-            {blockError && <p role="alert" className="text-xs text-rose-400 mt-3">{blockError}</p>}
+          <form
+            onSubmit={confirmBlock}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="block-title"
+            className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border border-slate-700"
+          >
+            <h3 id="block-title" className="text-lg font-bold text-white">
+              Block {blockingItem.name}
+            </h3>
+            <p className="text-xs text-slate-400 mt-2 mb-4">
+              This account will be unable to log in. Your remark will be shown
+              to this person when they try to sign in.
+            </p>
+            <label
+              htmlFor="block-remark"
+              className="block text-xs text-slate-300 mb-2"
+            >
+              Reason for blocking (required)
+            </label>
+            <textarea
+              id="block-remark"
+              autoFocus
+              required
+              maxLength={1000}
+              rows={4}
+              value={blockReason}
+              disabled={blocking}
+              onChange={(event) => setBlockReason(event.target.value)}
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white"
+            />
+            <p className="text-xs text-slate-500 mt-1">
+              {blockReason.length}/1000 characters
+            </p>
+            {blockError && (
+              <p role="alert" className="text-xs text-rose-400 mt-3">
+                {blockError}
+              </p>
+            )}
             <div className="flex justify-end gap-3 mt-5">
-              <button type="button" disabled={blocking} onClick={() => setBlockingItem(null)} className="text-xs text-slate-400 px-3 py-2">Cancel</button>
-              <button type="submit" disabled={blocking || !blockReason.trim()} className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold disabled:opacity-50">{blocking ? 'Blocking…' : 'Block account'}</button>
+              <button
+                type="button"
+                disabled={blocking}
+                onClick={() => setBlockingItem(null)}
+                className="text-xs text-slate-400 px-3 py-2"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={blocking || !blockReason.trim()}
+                className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                {blocking ? 'Blocking…' : 'Block account'}
+              </button>
             </div>
           </form>
         </div>
@@ -437,9 +632,13 @@ export default function ApprovalsView() {
       {rejectingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="w-full max-w-md p-6 rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl text-slate-100">
-            <h3 className="text-lg font-bold text-white mb-2">Decline Influencer Application</h3>
+            <h3 className="text-lg font-bold text-white mb-2">
+              Decline Influencer Application
+            </h3>
             <p className="text-xs text-slate-400 mb-4">
-              Enter the reason for declining <strong>{rejectingItem.name}</strong>. This status will be shown to the influencer when they attempt to sign in.
+              Enter the reason for declining{' '}
+              <strong>{rejectingItem.name}</strong>. This status will be shown
+              to the influencer when they attempt to sign in.
             </p>
 
             <textarea

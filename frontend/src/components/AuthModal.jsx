@@ -17,13 +17,18 @@ import {
   Briefcase,
   DollarSign,
   Upload,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 import Logo from './Logo';
 
-export default function AuthModal({ isOpen, onClose, initialRole = 'user', initialTab = 'login' }) {
+export default function AuthModal({
+  isOpen,
+  onClose,
+  initialRole = 'user',
+  initialTab = 'login',
+}) {
   const { login, registerUser, registerInfluencer } = useAuth();
-  
+
   const [role, setRole] = useState(initialRole); // 'user' | 'influencer'
   const [isRegister, setIsRegister] = useState(initialTab === 'register');
   const [loading, setLoading] = useState(false);
@@ -34,9 +39,11 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  
+
   // Influencer specific
-  const [specialization, setSpecialization] = useState('Tech & AI Product Advisor');
+  const [specialization, setSpecialization] = useState(
+    'Tech & AI Product Advisor',
+  );
   const [category, setCategory] = useState('Technology & AI');
   const [bio, setBio] = useState('');
   const [hourlyRate, setHourlyRate] = useState(200);
@@ -45,18 +52,20 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
   // Day-wise availability configuration for influencer
   // Default Monday: 9-12 and 17-20 as described in prompt!
-  const [availability, setAvailability] = useState(() => normalizeAvailability({
-    monday: [
-      { start: '09:00', end: '12:00' },
-      { start: '17:00', end: '20:00' }
-    ],
-    tuesday: [{ start: '10:00', end: '14:00' }],
-    wednesday: [{ start: '09:00', end: '12:00' }],
-    thursday: [{ start: '11:00', end: '15:00' }],
-    friday: [{ start: '09:00', end: '13:00' }],
-    saturday: [{ start: '10:00', end: '12:00' }],
-    sunday: []
-  }));
+  const [availability, setAvailability] = useState(() =>
+    normalizeAvailability({
+      monday: [
+        { start: '09:00', end: '12:00' },
+        { start: '17:00', end: '20:00' },
+      ],
+      tuesday: [{ start: '10:00', end: '14:00' }],
+      wednesday: [{ start: '09:00', end: '12:00' }],
+      thursday: [{ start: '11:00', end: '15:00' }],
+      friday: [{ start: '09:00', end: '13:00' }],
+      saturday: [{ start: '10:00', end: '12:00' }],
+      sunday: [],
+    }),
+  );
 
   const [activeDayTab, setActiveDayTab] = useState('monday');
 
@@ -69,15 +78,23 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
     'Business & Finance',
     'Content Creation & Media',
     'Design & Creative',
-    'Career & Leadership'
+    'Career & Leadership',
   ];
 
-  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const days = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
 
   // Calculate 1-hour slots for active tab to show real-time auto-generation preview!
   const generatePreviewSlots = (ranges = []) => {
     const slots = [];
-    dayRanges(ranges).forEach(r => {
+    dayRanges(ranges).forEach((r) => {
       if (!r.start || !r.end) return;
       const [sh] = r.start.split(':').map(Number);
       const [eh] = r.end.split(':').map(Number);
@@ -97,21 +114,23 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
   };
 
   const handleAddRange = (day) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
-      [day]: { ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }] }
+      [day]: {
+        ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }],
+      },
     }));
   };
 
   const handleRemoveRange = (day, index) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
-      [day]: { ranges: dayRanges(prev[day]).filter((_, idx) => idx !== index) }
+      [day]: { ranges: dayRanges(prev[day]).filter((_, idx) => idx !== index) },
     }));
   };
 
   const handleRangeChange = (day, index, field, value) => {
-    setAvailability(prev => {
+    setAvailability((prev) => {
       const updated = [...dayRanges(prev[day])];
       updated[index] = { ...updated[index], [field]: value };
       return { ...prev, [day]: { ranges: updated } };
@@ -209,7 +228,10 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
         <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-950/80 rounded-2xl border border-slate-800 mb-6">
           <button
             type="button"
-            onClick={() => { setRole('user'); setError(''); }}
+            onClick={() => {
+              setRole('user');
+              setError('');
+            }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
               role === 'user'
                 ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
@@ -222,7 +244,10 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
           <button
             type="button"
-            onClick={() => { setRole('influencer'); setError(''); }}
+            onClick={() => {
+              setRole('influencer');
+              setError('');
+            }}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
               role === 'influencer'
                 ? 'bg-gradient-to-r from-brand-purple to-brand-coral text-white shadow-md'
@@ -246,7 +271,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
           {/* Registration Fields */}
           {isRegister && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Full Name
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -262,7 +289,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
           {/* Email */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Email Address
+            </label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input
@@ -279,7 +308,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
           {/* Phone (required for influencer, optional for user) */}
           {isRegister && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Phone Number</label>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Phone Number
+              </label>
               <div className="relative">
                 <Phone className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
                 <input
@@ -296,7 +327,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
           {/* Password */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Password
+            </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input
@@ -320,20 +353,26 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Category
+                  </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   >
-                    {categories.map(c => (
-                      <option key={c} value={c} className="bg-slate-900">{c}</option>
+                    {categories.map((c) => (
+                      <option key={c} value={c} className="bg-slate-900">
+                        {c}
+                      </option>
                     ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Hourly Consultation Rate ($)</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    Hourly Consultation Rate ($)
+                  </label>
                   <div className="relative">
                     <DollarSign className="absolute left-3 top-2.5 w-4 h-4 text-slate-500" />
                     <input
@@ -349,7 +388,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Specialization / Expertise</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Specialization / Expertise
+                </label>
                 <input
                   type="text"
                   required
@@ -365,7 +406,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                     <FileCheck className="w-4 h-4 text-[#0095F6]" />
-                    <span>Specialization Certification (For Blue Verified Badge)</span>
+                    <span>
+                      Specialization Certification (For Blue Verified Badge)
+                    </span>
                   </label>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">
                     Instagram Style Badge
@@ -381,12 +424,18 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                 <div className="flex items-center gap-3">
                   <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple bg-slate-900/50 text-xs text-slate-400 hover:text-white transition-colors">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>{certificateFile ? certificateFile.name : 'Upload Certificate / Credential (PDF, PNG)'}</span>
+                    <span>
+                      {certificateFile
+                        ? certificateFile.name
+                        : 'Upload Certificate / Credential (PDF, PNG)'}
+                    </span>
                     <input
                       type="file"
                       accept=".pdf,.png,.jpg,.jpeg"
                       className="hidden"
-                      onChange={(e) => setCertificateFile(e.target.files[0] || null)}
+                      onChange={(e) =>
+                        setCertificateFile(e.target.files[0] || null)
+                      }
                     />
                   </label>
                   {certificateFile && (
@@ -400,7 +449,8 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                   )}
                 </div>
                 <p className="text-[11px] text-slate-500 mt-1.5">
-                  Uploaded certificates will be reviewed by admin to grant your profile the official Blue Verified badge.
+                  Uploaded certificates will be reviewed by admin to grant your
+                  profile the official Blue Verified badge.
                 </p>
               </div>
 
@@ -419,12 +469,14 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                 </div>
 
                 <p className="text-xs text-slate-400 mb-3">
-                  Define your available time ranges per day. MeetFame will automatically slice them into 1-hour bookable appointment slots.
+                  Define your available time ranges per day. MeetFame will
+                  automatically slice them into 1-hour bookable appointment
+                  slots.
                 </p>
 
                 {/* Day selector pills */}
                 <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 text-xs">
-                  {days.map(d => (
+                  {days.map((d) => (
                     <button
                       key={d}
                       type="button"
@@ -437,7 +489,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                     >
                       {d.slice(0, 3)}
                       {dayRanges(availability[d]).length > 0 && (
-                        <span className="ml-1 text-[10px] opacity-75">({dayRanges(availability[d]).length})</span>
+                        <span className="ml-1 text-[10px] opacity-75">
+                          ({dayRanges(availability[d]).length})
+                        </span>
                       )}
                     </button>
                   ))}
@@ -447,24 +501,42 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                 <div className="space-y-2 mb-3">
                   {dayRanges(availability[activeDayTab]).length === 0 ? (
                     <div className="text-xs text-slate-500 py-3 text-center bg-slate-900/60 rounded-xl border border-slate-800/80">
-                      No availability configured for {activeDayTab}. Click "Add Range" to open slots.
+                      No availability configured for {activeDayTab}. Click "Add
+                      Range" to open slots.
                     </div>
                   ) : (
                     dayRanges(availability[activeDayTab]).map((range, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 bg-slate-900/80 p-2 rounded-xl border border-slate-800"
+                      >
                         <Clock className="w-3.5 h-3.5 text-slate-400 ml-1" />
                         <span className="text-xs text-slate-400">From</span>
                         <input
                           type="time"
                           value={range.start}
-                          onChange={(e) => handleRangeChange(activeDayTab, idx, 'start', e.target.value)}
+                          onChange={(e) =>
+                            handleRangeChange(
+                              activeDayTab,
+                              idx,
+                              'start',
+                              e.target.value,
+                            )
+                          }
                           className="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-brand-purple"
                         />
                         <span className="text-xs text-slate-400">to</span>
                         <input
                           type="time"
                           value={range.end}
-                          onChange={(e) => handleRangeChange(activeDayTab, idx, 'end', e.target.value)}
+                          onChange={(e) =>
+                            handleRangeChange(
+                              activeDayTab,
+                              idx,
+                              'end',
+                              e.target.value,
+                            )
+                          }
                           className="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-brand-purple"
                         />
                         <button
@@ -491,17 +563,31 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
                 {/* Real-time 1-hour slots generator preview */}
                 <div className="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800 text-xs">
                   <div className="font-semibold text-slate-300 mb-1 flex items-center justify-between">
-                    <span>Generated 1-Hour Slots for {activeDayTab.toUpperCase()}:</span>
+                    <span>
+                      Generated 1-Hour Slots for {activeDayTab.toUpperCase()}:
+                    </span>
                     <span className="text-brand-purple font-mono">
-                      {generatePreviewSlots(availability[activeDayTab] || []).length} slots
+                      {
+                        generatePreviewSlots(availability[activeDayTab] || [])
+                          .length
+                      }{' '}
+                      slots
                     </span>
                   </div>
                   <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {generatePreviewSlots(availability[activeDayTab] || []).length === 0 ? (
-                      <span className="text-slate-500 italic text-[11px]">No slots generated yet</span>
+                    {generatePreviewSlots(availability[activeDayTab] || [])
+                      .length === 0 ? (
+                      <span className="text-slate-500 italic text-[11px]">
+                        No slots generated yet
+                      </span>
                     ) : (
-                      generatePreviewSlots(availability[activeDayTab] || []).map((slot, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[11px] font-mono">
+                      generatePreviewSlots(
+                        availability[activeDayTab] || [],
+                      ).map((slot, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[11px] font-mono"
+                        >
                           {slot}
                         </span>
                       ))
@@ -522,12 +608,17 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
               <LogoLoader variant="button" label="Processing…" />
             ) : isRegister ? (
               <>
-                <span>Complete {role === 'influencer' ? 'Influencer' : 'User'} Registration</span>
+                <span>
+                  Complete {role === 'influencer' ? 'Influencer' : 'User'}{' '}
+                  Registration
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </>
             ) : (
               <>
-                <span>Sign In as {role === 'influencer' ? 'Influencer' : 'User'}</span>
+                <span>
+                  Sign In as {role === 'influencer' ? 'Influencer' : 'User'}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -537,11 +628,16 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
         {/* Switch Login/Register */}
         <div className="text-center mt-5 pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
           <span>
-            {isRegister ? 'Already have an account?' : "Don't have an account yet?"}
+            {isRegister
+              ? 'Already have an account?'
+              : "Don't have an account yet?"}
           </span>
           <button
             type="button"
-            onClick={() => { setIsRegister(!isRegister); setError(''); }}
+            onClick={() => {
+              setIsRegister(!isRegister);
+              setError('');
+            }}
             className="font-bold text-brand-purple hover:text-brand-pink transition-colors underline"
           >
             {isRegister ? 'Sign In instead' : 'Create new account'}
@@ -552,7 +648,9 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
         <div className="mt-5 p-3 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs">
           <div className="font-semibold text-slate-400 mb-2 flex items-center justify-between">
             <span>Quick Test Demo Accounts:</span>
-            <span className="text-[10px] text-slate-500">Auto-fill & Login</span>
+            <span className="text-[10px] text-slate-500">
+              Auto-fill & Login
+            </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button
@@ -560,17 +658,27 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
               onClick={() => handleDemoLogin('alex@example.com', 'user')}
               className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
             >
-              <div className="font-bold text-white text-[11px]">Alex Rivera</div>
-              <div className="text-[10px] text-indigo-400">User Role (Active)</div>
+              <div className="font-bold text-white text-[11px]">
+                Alex Rivera
+              </div>
+              <div className="text-[10px] text-indigo-400">
+                User Role (Active)
+              </div>
             </button>
 
             <button
               type="button"
-              onClick={() => handleDemoLogin('marcus@techcreator.io', 'influencer')}
+              onClick={() =>
+                handleDemoLogin('marcus@techcreator.io', 'influencer')
+              }
               className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
             >
-              <div className="font-bold text-white text-[11px]">Marcus Vance</div>
-              <div className="text-[10px] text-purple-400">Influencer (Approved)</div>
+              <div className="font-bold text-white text-[11px]">
+                Marcus Vance
+              </div>
+              <div className="text-[10px] text-purple-400">
+                Influencer (Approved)
+              </div>
             </button>
 
             <button
@@ -579,8 +687,12 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
               className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
               title="Click to see Under Review Popup"
             >
-              <div className="font-bold text-white text-[11px]">Kavita Patel</div>
-              <div className="text-[10px] text-amber-400">Pending Review (Test Popup)</div>
+              <div className="font-bold text-white text-[11px]">
+                Kavita Patel
+              </div>
+              <div className="text-[10px] text-amber-400">
+                Pending Review (Test Popup)
+              </div>
             </button>
           </div>
         </div>
@@ -588,13 +700,18 @@ export default function AuthModal({ isOpen, onClose, initialRole = 'user', initi
         {/* Link to Admin Command Center on port 5174 */}
         <div className="mt-3 text-center">
           <a
-            href={import.meta.env.VITE_ADMIN_PANEL_URL || (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')}
+            href={
+              import.meta.env.VITE_ADMIN_PANEL_URL ||
+              (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')
+            }
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-brand-indigo transition-colors"
           >
             <span>Looking for Admin Command Center?</span>
-            <span className="font-bold underline">Open Admin Panel (Port 5174) &rarr;</span>
+            <span className="font-bold underline">
+              Open Admin Panel (Port 5174) &rarr;
+            </span>
           </a>
         </div>
       </div>

@@ -1,8 +1,13 @@
 export function createHealthHandler(connection, env = process.env) {
   return async (req, res) => {
-    const requiresDatabase = connection.status().configured || Boolean(env.VERCEL);
+    const requiresDatabase =
+      connection.status().configured || Boolean(env.VERCEL);
     if (requiresDatabase) {
-      try { await connection.connect(); } catch { /* The safe category is exposed below. */ }
+      try {
+        await connection.connect();
+      } catch {
+        /* The safe category is exposed below. */
+      }
     }
     const database = connection.status();
     const connected = database.state === 'connected';
@@ -15,7 +20,7 @@ export function createHealthHandler(connection, env = process.env) {
       time: new Date().toISOString(),
       mongoConnected: connected,
       database,
-      vercelBlobEnabled: Boolean(env.BLOB_READ_WRITE_TOKEN)
+      vercelBlobEnabled: Boolean(env.BLOB_READ_WRITE_TOKEN),
     });
   };
 }

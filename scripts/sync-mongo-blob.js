@@ -20,7 +20,9 @@ async function syncToAtlas() {
 
   try {
     console.log('🍃 Connecting to MongoDB Atlas to sync Vercel Blob URLs...');
-    const conn = await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+    const conn = await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
     const db = conn.connection.db;
 
     const dbPath = path.join(rootDir, 'backend/data/db.json');
@@ -30,27 +32,29 @@ async function syncToAtlas() {
     for (const inf of dbData.influencers || []) {
       await db.collection('influencers').updateOne(
         { email: inf.email },
-        { 
-          $set: { 
-            avatar: inf.avatar, 
+        {
+          $set: {
+            avatar: inf.avatar,
             certification: inf.certification,
             specialization: inf.specialization,
             isVerified: inf.isVerified,
-            status: inf.status
-          } 
+            status: inf.status,
+          },
         },
-        { upsert: true }
+        { upsert: true },
       );
       console.log(`   ✓ Synced Influencer: ${inf.name} -> ${inf.avatar}`);
     }
 
     // Sync Users in Atlas
     for (const u of dbData.users || []) {
-      await db.collection('users').updateOne(
-        { email: u.email },
-        { $set: { avatar: u.avatar, name: u.name, status: u.status } },
-        { upsert: true }
-      );
+      await db
+        .collection('users')
+        .updateOne(
+          { email: u.email },
+          { $set: { avatar: u.avatar, name: u.name, status: u.status } },
+          { upsert: true },
+        );
       console.log(`   ✓ Synced User: ${u.name} -> ${u.avatar}`);
     }
 

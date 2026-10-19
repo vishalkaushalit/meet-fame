@@ -20,27 +20,35 @@ import {
   CheckCircle,
   Save,
   Sparkles,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const { user, updateUserProfile } = useAuth();
-  
+
   const [activeTab, setActiveTab] = useState('slots'); // 'slots' | 'bookings' | 'certificate' | 'profile'
   useEffect(() => {
     const showBookings = () => setActiveTab('bookings');
     window.addEventListener('meetfame-show-bookings', showBookings);
-    return () => window.removeEventListener('meetfame-show-bookings', showBookings);
+    return () =>
+      window.removeEventListener('meetfame-show-bookings', showBookings);
   }, []);
-  const [availability, setAvailability] = useState(() => normalizeAvailability(user?.availability || {
-    monday: [{ start: '09:00', end: '12:00' }, { start: '17:00', end: '20:00' }],
-    tuesday: [{ start: '10:00', end: '14:00' }],
-    wednesday: [{ start: '09:00', end: '12:00' }],
-    thursday: [{ start: '11:00', end: '15:00' }],
-    friday: [{ start: '09:00', end: '13:00' }],
-    saturday: [{ start: '10:00', end: '12:00' }],
-    sunday: []
-  }));
+  const [availability, setAvailability] = useState(() =>
+    normalizeAvailability(
+      user?.availability || {
+        monday: [
+          { start: '09:00', end: '12:00' },
+          { start: '17:00', end: '20:00' },
+        ],
+        tuesday: [{ start: '10:00', end: '14:00' }],
+        wednesday: [{ start: '09:00', end: '12:00' }],
+        thursday: [{ start: '11:00', end: '15:00' }],
+        friday: [{ start: '09:00', end: '13:00' }],
+        saturday: [{ start: '10:00', end: '12:00' }],
+        sunday: [],
+      },
+    ),
+  );
 
   const [activeDay, setActiveDay] = useState('monday');
   const [generatedSlots, setGeneratedSlots] = useState({});
@@ -56,7 +64,15 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   const [certUploading, setCertUploading] = useState(false);
   const [certMessage, setCertMessage] = useState('');
 
-  const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  const days = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
 
   // Fetch full details and bookings
   useEffect(() => {
@@ -66,7 +82,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       try {
         const infData = await api.influencers.getById(user.id);
         if (infData.influencer?.availability) {
-          setAvailability(normalizeAvailability(infData.influencer.availability));
+          setAvailability(
+            normalizeAvailability(infData.influencer.availability),
+          );
         }
         if (infData.generatedSlotsByDay) {
           setGeneratedSlots(infData.generatedSlotsByDay);
@@ -74,8 +92,6 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       } catch (err) {
         console.error('Failed to load influencer data:', err);
       }
-
-
     }
 
     loadData();
@@ -87,37 +103,52 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
     const load = async (showLoading = false) => {
       if (showLoading) setLoadingBookings(true);
       try {
-        const result = await api.bookings.getMyBookings({ influencerId: user.id });
-        if (active) { setBookings(result.bookings || []); setBookingsError(''); }
+        const result = await api.bookings.getMyBookings({
+          influencerId: user.id,
+        });
+        if (active) {
+          setBookings(result.bookings || []);
+          setBookingsError('');
+        }
       } catch {
-        if (active) setBookingsError('Unable to load bookings. Please try again.');
-      } finally { if (active && showLoading) setLoadingBookings(false); }
+        if (active)
+          setBookingsError('Unable to load bookings. Please try again.');
+      } finally {
+        if (active && showLoading) setLoadingBookings(false);
+      }
     };
     const refresh = () => load();
     load(true);
     window.addEventListener('meetfame-bookings-updated', refresh);
     window.addEventListener('focus', refresh);
     const timer = activeTab === 'bookings' ? setInterval(refresh, 15000) : null;
-    return () => { active = false; clearInterval(timer); window.removeEventListener('meetfame-bookings-updated', refresh); window.removeEventListener('focus', refresh); };
+    return () => {
+      active = false;
+      clearInterval(timer);
+      window.removeEventListener('meetfame-bookings-updated', refresh);
+      window.removeEventListener('focus', refresh);
+    };
   }, [user?.id, activeTab]);
 
   // Handle slot range modifications
   const handleAddRange = (day) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
-      [day]: { ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }] }
+      [day]: {
+        ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }],
+      },
     }));
   };
 
   const handleRemoveRange = (day, idx) => {
-    setAvailability(prev => ({
+    setAvailability((prev) => ({
       ...prev,
-      [day]: { ranges: dayRanges(prev[day]).filter((_, i) => i !== idx) }
+      [day]: { ranges: dayRanges(prev[day]).filter((_, i) => i !== idx) },
     }));
   };
 
   const handleRangeChange = (day, idx, field, val) => {
-    setAvailability(prev => {
+    setAvailability((prev) => {
       const dayList = [...dayRanges(prev[day])];
       dayList[idx] = { ...dayList[idx], [field]: val };
       return { ...prev, [day]: { ranges: dayList } };
@@ -129,10 +160,15 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
     setSavingSlots(true);
     setSaveSuccess('');
     try {
-      const res = await api.influencers.updateAvailability(user.id, availability);
+      const res = await api.influencers.updateAvailability(
+        user.id,
+        availability,
+      );
       setGeneratedSlots(res.generatedSlotsByDay);
       updateUserProfile({ availability: res.availability });
-      setSaveSuccess('Availability updated! 1-hour slots re-generated successfully.');
+      setSaveSuccess(
+        'Availability updated! 1-hour slots re-generated successfully.',
+      );
       setTimeout(() => setSaveSuccess(''), 4000);
     } catch (err) {
       console.error('Error saving slots:', err);
@@ -156,10 +192,12 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       }
 
       const res = await api.influencers.uploadCertificate(user.id, formData);
-      setCertMessage('Certificate submitted! Admin will review to award your Instagram-style blue verified badge.');
+      setCertMessage(
+        'Certificate submitted! Admin will review to award your Instagram-style blue verified badge.',
+      );
       updateUserProfile({
         certification: res.certification,
-        certificateStatus: 'pending'
+        certificateStatus: 'pending',
       });
       setCertFile(null);
     } catch (err) {
@@ -171,7 +209,10 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   };
 
   // Stats calculation
-  const totalSlotsCount = Object.values(generatedSlots).reduce((sum, list) => sum + (list?.length || 0), 0);
+  const totalSlotsCount = Object.values(generatedSlots).reduce(
+    (sum, list) => sum + (list?.length || 0),
+    0,
+  );
   const totalEarnings = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
 
   return (
@@ -184,7 +225,10 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           <div className="flex items-center gap-5">
             <div className="relative">
               <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                src={
+                  user?.avatar ||
+                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'
+                }
                 alt={user?.name}
                 className="w-20 h-20 rounded-2xl object-cover ring-2 ring-brand-purple/50 shadow-md"
               />
@@ -215,11 +259,24 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-slate-400">
-                <span>Category: <strong className="text-white">{user?.category}</strong></span>
+                <span>
+                  Category:{' '}
+                  <strong className="text-white">{user?.category}</strong>
+                </span>
                 <span>•</span>
-                <span>Rate: <strong className="text-emerald-400">${user?.hourlyRate || 150} / hr</strong></span>
+                <span>
+                  Rate:{' '}
+                  <strong className="text-emerald-400">
+                    ${user?.hourlyRate || 150} / hr
+                  </strong>
+                </span>
                 <span>•</span>
-                <span>Status: <strong className="text-emerald-400 uppercase">{user?.status}</strong></span>
+                <span>
+                  Status:{' '}
+                  <strong className="text-emerald-400 uppercase">
+                    {user?.status}
+                  </strong>
+                </span>
               </div>
             </div>
           </div>
@@ -227,16 +284,28 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           {/* Quick Metrics */}
           <div className="flex items-center gap-3">
             <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-[100px]">
-              <span className="text-[11px] text-slate-400 uppercase font-semibold">Weekly Slots</span>
-              <div className="text-2xl font-black text-white mt-0.5">{totalSlotsCount}</div>
+              <span className="text-[11px] text-slate-400 uppercase font-semibold">
+                Weekly Slots
+              </span>
+              <div className="text-2xl font-black text-white mt-0.5">
+                {totalSlotsCount}
+              </div>
             </div>
             <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-[100px]">
-              <span className="text-[11px] text-slate-400 uppercase font-semibold">Bookings</span>
-              <div className="text-2xl font-black text-brand-purple mt-0.5">{bookings.length}</div>
+              <span className="text-[11px] text-slate-400 uppercase font-semibold">
+                Bookings
+              </span>
+              <div className="text-2xl font-black text-brand-purple mt-0.5">
+                {bookings.length}
+              </div>
             </div>
             <div className="px-4 py-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-center min-w-[100px]">
-              <span className="text-[11px] text-slate-400 uppercase font-semibold">Revenue</span>
-              <div className="text-2xl font-black text-emerald-400 mt-0.5">${totalEarnings}</div>
+              <span className="text-[11px] text-slate-400 uppercase font-semibold">
+                Revenue
+              </span>
+              <div className="text-2xl font-black text-emerald-400 mt-0.5">
+                ${totalEarnings}
+              </div>
             </div>
           </div>
         </div>
@@ -278,9 +347,13 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             <FileCheck className="w-4 h-4" />
             <span>Verification & Certificate</span>
             {user?.isVerified ? (
-              <span className="px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 text-[10px]">Verified</span>
+              <span className="px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 text-[10px]">
+                Verified
+              </span>
             ) : user?.certificateStatus === 'pending' ? (
-              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">Pending</span>
+              <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">
+                Pending
+              </span>
             ) : null}
           </button>
         </div>
@@ -297,7 +370,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                   <span>Day-Wise Availability & 1-Hour Slot Generator</span>
                 </h3>
                 <p className="text-slate-400 text-xs mt-1">
-                  Example: Enter Monday from 9am to 12pm & 5pm to 8pm — MeetFame will autogenerate 1-hour bookable slots (9-10, 10-11, 11-12, 5-6, 6-7, 7-8).
+                  Example: Enter Monday from 9am to 12pm & 5pm to 8pm — MeetFame
+                  will autogenerate 1-hour bookable slots (9-10, 10-11, 11-12,
+                  5-6, 6-7, 7-8).
                 </p>
               </div>
 
@@ -307,7 +382,13 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 className="py-2.5 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md flex items-center gap-2 self-start md:self-auto disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                <span>{savingSlots ? <LogoLoader variant="button" label="Saving…" /> : 'Save Availability & Generate Slots'}</span>
+                <span>
+                  {savingSlots ? (
+                    <LogoLoader variant="button" label="Saving…" />
+                  ) : (
+                    'Save Availability & Generate Slots'
+                  )}
+                </span>
               </button>
             </div>
 
@@ -320,7 +401,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
             {/* Day Selector Tabs */}
             <div className="flex gap-2 overflow-x-auto pb-3 mb-6">
-              {days.map(d => {
+              {days.map((d) => {
                 const count = dayRanges(availability[d]).length || 0;
                 const slotCount = generatedSlots[d]?.length || 0;
                 return (
@@ -336,7 +417,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                   >
                     <div className="flex items-center justify-between">
                       <span>{d}</span>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${count > 0 ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-500'}`}>
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full ${count > 0 ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-500'}`}
+                      >
                         {count} windows
                       </span>
                     </div>
@@ -353,7 +436,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                   <span>Time Ranges for</span>
-                  <span className="text-brand-purple capitalize">{activeDay}</span>
+                  <span className="text-brand-purple capitalize">
+                    {activeDay}
+                  </span>
                 </h4>
                 <button
                   type="button"
@@ -367,19 +452,32 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
               {dayRanges(availability[activeDay]).length === 0 ? (
                 <div className="py-8 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-xl">
-                  You are marked unavailable on {activeDay}s. Click "Add Time Window" to open booking slots.
+                  You are marked unavailable on {activeDay}s. Click "Add Time
+                  Window" to open booking slots.
                 </div>
               ) : (
                 <div className="space-y-3">
                   {dayRanges(availability[activeDay]).map((range, idx) => (
-                    <div key={idx} className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800">
+                    <div
+                      key={idx}
+                      className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800"
+                    >
                       <div className="flex items-center gap-2">
                         <Clock className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs text-slate-400">Available from:</span>
+                        <span className="text-xs text-slate-400">
+                          Available from:
+                        </span>
                         <input
                           type="time"
                           value={range.start}
-                          onChange={(e) => handleRangeChange(activeDay, idx, 'start', e.target.value)}
+                          onChange={(e) =>
+                            handleRangeChange(
+                              activeDay,
+                              idx,
+                              'start',
+                              e.target.value,
+                            )
+                          }
                           className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
                         />
                       </div>
@@ -389,7 +487,14 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                         <input
                           type="time"
                           value={range.end}
-                          onChange={(e) => handleRangeChange(activeDay, idx, 'end', e.target.value)}
+                          onChange={(e) =>
+                            handleRangeChange(
+                              activeDay,
+                              idx,
+                              'end',
+                              e.target.value,
+                            )
+                          }
                           className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
                         />
                       </div>
@@ -427,13 +532,16 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                       className="px-3 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-mono font-medium flex items-center gap-2 shadow-sm"
                     >
                       <Clock className="w-3.5 h-3.5 text-brand-purple" />
-                      <span>{s.label} ({s.slotId})</span>
+                      <span>
+                        {s.label} ({s.slotId})
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
                 <p className="text-xs text-slate-500 italic">
-                  No slots currently generated. Add time windows above and save to create slots.
+                  No slots currently generated. Add time windows above and save
+                  to create slots.
                 </p>
               )}
             </div>
@@ -456,12 +564,29 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
           </div>
 
-          {bookingsError && <div role="alert" className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl">{bookingsError}<button className="ml-3 underline" onClick={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}>Retry</button></div>}
+          {bookingsError && (
+            <div
+              role="alert"
+              className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl"
+            >
+              {bookingsError}
+              <button
+                className="ml-3 underline"
+                onClick={() =>
+                  window.dispatchEvent(new Event('meetfame-bookings-updated'))
+                }
+              >
+                Retry
+              </button>
+            </div>
+          )}
           {loadingBookings ? (
             <LogoLoader variant="inline" label="Loading appointments..." />
-          ) : bookingsError && bookings.length === 0 ? null : bookings.length === 0 ? (
+          ) : bookingsError &&
+            bookings.length === 0 ? null : bookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              No sessions booked yet. Once clients book your slots, they will appear here!
+              No sessions booked yet. Once clients book your slots, they will
+              appear here!
             </div>
           ) : (
             <div className="space-y-3">
@@ -476,8 +601,12 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm">{b.userName}</h4>
-                        <span className="text-[11px] text-slate-400">({b.userEmail})</span>
+                        <h4 className="font-bold text-white text-sm">
+                          {b.userName}
+                        </h4>
+                        <span className="text-[11px] text-slate-400">
+                          ({b.userEmail})
+                        </span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                           {b.status}
                         </span>
@@ -486,24 +615,42 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                         Topic: <span className="text-white">{b.topic}</span>
                       </p>
                       <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
-                        <span>Date: <strong className="text-white">{b.date}</strong> ({b.dayOfWeek})</span>
+                        <span>
+                          Date: <strong className="text-white">{b.date}</strong>{' '}
+                          ({b.dayOfWeek})
+                        </span>
                         <span>•</span>
-                        <span>Time: <strong className="text-brand-purple font-mono">{b.slotLabel || b.slot}</strong></span>
+                        <span>
+                          Time:{' '}
+                          <strong className="text-brand-purple font-mono">
+                            {b.slotLabel || b.slot}
+                          </strong>
+                        </span>
                         <span>•</span>
-                        <span>Fee: <strong className="text-emerald-400">${b.price}</strong></span>
+                        <span>
+                          Fee:{' '}
+                          <strong className="text-emerald-400">
+                            ${b.price}
+                          </strong>
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
-                  {b.status === 'confirmed' && b.meetingType === 'video' && <JoinCallButton booking={b} onJoinCall={onJoinCall} />}
-                  <button
-                    onClick={() => onOpenChat && onOpenChat({ id: b.userId, name: b.userName }, 'user')}
-                    className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 self-start md:self-auto transition-colors"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>Chat with Client</span>
-                  </button>
+                    {b.status === 'confirmed' && b.meetingType === 'video' && (
+                      <JoinCallButton booking={b} onJoinCall={onJoinCall} />
+                    )}
+                    <button
+                      onClick={() =>
+                        onOpenChat &&
+                        onOpenChat({ id: b.userId, name: b.userName }, 'user')
+                      }
+                      className="px-4 py-2 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-2 self-start md:self-auto transition-colors"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Chat with Client</span>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -520,21 +667,26 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <VerifiedBadge size="lg" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white">Instagram-Style Verified Badge</h3>
+              <h3 className="text-xl font-bold text-white">
+                Instagram-Style Verified Badge
+              </h3>
               <p className="text-slate-400 text-xs">
-                Upload your specialization credentials. Upon admin approval, the blue badge is displayed next to your name platform-wide.
+                Upload your specialization credentials. Upon admin approval, the
+                blue badge is displayed next to your name platform-wide.
               </p>
             </div>
           </div>
 
           {/* Current Status Box */}
-          <div className={`p-4 rounded-2xl mb-6 border ${
-            user?.isVerified
-              ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
-              : user?.certificateStatus === 'pending'
-              ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
-              : 'bg-slate-950 border-slate-800 text-slate-300'
-          }`}>
+          <div
+            className={`p-4 rounded-2xl mb-6 border ${
+              user?.isVerified
+                ? 'bg-blue-500/10 border-blue-500/30 text-blue-300'
+                : user?.certificateStatus === 'pending'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  : 'bg-slate-950 border-slate-800 text-slate-300'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {user?.isVerified ? (
@@ -546,8 +698,8 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                   {user?.isVerified
                     ? 'Verified Badge Active (Approved by Admin)'
                     : user?.certificateStatus === 'pending'
-                    ? 'Certificate Under Admin Review'
-                    : 'No Certificate Submitted Yet'}
+                      ? 'Certificate Under Admin Review'
+                      : 'No Certificate Submitted Yet'}
                 </span>
               </div>
               {user?.isVerified && <VerifiedBadge size="md" />}
@@ -555,7 +707,8 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
             {user?.certification?.title && (
               <div className="mt-2 text-xs text-slate-300">
-                Submitted Credential: <strong>{user.certification.title}</strong>
+                Submitted Credential:{' '}
+                <strong>{user.certification.title}</strong>
               </div>
             )}
           </div>
@@ -583,7 +736,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <div className="flex items-center gap-3">
                 <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple bg-slate-950 text-xs text-slate-400 hover:text-white transition-colors">
                   <Upload className="w-4 h-4 text-brand-purple" />
-                  <span>{certFile ? certFile.name : 'Select Certificate File'}</span>
+                  <span>
+                    {certFile ? certFile.name : 'Select Certificate File'}
+                  </span>
                   <input
                     type="file"
                     accept=".pdf,.png,.jpg,.jpeg"
@@ -615,7 +770,13 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               className="py-3 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md disabled:opacity-40 flex items-center gap-2"
             >
               <Upload className="w-4 h-4" />
-              <span>{certUploading ? <LogoLoader variant="button" label="Submitting…" /> : 'Submit Certificate for Verification'}</span>
+              <span>
+                {certUploading ? (
+                  <LogoLoader variant="button" label="Submitting…" />
+                ) : (
+                  'Submit Certificate for Verification'
+                )}
+              </span>
             </button>
           </form>
         </div>

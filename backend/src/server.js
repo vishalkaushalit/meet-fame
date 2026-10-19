@@ -26,10 +26,12 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(cors({
-  origin: '*',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: '*',
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -40,20 +42,32 @@ app.use('/uploads', express.static(uploadsPath));
 // MongoDB Connectivity
 const MONGODB_URI = process.env.MONGODB_URI;
 if (MONGODB_URI) {
-  mongoConnection.connect()
-    .then(() => { console.log('MongoDB connected. Persistent API storage is active.'); })
+  mongoConnection
+    .connect()
+    .then(() => {
+      console.log('MongoDB connected. Persistent API storage is active.');
+    })
     .catch(() => {
-      console.warn('MongoDB connection unavailable:', mongoConnection.status().issue);
+      console.warn(
+        'MongoDB connection unavailable:',
+        mongoConnection.status().issue,
+      );
     });
 } else {
-  console.log('ℹ️  No MONGODB_URI provided, running with high-performance persistent JSON storage.');
+  console.log(
+    'ℹ️  No MONGODB_URI provided, running with high-performance persistent JSON storage.',
+  );
 }
 
 // Log Vercel Blob token status
 if (process.env.BLOB_READ_WRITE_TOKEN) {
-  console.log('☁️  Vercel Blob Storage token detected. Cloud asset storage active.');
+  console.log(
+    '☁️  Vercel Blob Storage token detected. Cloud asset storage active.',
+  );
 } else {
-  console.log('📁 Vercel Blob token not set. Using local file storage for uploads.');
+  console.log(
+    '📁 Vercel Blob token not set. Using local file storage for uploads.',
+  );
 }
 
 // Use durable storage for all API snapshots when configured. Never silently
@@ -62,7 +76,11 @@ const persistentDatabase = createDatabaseMiddleware(mongoStore);
 app.use('/api', (req, res, next) => {
   if (req.path === '/health') return next();
   if (process.env.MONGODB_URI) return persistentDatabase(req, res, next);
-  if (process.env.VERCEL) return res.status(503).json({ error: 'Booking service is temporarily unavailable. Please try again later.' });
+  if (process.env.VERCEL)
+    return res.status(503).json({
+      error:
+        'Booking service is temporarily unavailable. Please try again later.',
+    });
   return next();
 });
 
@@ -85,7 +103,8 @@ app.get('/api/blob/status', async (req, res) => {
     return res.json({
       connected: false,
       tokenConfigured: false,
-      message: 'BLOB_READ_WRITE_TOKEN is not yet set in backend/.env. Follow instructions to paste it.'
+      message:
+        'BLOB_READ_WRITE_TOKEN is not yet set in backend/.env. Follow instructions to paste it.',
     });
   }
 
@@ -96,18 +115,18 @@ app.get('/api/blob/status', async (req, res) => {
       connected: true,
       tokenConfigured: true,
       totalBlobs: blobList.blobs.length,
-      blobs: blobList.blobs.map(b => ({
+      blobs: blobList.blobs.map((b) => ({
         pathname: b.pathname,
         url: b.url,
         size: b.size,
-        uploadedAt: b.uploadedAt
-      }))
+        uploadedAt: b.uploadedAt,
+      })),
     });
   } catch (err) {
     return res.status(500).json({
       connected: false,
       tokenConfigured: true,
-      error: err.message
+      error: err.message,
     });
   }
 });
@@ -121,8 +140,8 @@ app.get('/', (req, res) => {
       influencers: '/api/influencers',
       bookings: '/api/bookings',
       admin: '/api/admin',
-      chat: '/api/chat'
-    }
+      chat: '/api/chat',
+    },
   });
 });
 
@@ -130,13 +149,15 @@ app.get('/', (req, res) => {
 app.use((err, req, res, next) => {
   console.error('Server error:', err);
   res.status(err.status || 500).json({
-    error: err.message || 'Internal Server Error'
+    error: err.message || 'Internal Server Error',
   });
 });
 
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log(`🚀 MeetFame Backend Server running on http://localhost:${PORT}`);
+    console.log(
+      `🚀 MeetFame Backend Server running on http://localhost:${PORT}`,
+    );
   });
 }
 

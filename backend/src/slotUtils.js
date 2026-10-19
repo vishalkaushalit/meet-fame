@@ -53,7 +53,7 @@ export function generateOneHourSlotsFromRange(startTime, endTime) {
       slotId,
       startTime: slotStart,
       endTime: slotEnd,
-      label: displayLabel
+      label: displayLabel,
     });
     current += 60;
   }
@@ -77,7 +77,9 @@ export function generateDaySlots(ranges = []) {
   for (const s of allSlots) {
     map.set(s.slotId, s);
   }
-  return Array.from(map.values()).sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
+  return Array.from(map.values()).sort(
+    (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime),
+  );
 }
 
 /**
@@ -86,6 +88,14 @@ export function generateDaySlots(ranges = []) {
 export function getDayNameFromDate(dateStr) {
   if (!dateStr) return '';
   const date = new Date(dateStr + 'T00:00:00');
-  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const days = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+  ];
   return days[date.getDay()];
 }

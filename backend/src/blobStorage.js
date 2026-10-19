@@ -16,27 +16,35 @@ export async function uploadToStorage(file, filenamePrefix = 'upload') {
 
   const originalName = file.originalname || 'file.bin';
   const ext = path.extname(originalName);
-  const cleanBase = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '');
+  const cleanBase = path
+    .basename(originalName, ext)
+    .replace(/[^a-zA-Z0-9_-]/g, '');
   const pathname = `meetfame/${filenamePrefix}-${cleanBase}-${Date.now()}${ext}`;
 
   // If Vercel Blob Token is set, upload directly to Vercel Blob CDN
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     try {
-      console.log(`[Vercel Blob] Uploading ${pathname} to Vercel Blob Storage...`);
-      const buffer = file.buffer || (file.path ? fs.readFileSync(file.path) : null);
+      console.log(
+        `[Vercel Blob] Uploading ${pathname} to Vercel Blob Storage...`,
+      );
+      const buffer =
+        file.buffer || (file.path ? fs.readFileSync(file.path) : null);
       if (!buffer) {
         throw new Error('No file buffer available for Vercel Blob upload');
       }
 
       const blob = await put(pathname, buffer, {
         access: 'public',
-        token: process.env.BLOB_READ_WRITE_TOKEN
+        token: process.env.BLOB_READ_WRITE_TOKEN,
       });
 
       console.log(`[Vercel Blob] Upload successful! URL:`, blob.url);
       return blob.url;
     } catch (err) {
-      console.error('[Vercel Blob] Error uploading to Vercel Blob, falling back to local storage:', err.message);
+      console.error(
+        '[Vercel Blob] Error uploading to Vercel Blob, falling back to local storage:',
+        err.message,
+      );
     }
   }
 

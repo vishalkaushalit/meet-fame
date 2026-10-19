@@ -8,7 +8,7 @@ import {
   Clock,
   ArrowRight,
   Shield,
-  Search
+  Search,
 } from 'lucide-react';
 
 export default function ConversationsView() {
@@ -35,7 +35,7 @@ export default function ConversationsView() {
     loadConversations();
   }, []);
 
-  const filtered = conversations.filter(c => {
+  const filtered = conversations.filter((c) => {
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
     return (
@@ -54,7 +54,8 @@ export default function ConversationsView() {
           <span>User & Influencer Conversations Monitor</span>
         </h2>
         <p className="text-xs text-slate-400 mt-1">
-          Inspect message threads, review attendee briefings, and monitor community interactions.
+          Inspect message threads, review attendee briefings, and monitor
+          community interactions.
         </p>
       </div>
 
@@ -81,7 +82,8 @@ export default function ConversationsView() {
 
             <div className="space-y-2 flex-1 overflow-y-auto max-h-[500px]">
               {filtered.map((conv) => {
-                const isSelected = selectedConv?.conversationId === conv.conversationId;
+                const isSelected =
+                  selectedConv?.conversationId === conv.conversationId;
                 return (
                   <button
                     key={conv.conversationId}
@@ -97,7 +99,9 @@ export default function ConversationsView() {
                       <div className="flex items-center gap-1.5 font-bold text-xs text-white">
                         <span>{conv.userName}</span>
                         <span className="text-slate-500 font-normal">↔</span>
-                        <span className="text-brand-purple">{conv.influencerName}</span>
+                        <span className="text-brand-purple">
+                          {conv.influencerName}
+                        </span>
                       </div>
                       <span className="text-[10px] text-slate-500 font-mono">
                         {conv.messageCount} msgs
@@ -124,9 +128,13 @@ export default function ConversationsView() {
                 <div className="p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white text-sm">Client: {selectedConv.userName}</span>
+                      <span className="font-bold text-white text-sm">
+                        Client: {selectedConv.userName}
+                      </span>
                       <span className="text-slate-500">•</span>
-                      <span className="font-bold text-brand-purple text-sm">Creator: {selectedConv.influencerName}</span>
+                      <span className="font-bold text-brand-purple text-sm">
+                        Creator: {selectedConv.influencerName}
+                      </span>
                     </div>
                     <p className="text-[10px] text-slate-500 font-mono mt-0.5">
                       Thread ID: {selectedConv.conversationId}
@@ -151,12 +159,16 @@ export default function ConversationsView() {
                           {isInfluencer ? (
                             <>
                               <Sparkles className="w-3 h-3 text-brand-purple" />
-                              <span className="text-brand-purple">{msg.influencerName} (Influencer)</span>
+                              <span className="text-brand-purple">
+                                {msg.influencerName} (Influencer)
+                              </span>
                             </>
                           ) : (
                             <>
                               <User className="w-3 h-3 text-indigo-400" />
-                              <span className="text-indigo-300">{msg.userName} (Client)</span>
+                              <span className="text-indigo-300">
+                                {msg.userName} (Client)
+                              </span>
                             </>
                           )}
                         </span>

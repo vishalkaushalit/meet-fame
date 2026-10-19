@@ -7,9 +7,14 @@ const schema = new mongoose.Schema({
   influencerId: String,
   influencerName: String,
   senderId: { type: String, required: true },
-  senderRole: { type: String, enum: ['user', 'influencer', 'admin'], required: true },
+  senderRole: {
+    type: String,
+    enum: ['user', 'influencer', 'admin'],
+    required: true,
+  },
   text: { type: String, required: true },
-  timestamp: { type: Date, required: true }
+  timestamp: { type: Date, required: true },
 });
 addPersistenceFields(schema);
-export const Message = mongoose.models.Message || mongoose.model('Message', schema);
+export const Message =
+  mongoose.models.Message || mongoose.model('Message', schema);

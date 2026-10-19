@@ -57,7 +57,8 @@ export default function AdminLogin({ onLoginSuccess }) {
             <span>Master Administration Access</span>
           </div>
           <p className="text-xs text-slate-400">
-            Sign in to manage influencer approvals, slots, bookings & conversations.
+            Sign in to manage influencer approvals, slots, bookings &
+            conversations.
           </p>
         </div>
 
@@ -69,7 +70,9 @@ export default function AdminLogin({ onLoginSuccess }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Admin Email</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Admin Email
+            </label>
             <div className="relative">
               <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input
@@ -84,7 +87,9 @@ export default function AdminLogin({ onLoginSuccess }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Admin Password</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Admin Password
+            </label>
             <div className="relative">
               <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
               <input
@@ -103,7 +108,11 @@ export default function AdminLogin({ onLoginSuccess }) {
             disabled={loading}
             className="w-full py-3 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-2 transition-all active:scale-[0.99]"
           >
-            {loading ? <LogoLoader variant="button" label="Authenticating…" /> : 'Sign In to Command Center'}
+            {loading ? (
+              <LogoLoader variant="button" label="Authenticating…" />
+            ) : (
+              'Sign In to Command Center'
+            )}
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>

@@ -18,34 +18,40 @@ router.get('/slots', (req, res) => {
   try {
     const { influencerId, date } = req.query;
     if (!influencerId || !date) {
-      return res.status(400).json({ error: 'influencerId and date (YYYY-MM-DD) are required' });
+      return res
+        .status(400)
+        .json({ error: 'influencerId and date (YYYY-MM-DD) are required' });
     }
 
     const data = db.read();
-    const influencer = data.influencers.find(i => i.id === influencerId);
+    const influencer = data.influencers.find((i) => i.id === influencerId);
     if (!influencer) {
       return res.status(404).json({ error: 'Influencer not found' });
     }
 
     const dayOfWeek = getDayNameFromDate(date);
-    const dayRanges = (influencer.availability && influencer.availability[dayOfWeek]) || [];
-    
+    const dayRanges =
+      (influencer.availability && influencer.availability[dayOfWeek]) || [];
+
     // Auto-generate 1-hour slots from day ranges
     const generatedSlots = generateDaySlots(dayRanges);
 
     // Find all active bookings for this influencer on this date
-    const bookedOnDate = data.bookings.filter(b => 
-      b.influencerId === influencerId && 
-      b.date === date && 
-      b.status !== 'cancelled'
+    const bookedOnDate = data.bookings.filter(
+      (b) =>
+        b.influencerId === influencerId &&
+        b.date === date &&
+        b.status !== 'cancelled',
     );
-    const bookedSlotIds = new Set(bookedOnDate.map(b => b.slot));
+    const bookedSlotIds = new Set(bookedOnDate.map((b) => b.slot));
 
     const now = Date.now();
-    const slotsWithBookingStatus = generatedSlots.map(slot => {
+    const slotsWithBookingStatus = generatedSlots.map((slot) => {
       const window = bookingWindow({ date, slot: slot.slotId });
       const isBooked = bookedSlotIds.has(slot.slotId);
-      const existingBooking = isBooked ? bookedOnDate.find(b => b.slot === slot.slotId) : null;
+      const existingBooking = isBooked
+        ? bookedOnDate.find((b) => b.slot === slot.slotId)
+        : null;
       return {
         slot: slot.slotId,
         label: slot.label,
@@ -54,7 +60,7 @@ router.get('/slots', (req, res) => {
         isBooked,
         isPast: !window || window.start <= now,
         bookedBy: existingBooking ? existingBooking.userName : null,
-        bookingId: existingBooking ? existingBooking.id : null
+        bookingId: existingBooking ? existingBooking.id : null,
       };
     });
 
@@ -65,8 +71,10 @@ router.get('/slots', (req, res) => {
       date,
       dayOfWeek,
       totalSlots: slotsWithBookingStatus.length,
-      availableSlotsCount: slotsWithBookingStatus.filter(s => !s.isBooked && !s.isPast).length,
-      slots: slotsWithBookingStatus
+      availableSlotsCount: slotsWithBookingStatus.filter(
+        (s) => !s.isBooked && !s.isPast,
+      ).length,
+      slots: slotsWithBookingStatus,
     });
   } catch (err) {
     console.error('Error fetching slots:', err);
@@ -80,49 +88,64 @@ router.get('/slots', (req, res) => {
  */
 router.post('/', requireSession, (req, res) => {
   try {
-    const {
-      influencerId,
-      userId,
-      date,
-      slot,
-      slotLabel,
-      topic,
-      meetingType
-    } = req.body;
+    const { influencerId, userId, date, slot, slotLabel, topic, meetingType } =
+      req.body;
 
-    if (req.session.role !== 'user' || req.session.id !== userId) return res.status(403).json({ error: 'You can only book for your own account.' });
+    if (req.session.role !== 'user' || req.session.id !== userId)
+      return res
+        .status(403)
+        .json({ error: 'You can only book for your own account.' });
 
     if (!influencerId || !userId || !date || !slot) {
-      return res.status(400).json({ error: 'Missing required booking fields (influencerId, userId, date, slot)' });
+      return res.status(400).json({
+        error:
+          'Missing required booking fields (influencerId, userId, date, slot)',
+      });
     }
 
     const data = db.read();
-    const influencer = data.influencers.find(i => i.id === influencerId);
+    const influencer = data.influencers.find((i) => i.id === influencerId);
     if (!influencer) {
       return res.status(404).json({ error: 'Influencer not found' });
     }
 
-    const user = data.users.find(u => u.id === userId);
+    const user = data.users.find((u) => u.id === userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     const window = bookingWindow({ date, slot });
-    if (!window) return res.status(400).json({ error: 'Invalid booking date or time slot.' });
-    if (window.start <= Date.now()) return res.status(409).json({ error: 'This time slot has already started. Please select a future slot (IST).' });
-    const configuredSlots = generateDaySlots(influencer.availability?.[getDayNameFromDate(date)] || []);
-    if (!configuredSlots.some(item => item.slotId === slot)) return res.status(400).json({ error: 'This slot is not in the influencer schedule.' });
+    if (!window)
+      return res
+        .status(400)
+        .json({ error: 'Invalid booking date or time slot.' });
+    if (window.start <= Date.now())
+      return res.status(409).json({
+        error:
+          'This time slot has already started. Please select a future slot (IST).',
+      });
+    const configuredSlots = generateDaySlots(
+      influencer.availability?.[getDayNameFromDate(date)] || [],
+    );
+    if (!configuredSlots.some((item) => item.slotId === slot))
+      return res
+        .status(400)
+        .json({ error: 'This slot is not in the influencer schedule.' });
 
     // Double check slot availability on this date
-    const existingBooking = data.bookings.find(b => 
-      b.influencerId === influencerId &&
-      b.date === date &&
-      b.slot === slot &&
-      b.status !== 'cancelled'
+    const existingBooking = data.bookings.find(
+      (b) =>
+        b.influencerId === influencerId &&
+        b.date === date &&
+        b.slot === slot &&
+        b.status !== 'cancelled',
     );
 
     if (existingBooking) {
-      return res.status(409).json({ error: 'This time slot is already booked for the selected date. Please choose another available slot.' });
+      return res.status(409).json({
+        error:
+          'This time slot is already booked for the selected date. Please choose another available slot.',
+      });
     }
 
     const dayOfWeek = getDayNameFromDate(date);
@@ -142,7 +165,7 @@ router.post('/', requireSession, (req, res) => {
       meetingType: meetingType || 'video',
       status: 'confirmed',
       price: influencer.hourlyRate || 150,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
     data.bookings.push(newBooking);
@@ -161,15 +184,16 @@ router.post('/', requireSession, (req, res) => {
       senderId: user.id,
       senderRole: 'user',
       text: `Hello ${influencer.name}! I have booked a 1-hour session on ${date} (${slotLabel || slot}) regarding: "${newBooking.topic}". Looking forward to meeting!`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
-    if (!db.write(data)) return res.status(500).json({ error: 'Unable to save booking.' });
+    if (!db.write(data))
+      return res.status(500).json({ error: 'Unable to save booking.' });
 
     return res.status(201).json({
       success: true,
       message: 'Booking confirmed successfully!',
-      booking: newBooking
+      booking: newBooking,
     });
   } catch (err) {
     console.error('Error creating booking:', err);
@@ -187,11 +211,13 @@ router.get('/my-bookings', (req, res) => {
     let bookings = [];
 
     if (userId) {
-      bookings = data.bookings.filter(b => b.userId === userId);
+      bookings = data.bookings.filter((b) => b.userId === userId);
     } else if (influencerId) {
-      bookings = data.bookings.filter(b => b.influencerId === influencerId);
+      bookings = data.bookings.filter((b) => b.influencerId === influencerId);
     } else {
-      return res.status(400).json({ error: 'Please provide either userId or influencerId' });
+      return res
+        .status(400)
+        .json({ error: 'Please provide either userId or influencerId' });
     }
 
     // Sort newest date first
@@ -209,14 +235,23 @@ router.put('/:id/status', requireSession, (req, res) => {
   try {
     const { status } = req.body;
     const data = db.read();
-    const idx = data.bookings.findIndex(b => b.id === req.params.id);
+    const idx = data.bookings.findIndex((b) => b.id === req.params.id);
     if (idx === -1) {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
     const booking = data.bookings[idx];
-    if (req.session.role !== 'admin' && !(req.session.role === 'user' && req.session.id === booking.userId) && !(req.session.role === 'influencer' && req.session.id === booking.influencerId)) return res.status(403).json({ error: 'You cannot update this booking.' });
-    if (!['confirmed', 'completed', 'cancelled'].includes(status)) return res.status(400).json({ error: 'Invalid booking status.' });
+    if (
+      req.session.role !== 'admin' &&
+      !(req.session.role === 'user' && req.session.id === booking.userId) &&
+      !(
+        req.session.role === 'influencer' &&
+        req.session.id === booking.influencerId
+      )
+    )
+      return res.status(403).json({ error: 'You cannot update this booking.' });
+    if (!['confirmed', 'completed', 'cancelled'].includes(status))
+      return res.status(400).json({ error: 'Invalid booking status.' });
     if (booking.status !== status) {
       booking.status = status;
     }

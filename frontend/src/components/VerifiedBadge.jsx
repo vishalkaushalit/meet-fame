@@ -1,12 +1,13 @@
 import React from 'react';
 
 export default function VerifiedBadge({ size = 'md', className = '' }) {
-  const sizeMap = {
-    sm: 'w-4 h-4',
-    md: 'w-5 h-5',
-    lg: 'w-6 h-6',
-    xl: 'w-8 h-8'
-  }[size] || 'w-5 h-5';
+  const sizeMap =
+    {
+      sm: 'w-4 h-4',
+      md: 'w-5 h-5',
+      lg: 'w-6 h-6',
+      xl: 'w-8 h-8',
+    }[size] || 'w-5 h-5';
 
   return (
     <span
