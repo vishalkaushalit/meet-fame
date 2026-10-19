@@ -3,10 +3,10 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import { createDatabaseMiddleware } from './databaseContext.js';
 import { mongoStore } from './mongoStore.js';
 import { mongoConnection } from './mongoConnection.js';
+import { createHealthHandler } from './health.js';
 
 // Load environment variables
 dotenv.config();
@@ -76,17 +76,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/calls', callRoutes);
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    app: 'MeetFame API',
-    version: '1.0.0',
-    time: new Date().toISOString(),
-    mongoConnected: mongoose.connection.readyState === 1,
-    database: mongoConnection.status(),
-    vercelBlobEnabled: Boolean(process.env.BLOB_READ_WRITE_TOKEN)
-  });
-});
+app.get('/api/health', createHealthHandler(mongoConnection));
 
 // Vercel Blob Connectivity Status Check
 app.get('/api/blob/status', async (req, res) => {
