@@ -1,6 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createConnectionManager } from '../src/mongoConnection.js';
+test('reuses an established connection and bounds idle serverless pools', async () => {
+  const calls = [];
+  const driver = {
+    connection: { readyState: 0 },
+    async connect(uri, options) {
+      calls.push(options);
+      driver.connection.readyState = 1;
+    },
+  };
+  const manager = createConnectionManager(
+    driver,
+    () => 'mongodb://database.example/test',
+  );
+  await manager.connect();
+  await manager.connect();
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].maxPoolSize, 10);
+  assert.equal(calls[0].minPoolSize, 0);
+  assert.equal(calls[0].maxIdleTimeMS, 60000);
+});
 test('failed startup connection retries on the next request and shares concurrent attempts', async () => {
   let attempts = 0;
   const driver = {

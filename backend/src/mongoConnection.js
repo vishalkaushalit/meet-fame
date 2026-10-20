@@ -57,6 +57,10 @@ export function createConnectionManager(
               serverSelectionTimeoutMS: 10000,
               connectTimeoutMS: 10000,
               maxPoolSize: 10,
+              // Each serverless instance owns a pool. Release unused sockets
+              // so warm instances do not retain them against Atlas's limit.
+              minPoolSize: 0,
+              maxIdleTimeMS: 60000,
             });
           lastFailure = null;
         } catch (error) {
