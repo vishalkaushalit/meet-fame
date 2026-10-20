@@ -9,9 +9,9 @@ apart, trigger one Vercel deployment per run. Healthy checks do nothing.
 
 1. Push the workflow, script, and connection pool changes to the repository's
    default branch. Deploy the pool changes to Vercel.
-2. In GitHub → Settings → Secrets and variables → Actions, add the repository
-   variable `MEETFAME_URL` with the production backend origin, such as
-   `https://your-project.vercel.app`.
+2. The production origin defaults to `https://meet-fame.vercel.app` and the health
+   endpoint is `https://meet-fame.vercel.app/api/health`. To change it, set the
+   GitHub Actions repository variable `MEETFAME_URL`.
 3. In the Vercel project → Settings → Git → Deploy Hooks, create a hook for the
    production branch. Store its URL as the GitHub Actions secret
    `VERCEL_DEPLOY_HOOK_URL`. Anyone holding that URL can trigger deployments.
