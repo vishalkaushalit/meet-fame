@@ -166,7 +166,7 @@
         }
       },
       "createdAt": "2026-10-15T12:29:16.666Z",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_1-A3xdqL9c5Q1l6DpgnAAuLTlUZ52yik.mp4"
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_1-A3xdqL9c5Q1l6DpgnAAuLTlUZ52yik.mp4"
     },
     {
       "id": "inf_2",
@@ -242,7 +242,7 @@
         }
       },
       "createdAt": "2026-10-15T12:29:16.666Z",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_2-mBpYWxoYKnXrq37WCeY2KBhbv32TfZ.mp4"
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_2-mBpYWxoYKnXrq37WCeY2KBhbv32TfZ.mp4"
     },
     {
       "id": "inf_3",
@@ -323,7 +323,7 @@
         }
       },
       "createdAt": "2026-10-15T12:29:16.666Z",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_3-HfuLwdSlCGJb2IyWII5LMANcR4prc2.mp4"
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_3-HfuLwdSlCGJb2IyWII5LMANcR4prc2.mp4"
     },
     {
       "id": "inf_4",
@@ -399,7 +399,7 @@
         }
       },
       "createdAt": "2026-10-15T12:29:16.666Z",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_4-xIDi4TgD3sG1Pm5IJhJAV7QrlJeRVr.mp4"
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_4-xIDi4TgD3sG1Pm5IJhJAV7QrlJeRVr.mp4"
     },
     {
       "email": "inf_demo_ananya@demo.meetfame.example",
@@ -464,7 +464,7 @@
       "createdAt": "2026-10-21T08:36:08.454Z",
       "hourlyRate": 120,
       "id": "inf_demo_ananya",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_ananya-TxXvuZzEiMngnJYN8WISk5TeWkkaUM.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_ananya-TxXvuZzEiMngnJYN8WISk5TeWkkaUM.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Ananya Sharma",
@@ -539,7 +539,7 @@
       "createdAt": "2026-10-21T08:36:11.098Z",
       "hourlyRate": 150,
       "id": "inf_demo_rohan",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_rohan-3Rlwp1d6QegVTPbyxK3cPfWBPP7Zkt.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_rohan-3Rlwp1d6QegVTPbyxK3cPfWBPP7Zkt.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Rohan Mehta",
@@ -614,7 +614,7 @@
       "createdAt": "2026-10-21T08:36:13.109Z",
       "hourlyRate": 180,
       "id": "inf_demo_zara",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_zara-WOZV5N05xThRho2gdaHqMYwMeILQMZ.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_zara-WOZV5N05xThRho2gdaHqMYwMeILQMZ.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Zara Khan",
@@ -689,7 +689,7 @@
       "createdAt": "2026-10-21T08:36:15.678Z",
       "hourlyRate": 130,
       "id": "inf_demo_arjun",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_arjun-Re2G2vmXf46O6eQlNBBluiOObCQLeH.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_arjun-Re2G2vmXf46O6eQlNBBluiOObCQLeH.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Arjun Kapoor",
@@ -764,7 +764,7 @@
       "createdAt": "2026-10-21T08:36:17.851Z",
       "hourlyRate": 160,
       "id": "inf_demo_priya",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_priya-HtNWMk9dAThz1jpVCu3WmW46j1XzKk.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_priya-HtNWMk9dAThz1jpVCu3WmW46j1XzKk.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Priya Nair",
@@ -839,7 +839,7 @@
       "createdAt": "2026-10-21T08:36:20.351Z",
       "hourlyRate": 200,
       "id": "inf_demo_kabir",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_kabir-lPR81lzlAxhU2nkS44ssB2SQtLJ42M.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_kabir-lPR81lzlAxhU2nkS44ssB2SQtLJ42M.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Kabir Sethi",
@@ -914,7 +914,7 @@
       "createdAt": "2026-10-21T08:36:44.277Z",
       "hourlyRate": 140,
       "id": "inf_demo_meera",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_meera-9Tp3dbhQoAhf1gr48XIwo9x1Cht35t.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_meera-9Tp3dbhQoAhf1gr48XIwo9x1Cht35t.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Meera Joshi",
@@ -989,7 +989,7 @@
       "createdAt": "2026-10-21T08:36:46.721Z",
       "hourlyRate": 170,
       "id": "inf_demo_dev",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_dev-drS8OL3obHCz3F1yAVnfC7YsjnErQG.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_dev-drS8OL3obHCz3F1yAVnfC7YsjnErQG.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Dev Malhotra",
@@ -1064,7 +1064,7 @@
       "createdAt": "2026-10-21T08:36:49.186Z",
       "hourlyRate": 190,
       "id": "inf_demo_isha",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_isha-Q3dIyKF0DnSIoZ5SAHsoAKI7OSUeF7.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_isha-Q3dIyKF0DnSIoZ5SAHsoAKI7OSUeF7.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Isha Verma",
@@ -1139,7 +1139,7 @@
       "createdAt": "2026-10-21T08:36:51.576Z",
       "hourlyRate": 220,
       "id": "inf_demo_aman",
-      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_aman-oMxaeFAYbEQ3s66DpsmppUsK6a0Xlc.mp4",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/introduction_video/intro-demo-inf_demo_aman-oMxaeFAYbEQ3s66DpsmppUsK6a0Xlc.mp4",
       "isDemo": true,
       "isVerified": false,
       "name": "Aman Gupta",

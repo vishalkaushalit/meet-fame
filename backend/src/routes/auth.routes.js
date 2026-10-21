@@ -42,7 +42,7 @@ router.post('/intro-video-upload', async (req, res) => {
       body: req.body,
       request: req,
       onBeforeGenerateToken: async (pathname) => {
-        if (!pathname.startsWith('meetfame/intro-')) throw new Error('Invalid video path.');
+        if (!pathname.startsWith('introduction_video/intro-')) throw new Error('Invalid video path.');
         return { allowedContentTypes: ['video/mp4', 'video/webm'], maximumSizeInBytes: 5 * 1024 * 1024, addRandomSuffix: true };
       },
       onUploadCompleted: async () => {},
@@ -55,7 +55,7 @@ router.post('/intro-video-upload', async (req, res) => {
 
 async function readIntroVideo(url) {
   const parsed = new URL(url);
-  if (parsed.protocol !== 'https:' || !/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/.test(parsed.hostname) || !parsed.pathname.startsWith('/meetfame/intro-'))
+  if (parsed.protocol !== 'https:' || !/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/.test(parsed.hostname) || !parsed.pathname.startsWith('/introduction_video/intro-'))
     throw new Error('Invalid introduction video URL.');
   const response = await fetch(parsed, { redirect: 'error', signal: AbortSignal.timeout(15000) });
   if (!response.ok) throw new Error('Video unavailable.');

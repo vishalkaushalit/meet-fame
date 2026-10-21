@@ -38,7 +38,7 @@ if (process.argv.includes('--prepare')) {
       const email = `${profile.id}@demo.meetfame.example`;
       let record = await Influencer.findOne({ $or: [{ id: profile.id }, { email }] }).lean();
       if (!record) {
-        const blob = await put(`meetfame/intro-demo-${profile.id}.mp4`, videos.get(profile.id), { access: 'public', contentType: 'video/mp4', addRandomSuffix: true });
+        const blob = await put(`introduction_video/intro-demo-${profile.id}.mp4`, videos.get(profile.id), { access: 'public', contentType: 'video/mp4', addRandomSuffix: true });
         const { photo, ...fields } = profile;
         const candidate = new Influencer({ ...fields, email, phone: `+120255501${String(index).padStart(2, '0')}`, password: await bcrypt.hash(randomUUID(), 10), role: 'influencer', status: 'approved', isDemo: true, isVerified: false, certificateStatus: 'none', introVideoUrl: blob.url, avatar: `https://images.unsplash.com/${photo}?auto=format&fit=crop&w=600&q=80`, availability: normalizeAvailability({ monday: [{ start: '09:00', end: '12:00' }], tuesday: [{ start: '14:00', end: '18:00' }], wednesday: [{ start: '10:00', end: '13:00' }], thursday: [{ start: '15:00', end: '19:00' }], friday: [{ start: '09:00', end: '12:00' }], saturday: [{ start: '10:00', end: '13:00' }], sunday: [] }), _version: 0 });
         await candidate.validate();

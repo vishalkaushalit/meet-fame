@@ -26,7 +26,7 @@ try {
     const duration = metadata.format.containerDuration || metadata.format.duration;
     if (!metadata.format.hasVideo || !Number.isFinite(duration) || duration <= 0 || duration > 15 || buffer.length > 5 * 1024 * 1024)
       throw new Error('Demo video does not meet video limits.');
-    const blob = await put(`meetfame/intro-demo-${source.id}.mp4`, buffer, { access: 'public', contentType: 'video/mp4', addRandomSuffix: true });
+    const blob = await put(`introduction_video/intro-demo-${source.id}.mp4`, buffer, { access: 'public', contentType: 'video/mp4', addRandomSuffix: true });
     const result = await collection.updateOne({ _id: record._id, ...missing }, { $set: { introVideoUrl: blob.url }, $inc: { _version: 1 } });
     if (!result.modifiedCount) continue;
     // Read again so unrelated local edits are preserved.

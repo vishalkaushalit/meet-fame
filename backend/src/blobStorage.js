@@ -19,7 +19,8 @@ export async function uploadToStorage(file, filenamePrefix = 'upload') {
   const cleanBase = path
     .basename(originalName, ext)
     .replace(/[^a-zA-Z0-9_-]/g, '');
-  const pathname = `meetfame/${filenamePrefix}-${cleanBase}-${Date.now()}${ext}`;
+  const folder = filenamePrefix === 'intro' ? 'introduction_video' : 'meetfame';
+  const pathname = `${folder}/${filenamePrefix}-${cleanBase}-${Date.now()}${ext}`;
 
   // If Vercel Blob Token is set, upload directly to Vercel Blob CDN
   if (process.env.BLOB_READ_WRITE_TOKEN) {
@@ -51,9 +52,15 @@ export async function uploadToStorage(file, filenamePrefix = 'upload') {
   }
 
   if (process.env.VERCEL) throw new Error('Cloud upload storage is unavailable.');
-  fs.mkdirSync(uploadDir, { recursive: true });
+  const localDir = filenamePrefix === 'intro' ? path.join(uploadDir, 'introduction_video') : uploadDir;
+  fs.mkdirSync(localDir, { recursive: true });
 
   // Local storage fallback (saved in data/uploads)
+  if (filenamePrefix === 'intro' && (file.buffer || file.path)) {
+    const filename = `intro-${Date.now()}${ext}`;
+    fs.writeFileSync(path.join(localDir, filename), file.buffer || fs.readFileSync(file.path));
+    return `/uploads/introduction_video/${filename}`;
+  }
   if (file.filename) {
     return `/uploads/${file.filename}`;
   } else if (file.buffer) {

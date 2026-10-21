@@ -45,7 +45,7 @@ export const api = {
       for (const [key, value] of formData.entries()) payload.append(key, value);
       if (import.meta.env.PROD) {
         const file = payload.get('introVideoFile');
-        const blob = await upload(`meetfame/intro-${Date.now()}.${file.name.split('.').pop()}`, file, {
+        const blob = await upload(`introduction_video/intro-${Date.now()}.${file.name.split('.').pop()}`, file, {
           access: 'public', handleUploadUrl: `${API_BASE}${INTRO_VIDEO_UPLOAD_API}`,
         });
         payload.delete('introVideoFile');
