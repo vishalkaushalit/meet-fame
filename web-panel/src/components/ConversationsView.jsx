@@ -1,7 +1,9 @@
+import { formatDateTime } from '../../../shared/dateFormat';
 import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
+import { navigateAdminRecord } from '../routes';
 import {
   User,
   Sparkles,
@@ -9,10 +11,10 @@ import {
   Search,
 } from 'lucide-react';
 
-export default function ConversationsView() {
+export default function ConversationsView({ detailId }) {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedConv, setSelectedConv] = useState(null);
+  const selectedConv = conversations.find((conversation) => conversation.conversationId === detailId);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -41,6 +43,10 @@ export default function ConversationsView() {
   });
 
   const threadPagination = usePagination(filtered, searchTerm);
+
+  if (detailId && !loading && !selectedConv) {
+    return <div className="dashboard-card p-6 space-y-4"><p>Conversation not found.</p></div>;
+  }
 
   return (
     <div className="conversations-view space-y-6">
@@ -78,8 +84,8 @@ export default function ConversationsView() {
                       <td>{conv.influencerName}</td>
                       <td>{conv.messageCount}</td>
                       <td><span className="conversation-preview">{conv.lastMessage || '—'}</span></td>
-                      <td>{new Date(conv.lastTimestamp).toLocaleString()}</td>
-                      <td><div className="account-icon-actions"><button type="button" className="user-view-button" aria-label={`View conversation between ${conv.userName} and ${conv.influencerName}`} title="View conversation" onClick={() => setSelectedConv(conv)}><Eye size={18} aria-hidden="true" /></button></div></td>
+                      <td>{formatDateTime(conv.lastTimestamp)}</td>
+                      <td><div className="account-icon-actions"><button type="button" className="user-view-button" aria-label={`View conversation between ${conv.userName} and ${conv.influencerName}`} title="View conversation" onClick={() => navigateAdminRecord('conversations', conv.conversationId)}><Eye size={18} aria-hidden="true" /></button></div></td>
                     </tr>
                   ))}
                   {!filtered.length && <tr><td colSpan={7}>No conversations match your search.</td></tr>}
@@ -93,7 +99,6 @@ export default function ConversationsView() {
           <div className=" bg-slate-900 rounded-3xl border border-slate-800 flex flex-col overflow-hidden">
             {selectedConv ? (
               <>
-                <div className="p-4 border-b border-slate-800"><button type="button" className="dashboard-button" onClick={() => setSelectedConv(null)}>Back to conversations</button></div>
                 <div className="conversation-header p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -151,7 +156,7 @@ export default function ConversationsView() {
                         >
                           {msg.text}
                           <div className="conversation-message-time text-[9px] text-slate-400 mt-1 text-right">
-                            {new Date(msg.timestamp).toLocaleString()}
+                            {formatDateTime(msg.timestamp)}
                           </div>
                         </div>
                       </div>

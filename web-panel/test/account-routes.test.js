@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { matchAdminPage, matchAccountDetails, accountDetailsParent } from '../src/routes.js';
+import { matchAdminPage, matchAdminRecord, matchAccountDetails, accountDetailsParent } from '../src/routes.js';
 
 test('account details support direct links in development and production', () => {
   assert.equal(matchAdminPage('/accounts/influencer/inf_1', '/'), 'account-details');
@@ -22,4 +22,21 @@ test('edit and add forms have separate routes with safe return destinations', ()
   assert.equal(matchAdminPage('/announcements/new', '/'), 'add-announcement');
   assert.equal(matchAdminPage('/admin/announcements/new', '/admin/'), 'add-announcement');
   assert.equal(accountDetailsParent('?from=announcements'), 'announcements');
+});
+
+test('return destinations can be stored in history without query parameters', () => {
+  assert.equal(accountDetailsParent(undefined, { from: 'announcements' }), 'announcements');
+  assert.equal(accountDetailsParent(undefined, { from: 'bookings' }), 'bookings');
+  assert.equal(accountDetailsParent(undefined, { from: 'https://example.com' }), 'approvals');
+});
+
+test('booking, conversation, and influencer detail pages have separate routes', () => {
+  for (const [segment, page] of [['bookings', 'bookings'], ['conversations', 'conversations'], ['approvals/influencers', 'approvals']]) {
+    for (const base of ['/', '/admin/']) {
+      const path = `${base}${segment}/record%20one`;
+      assert.equal(matchAdminPage(path, base), page);
+      assert.deepEqual(matchAdminRecord(path, base), { page, id: 'record one' });
+    }
+  }
+  assert.equal(matchAdminRecord('/bookings/%bad', '/'), null);
 });

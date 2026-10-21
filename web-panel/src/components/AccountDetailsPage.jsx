@@ -1,7 +1,9 @@
+import { formatDateTime } from '../../../shared/dateFormat';
+import StatusBadge from './StatusBadge';
 import LogoLoader from './LogoLoader';
 import { dayRanges } from '../../../shared/availability';
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { adminApi } from '../api';
 
 const text = (value) =>
@@ -11,7 +13,7 @@ const text = (value) =>
 const label = (value) => text(value).replaceAll('_', ' ');
 const date = (value) =>
   value && !Number.isNaN(Date.parse(value))
-    ? new Date(value).toLocaleString()
+    ? formatDateTime(value)
     : 'Not provided';
 const safeLink = (value) => {
   if (typeof value !== 'string') return null;
@@ -23,7 +25,7 @@ const safeLink = (value) => {
   }
 };
 
-export default function AccountDetailsPage({ account, onBack }) {
+export default function AccountDetailsPage({ account }) {
   const [details, setDetails] = useState(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
@@ -85,13 +87,7 @@ export default function AccountDetailsPage({ account, onBack }) {
               {details?.name || account.name || 'Account details'}
             </h2>
           </div>
-          <button
-            type="button"
-            aria-label="Back to previous page"
-            onClick={onBack}
-          >
-            <ArrowLeft size={16} /> Back
-          </button>
+
         </header>
         <div className="account-details-body">
           {error ? (
@@ -110,15 +106,10 @@ export default function AccountDetailsPage({ account, onBack }) {
                   <div key={title}>
                     <dt>{title}</dt>
                     <dd>
-                      {title === 'Status' ? (
-                        <span
-                          className={`account-status-badge ${['active', 'approved'].includes(details.status) ? 'status-approved' : details.status === 'pending_review' ? 'status-pending' : ['blocked', 'rejected'].includes(details.status) ? 'status-blocked' : 'status-neutral'}`}
-                        >
-                          {text(value)}
-                        </span>
-                      ) : (
-                        text(value)
-                      )}
+                      {title === 'Certificate status' ? <StatusBadge status={details.certificateStatus} />
+                        : title === 'Status' ? <StatusBadge status={details.status} />
+                        : title === 'Verified' ? <StatusBadge status={details.isVerified ? 'verified' : 'unverified'}>{value}</StatusBadge>
+                        : text(value)}
                     </dd>
                   </div>
                 ))}
@@ -183,11 +174,7 @@ export default function AccountDetailsPage({ account, onBack }) {
             </>
           )}
         </div>
-        <footer>
-          <button type="button" onClick={onBack}>
-            Back to list
-          </button>
-        </footer>
+
       </section>
   );
 }

@@ -1,3 +1,4 @@
+import { formatDateTime } from '../../../shared/dateFormat';
 import LogoLoader from './LogoLoader';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -184,9 +185,7 @@ export default function Notifications() {
                       )}
                     </div>
                     <time dateTime={item.createdAt}>
-                      {new Date(item.createdAt).toLocaleString('en-IN', {
-                        timeZone: 'Asia/Kolkata',
-                      })}{' '}
+                      {formatDateTime(item.createdAt)}{' '}
                       IST
                     </time>
                   </article>

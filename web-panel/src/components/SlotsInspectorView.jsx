@@ -1,3 +1,4 @@
+import { formatDate } from '../../../shared/dateFormat';
 import React, { useEffect, useState } from 'react';
 import {
   CalendarDays,
@@ -199,12 +200,8 @@ export default function SlotsInspectorView() {
               <div>
                 <h3>
                   {mode === 'week'
-                    ? `${dateLabel(week[0].date, { month: 'long', day: 'numeric' })} – ${dateLabel(week[6].date, { month: 'short', day: 'numeric', year: 'numeric' })}`
-                    : dateLabel(date, {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
+                    ? `${formatDate(week[0].date)} – ${formatDate(week[6].date)}`
+                    : formatDate(date)}
                 </h3>
                 <p>India Standard Time · UTC+05:30</p>
               </div>
@@ -251,11 +248,7 @@ export default function SlotsInspectorView() {
               </div>
             </header>
             <h4>
-              {dateLabel(detailDate, {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-              })}
+              {formatDate(detailDate)}
             </h4>
             <div className="availability-summary">
               <span className="slot-summary-badge is-total">{daySlots.length} total slots</span>
@@ -366,12 +359,7 @@ export default function SlotsInspectorView() {
                 </span>
                 <h4>{selected.label || selected.slotId}</h4>
                 <p>
-                  {dateLabel(selected.date, {
-                    weekday: 'short',
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })}{' '}
+                  {formatDate(selected.date)}{' '}
                   · IST
                 </p>
                 {selected.booking ? (

@@ -1,3 +1,4 @@
+import { formatDate } from '../../../shared/dateFormat';
 import React, { useEffect, useState } from 'react';
 import { Video } from 'lucide-react';
 import { callAvailability } from '../../../shared/bookingTime';
@@ -11,7 +12,7 @@ export default function JoinCallButton({ booking, onJoinCall }) {
   return (
     <button
       disabled={!availability.allowed}
-      title={`${booking.date}, ${booking.slotLabel || booking.slot} IST`}
+      title={`${formatDate(booking.date)}, ${booking.slotLabel || booking.slot} IST`}
       onClick={() => {
         if (callAvailability(booking).allowed) onJoinCall(booking);
       }}

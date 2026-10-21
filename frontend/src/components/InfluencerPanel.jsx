@@ -1,3 +1,4 @@
+import { formatDate } from '../../../shared/dateFormat';
 import Pagination, { usePagination } from './Pagination';
 import './creator-dashboard.css';
 import LogoLoader from './LogoLoader';
@@ -626,10 +627,10 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                     <div className="creator-session-time">
                       <span>
                         <Calendar size={16} aria-hidden="true" />
-                        {b.date}{' '}
+                        {formatDate(b.date)}{' '}
                         <span className="capitalize">({b.dayOfWeek})</span>
                       </span>
-                      <span>
+                      <span className="time-slot-badge">
                         <Clock size={16} aria-hidden="true" />
                         {b.slotLabel || b.slot} <small>IST</small>
                       </span>

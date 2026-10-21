@@ -3,7 +3,7 @@ import AdminLogin from './components/AdminLogin';
 import LogoLoader from './components/LogoLoader';
 import AdminDashboard from './components/AdminDashboard';
 import { adminApi } from './api';
-import { matchAdminPage, navigateAdmin } from './routes';
+import { matchAdminPage, navigateAdmin, cleanAdminReturnUrl } from './routes';
 
 export default function App() {
   const [admin, setAdmin] = useState(null);
@@ -12,19 +12,20 @@ export default function App() {
   const requestedPage = useRef(null);
   const page = matchAdminPage(path);
   useEffect(() => {
-    const update = () => setPath(window.location.pathname);
+    cleanAdminReturnUrl();
+    const update = () => { cleanAdminReturnUrl(); setPath(window.location.pathname); };
     window.addEventListener('popstate', update);
     return () => window.removeEventListener('popstate', update);
   }, []);
   useEffect(() => {
     if (loading) return;
     if (!admin && page !== 'login') {
-      if (page) requestedPage.current = { path: window.location.pathname, search: window.location.search };
+      if (page) requestedPage.current = { path: window.location.pathname, search: window.location.search, state: window.history.state };
       navigateAdmin(null, { replace: true });
     } else if (admin && (!page || page === 'login')) {
       const destination = requestedPage.current;
       if (destination) {
-        window.history.replaceState({}, '', destination.path + destination.search);
+        window.history.replaceState(destination.state || {}, '', destination.path + destination.search);
         window.dispatchEvent(new PopStateEvent('popstate'));
         window.scrollTo(0, 0);
       } else navigateAdmin('overview', { replace: true });

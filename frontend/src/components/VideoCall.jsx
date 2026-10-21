@@ -1,3 +1,4 @@
+import { formatDate } from '../../../shared/dateFormat';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -478,7 +479,7 @@ export default function VideoCall({ booking, role, onClose }) {
           <div>
             <h2 id="video-call-title">Session with {counterpart}</h2>
             <p>
-              {booking.date} · {booking.slotLabel || booking.slot} IST
+              {formatDate(booking.date)} · <span className="time-slot-badge">{booking.slotLabel || booking.slot} IST</span>
             </p>
           </div>
           <button

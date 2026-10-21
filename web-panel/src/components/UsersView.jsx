@@ -1,3 +1,5 @@
+import { formatDate } from '../../../shared/dateFormat';
+import StatusBadge from './StatusBadge';
 import Pagination from './Pagination';
 import { paginate } from '../../../shared/pagination';
 import LogoLoader from './LogoLoader';
@@ -232,15 +234,11 @@ export default function UsersView({ refreshKey = 0 }) {
                     <td>
                       {user.createdAt &&
                       !Number.isNaN(Date.parse(user.createdAt))
-                        ? new Date(user.createdAt).toLocaleDateString()
+                        ? formatDate(user.createdAt)
                         : '—'}
                     </td>
                     <td>
-                      <span
-                        className={`booking-status ${user.status === 'approved' || user.status === 'active' ? 'confirmed' : user.status === 'blocked' || user.status === 'rejected' ? 'cancelled' : user.status === 'pending_review' ? 'pending-review' : ''}`}
-                      >
-                        {label(user.status)}
-                      </span>
+                      <StatusBadge status={user.status} />
                     </td>
                     <td className="user-remark">
                       {user.status === 'blocked'

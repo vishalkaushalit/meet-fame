@@ -1410,3 +1410,25 @@ html .approval-status-filter select,
 html .approval-status-filter option {
   font-weight: 400;
 }
+
+/* Consistent session timing badges in both applications. */
+html .time-slot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-items: center;
+  white-space: nowrap;
+  padding: 5px 9px;
+  border-radius: 7px;
+  border: 1px solid #5b4880;
+  background: #27213c;
+  color: #ddd6fe;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+html[data-theme='light'] .time-slot-badge {
+  background: #ede9fe;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}

@@ -1,12 +1,15 @@
+import { formatDate } from '../../../shared/dateFormat';
+import StatusBadge from './StatusBadge';
 import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
+import { navigateAdminRecord } from '../routes';
 import { Calendar, DollarSign, Search, Eye } from 'lucide-react';
 
-export default function BookingsView() {
+export default function BookingsView({ detailId }) {
   const [bookings, setBookings] = useState([]);
-  const [selectedBooking, setSelectedBooking] = useState(null);
+  const selectedBooking = bookings.find((booking) => booking.id === detailId);
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -49,16 +52,15 @@ export default function BookingsView() {
     const b = selectedBooking;
     const details = [
       ['Booking ID', b.id], ['Client', b.userName], ['Client email', b.userEmail],
-      ['Creator', b.influencerName], ['Date', b.date], ['Day', b.dayOfWeek],
-      ['Time (IST)', b.slotLabel || b.slot], ['Meeting type', b.meetingType],
-      ['Status', <span className={`booking-status ${b.status}`}>{b.status}</span>],
+      ['Creator', b.influencerName], ['Date', formatDate(b.date)], ['Day', b.dayOfWeek],
+      ['Time (IST)', <span className="time-slot-badge">{b.slotLabel || b.slot || '—'}</span>], ['Meeting type', b.meetingType],
+      ['Status', <StatusBadge status={b.status} />],
       ['Fee', `$${b.price ?? 0}`], ['Topic', b.topic],
     ];
     return (
       <section className="account-details-dialog account-details-page" aria-labelledby="booking-details-title">
         <div className="card-heading">
           <h2 id="booking-details-title">Booking details</h2>
-          <button type="button" className="dashboard-button" onClick={() => setSelectedBooking(null)}>Back to bookings</button>
         </div>
         <div className="account-details-body">
           <dl className="account-details-fields">
@@ -69,6 +71,10 @@ export default function BookingsView() {
     );
   }
 
+
+  if (detailId && !loading && !selectedBooking) {
+    return <div className="dashboard-card p-6 space-y-4"><p>Booking not found.</p></div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -155,18 +161,16 @@ export default function BookingsView() {
                     </td>
                     <td>{b.influencerName}</td>
                     <td>
-                      {b.date}
+                      {formatDate(b.date)}
                     </td>
                     <td className="whitespace-nowrap">
-                      {b.slotLabel || b.slot}
+                      <span className="time-slot-badge">{b.slotLabel || b.slot || '—'}</span>
                     </td>
                     <td>
-                      <span className={`booking-status ${b.status}`}>
-                        {b.status}
-                      </span>
+                      <StatusBadge status={b.status} />
                     </td>
                     <td>${b.price ?? 0}</td>
-                    <td><div className="account-icon-actions"><button type="button" className="user-view-button" title="View booking details" aria-label={`View booking details for ${b.userName} with ${b.influencerName}`} onClick={() => setSelectedBooking(b)}><Eye size={18} aria-hidden="true" /></button></div></td>
+                    <td><div className="account-icon-actions"><button type="button" className="user-view-button" title="View booking details" aria-label={`View booking details for ${b.userName} with ${b.influencerName}`} onClick={() => navigateAdminRecord('bookings', b.id)}><Eye size={18} aria-hidden="true" /></button></div></td>
                   </tr>
                 ))}
               </tbody>

@@ -1,3 +1,4 @@
+import { formatDate } from '../../../shared/dateFormat';
 import IntroVideo from './IntroVideo';
 import Pagination, { usePagination } from './Pagination';
 import './creator-dashboard.css';
@@ -374,10 +375,10 @@ export default function UserPanel({
                     <div className="creator-session-time">
                       <span>
                         <Calendar size={16} aria-hidden="true" />
-                        {b.date}{' '}
+                        {formatDate(b.date)}{' '}
                         <span className="capitalize">({b.dayOfWeek})</span>
                       </span>
-                      <span>
+                      <span className="time-slot-badge">
                         <Clock size={16} aria-hidden="true" />
                         {b.slotLabel || b.slot} <small>IST</small>
                       </span>

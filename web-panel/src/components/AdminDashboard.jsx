@@ -1,5 +1,6 @@
+import { formatDate } from '../../../shared/dateFormat';
 import AuthSocialBackground from '@shared/AuthSocialBackground';
-import { adminPath, navigateAdmin, navigateAccountDetails, matchAccountDetails, accountDetailsParent, navigateAdminAction } from '../routes';
+import { adminPath, matchAdminRecord, navigateAdmin, navigateAccountDetails, matchAccountDetails, accountDetailsParent, navigateAdminAction } from '../routes';
 import ThemeToggle from './ThemeToggle';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
@@ -171,6 +172,7 @@ export default function AdminDashboard({
     'add-announcement': { label: 'Add announcement', description: 'Create a notification for your community.' },
   };
   const current = actionPages[activeTab] || navigation.find((item) => item.id === navigationTab) || { label: 'Account details', description: 'Profile, credentials, and availability.' };
+  const recordDetails = matchAdminRecord(window.location.pathname);
   const detailsAccount = matchAccountDetails(window.location.pathname);
   const pending = stats
     ? (stats.pendingInfluencers || 0) +
@@ -393,14 +395,25 @@ export default function AdminDashboard({
         <main className="dashboard-main social-background-host">
           <AuthSocialBackground page />
             <div className="dashboard-page-heading">
-              <div>
+              <div className="admin-heading-leading">
+                <button type="button" className="dashboard-button admin-back-button admin-back-icon" aria-label="Go back" title="Back" onClick={() => {
+                  if (recordDetails) navigateAdmin(recordDetails.page);
+                  else if (detailsAccount || ['edit-profile', 'add-announcement'].includes(activeTab)) navigateAdmin(accountDetailsParent());
+                  else if (window.history.state?.adminNavigation) window.history.back();
+                  else navigateAdmin('overview', { replace: true });
+                }}>
+                  <ArrowLeft size={18} aria-hidden="true" />
+                </button>
+                <div className="admin-heading-copy">
                 <h1 id="admin-page-title">
                   {activeTab === 'overview'
                     ? 'Platform overview'
                     : current.label}
                 </h1>
                 <p>{current.description}</p>
+                </div>
               </div>
+              <div className="admin-heading-actions">
               <button
                 className="dashboard-button"
                 onClick={load}
@@ -412,6 +425,7 @@ export default function AdminDashboard({
                 />
                 {refreshing ? 'Refreshing…' : 'Refresh data'}
               </button>
+              </div>
             </div>
           {profileNotice && (
             <p role="status" className="mb-4 text-xs text-emerald-400">
@@ -576,6 +590,7 @@ export default function AdminDashboard({
                   <table className="dashboard-table">
                     <thead>
                       <tr>
+                        <th>S.No.</th>
                         <th>Client / Creator</th>
                         <th>Session</th>
                         <th>Date</th>
@@ -584,8 +599,9 @@ export default function AdminDashboard({
                       </tr>
                     </thead>
                     <tbody>
-                      {bookings.slice(0, 5).map((booking) => (
+                      {bookings.slice(0, 5).map((booking, index) => (
                         <tr key={booking.id}>
+                          <td>{index + 1}</td>
                           <td>
                             <div className="booking-person">
                               <span className="booking-avatar">
@@ -599,9 +615,9 @@ export default function AdminDashboard({
                           </td>
                           <td>
                             {booking.topic || 'Consultation'}
-                            <small>{booking.slotLabel || booking.slot}</small>
+                            <div className="recent-booking-time"><span className="time-slot-badge">{booking.slotLabel || booking.slot || '—'}</span></div>
                           </td>
-                          <td>{booking.date}</td>
+                          <td>{formatDate(booking.date)}</td>
                           <td className="booking-amount">
                             {money(booking.price)}
                           </td>
@@ -643,7 +659,7 @@ export default function AdminDashboard({
               className="dashboard-detail"
             >
               {activeTab === 'account-details' && detailsAccount && (
-                <AccountDetailsPage key={`${detailsAccount.role}:${detailsAccount.id}`} account={detailsAccount} onBack={() => navigateAdmin(accountDetailsParent())} />
+                <AccountDetailsPage key={`${detailsAccount.role}:${detailsAccount.id}`} account={detailsAccount} />
               )}
               {activeTab === 'edit-profile' && (
                 <AdminEditProfile admin={admin}
@@ -662,14 +678,13 @@ export default function AdminDashboard({
               )}
               {activeTab === 'add-announcement' && (
                 <div className="space-y-4">
-                  <button type="button" className="dashboard-button" onClick={() => navigateAdmin(accountDetailsParent())}><ArrowLeft size={16} /> Back</button>
                   <AnnouncementsView />
                 </div>
               )}
-              {activeTab === 'approvals' && <ApprovalsView onChange={load} />}
+              {activeTab === 'approvals' && <ApprovalsView onChange={load} detailId={recordDetails?.id} />}
               {activeTab === 'slots' && <SlotsInspectorView />}
-              {activeTab === 'bookings' && <BookingsView />}
-              {activeTab === 'conversations' && <ConversationsView />}
+              {activeTab === 'bookings' && <BookingsView detailId={recordDetails?.id} />}
+              {activeTab === 'conversations' && <ConversationsView detailId={recordDetails?.id} />}
             </div>
           )}
         </main>
