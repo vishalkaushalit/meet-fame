@@ -1415,6 +1415,18 @@ html .approval-actions > :is(button, span) > svg {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 24px;
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  padding-top: 20px;
+}
+html .account-details-body .account-media-schedule > section {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+html .account-details-body .account-media-schedule > .account-weekly-schedule {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
 }
 .account-weekday-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .account-weekday-grid > div { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
@@ -1441,6 +1453,12 @@ html[data-theme='light'] .account-certificate-card { background: #f8fafc; }
     gap: 28px;
   }
   .account-media-schedule .account-intro-player { width: 100%; }
+  html .account-details-body .account-media-schedule > .account-weekly-schedule {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+    padding-top: 0;
+    padding-left: 28px;
+  }
 }
 @media (max-width: 480px) {
   .account-weekday-grid { grid-template-columns: 1fr; }
