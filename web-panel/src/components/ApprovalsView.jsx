@@ -270,48 +270,12 @@ export default function ApprovalsView({ onChange, detailId }) {
                                 )}</>}
     </>;
   };
-  const renderInfluencerReview = (inf) => {
-    const isPending = inf.status === 'pending_review';
-    const isApproved = inf.status === 'approved';
-    const isRejected = inf.status === 'rejected';
-    return <div className="dashboard-card p-5 space-y-4">
+  const renderInfluencerReview = (inf) => (
+    <div className="dashboard-card p-5 space-y-4">
       <h3 className="font-semibold">Application and certificate review</h3>
-<section className="record-certification">
-                          {' '}
-                          {inf.certification && (
-                            <div className="mt-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs">
-                              <div className="flex items-center gap-2">
-                                <FileCheck className="w-4 h-4 text-[#0095F6]" />
-                                <span className="text-slate-300">
-                                  Credential:{' '}
-                                  <strong>
-                                    {inf.certification.title ||
-                                      'Specialization Certificate'}
-                                  </strong>
-                                </span>
-                                {inf.certification.fileUrl && (
-                                  <a
-                                    href={inf.certification.fileUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-[11px] text-brand-purple hover:underline flex items-center gap-1"
-                                  >
-                                    <span>Preview Document</span>
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                )}
-                              </div>
-
-                              {/* Certificate verified status */}
-                              <div className="flex items-center gap-2">
-
-                              </div>
-                            </div>
-                          )}
-                          {!inf.certification && '—'}
-                        </section>
-<div className="approval-actions flex flex-wrap items-center gap-2">{renderInfluencerActions(inf)}</div></div>;
-  };
+      <div className="approval-actions flex flex-wrap items-center gap-2">{renderInfluencerActions(inf)}</div>
+    </div>
+  );
 
   if (detailId && !loading && !inspected) {
     return <div className="dashboard-card p-6 space-y-4"><p>Influencer not found.</p></div>;

@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ command }) => ({
   plugins: [react()],
   resolve: {
-    dedupe: ['react', 'react-dom'],
+    dedupe: ['react', 'react-dom', 'lucide-react'],
     alias: { '@shared': fileURLToPath(new URL('../shared', import.meta.url)) },
   },
   base: command === 'serve' ? '/' : '/admin/',

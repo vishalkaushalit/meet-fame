@@ -1,10 +1,12 @@
+import IntroVideo from '../../../shared/IntroVideo';
 import { formatDateTime } from '../../../shared/dateFormat';
 import StatusBadge from './StatusBadge';
 import LogoLoader from './LogoLoader';
 import { dayRanges } from '../../../shared/availability';
 import React, { useEffect, useRef, useState } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, FileCheck } from 'lucide-react';
 import { adminApi } from '../api';
+import { API_BASE } from '../api/endpoints';
 
 const text = (value) =>
   value === undefined || value === null || value === ''
@@ -130,21 +132,16 @@ export default function AccountDetailsPage({ account }) {
                     <h3>About</h3>
                     <p>{text(details.bio)}</p>
                   </section>
-                  <section>
-                    <h3>Certificate</h3>
-                    <p>{text(details.certification?.title)}</p>
-                    {details.certification?.fileName && (
-                      <p>{details.certification.fileName}</p>
-                    )}
-                    {certificateUrl && (
-                      <a href={certificateUrl} target="_blank" rel="noreferrer">
-                        View certificate <ExternalLink size={14} />
-                      </a>
-                    )}
+                  <div className="account-media-schedule">
+                  <section className="account-video-section">
+                    <h3>Introduction video</h3>
+                    {details.introVideoUrl ? (
+                      <div className="account-intro-player"><IntroVideo influencer={details} apiBase={API_BASE} card /></div>
+                    ) : <p>No introduction video uploaded.</p>}
                   </section>
-                  <section>
-                    <h3>Weekly availability</h3>
-                    <dl className="account-details-fields">
+                  <section className="account-weekly-schedule">
+                    <h3>Weekly availability <span className="account-schedule-zone">(IST)</span></h3>
+                    <dl className="account-weekday-grid">
                       {[
                         'monday',
                         'tuesday',
@@ -169,6 +166,20 @@ export default function AccountDetailsPage({ account }) {
                       ))}
                     </dl>
                   </section>
+                  </div>
+                  <section>
+                    <h3>Certificate</h3>
+                    <div className="account-certificate-card">
+                      <FileCheck size={20} aria-hidden="true" />
+                      <span>Credential: <strong>{text(details.certification?.title)}</strong></span>
+                    {certificateUrl && (
+                      <a href={certificateUrl} target="_blank" rel="noreferrer">
+                        Preview Document <ExternalLink size={14} />
+                      </a>
+                    )}
+                    </div>
+                  </section>
+
                 </>
               )}
             </>

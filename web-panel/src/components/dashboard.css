@@ -1407,6 +1407,53 @@ html .approval-actions > :is(button, span) > svg {
   font-size: 12px;
   font-weight: 500;
 }
+.account-intro-player {
+  width: min(100%, calc(100vw - 82px));
+  margin-top: 12px;
+}
+.account-media-schedule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+.account-weekday-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.account-weekday-grid > div { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 10px; }
+.account-weekday-grid dt { margin-bottom: 8px; font-size: 14px; }
+.account-schedule-zone { font-size: 12px; font-weight: 400; }
+.account-certificate-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #080d1a;
+  overflow-wrap: anywhere;
+}
+.account-certificate-card > svg { color: #0095f6; flex-shrink: 0; }
+.account-certificate-card > span { min-width: 0; }
+.account-details-body .account-certificate-card a { margin-top: 0; font-size: 14px; }
+html[data-theme='light'] .account-certificate-card { background: #f8fafc; }
+@media (min-width: 1100px) {
+  .account-media-schedule {
+    grid-template-columns: calc((min(100vw, 1280px) - 96px) / 3 - 50px) minmax(0, 1fr);
+    gap: 28px;
+  }
+  .account-media-schedule .account-intro-player { width: 100%; }
+}
+@media (max-width: 480px) {
+  .account-weekday-grid { grid-template-columns: 1fr; }
+}
+@media (min-width: 640px) {
+  .account-intro-player { width: min(100%, calc(100vw - 98px)); }
+}
+@media (min-width: 768px) {
+  .account-intro-player { width: min(100%, calc((100vw - 72px) / 2 - 50px)); }
+}
+@media (min-width: 1024px) {
+  .account-intro-player { width: min(100%, calc((min(100vw, 1280px) - 96px) / 3 - 50px)); }
+}
 .status-approved {
   color: #6ee7b7;
   background: #17342f;

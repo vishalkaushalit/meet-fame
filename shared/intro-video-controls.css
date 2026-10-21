@@ -1,0 +1,94 @@
+.intro-play-control,
+html[data-theme='light'] .intro-play-control {
+  color: #fff;
+  background-color: rgb(15 23 42 / 85%);
+  border: 2px solid rgb(255 255 255 / 90%);
+  box-shadow: 0 4px 20px rgb(0 0 0 / 45%);
+}
+.intro-play-control svg {
+  color: #fff;
+  stroke: #fff;
+}
+.intro-play-control:hover,
+html[data-theme='light'] .intro-play-control:hover {
+  background-color: #6d28d9;
+  border-color: #fff;
+}
+html .intro-video-stage { isolation: isolate; background: #020617; line-height: 1.5; }
+html .intro-video-stage.aspect-square { aspect-ratio: 1 / 1; }
+html .intro-video-stage.aspect-video { aspect-ratio: 16 / 9; }
+html .intro-video-stage > video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+html .intro-video-stage .intro-play-control { width: 56px; height: 56px; padding: 0; border-radius: 50%; }
+html .intro-video-stage > button.intro-play-control {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+html .intro-video-stage .intro-video-toolbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  color: #fff;
+  background: linear-gradient(to top, rgb(0 0 0 / 90%), transparent);
+  padding: 24px 12px 12px;
+}
+html .intro-video-stage .intro-volume-anchor { position: relative; margin-left: auto; }
+html .intro-video-stage .intro-volume-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  color: #fff;
+  background: rgb(15 23 42 / 85%);
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+}
+html .intro-video-stage .intro-volume-button svg { color: #fff; stroke: currentColor; }
+html .intro-video-stage .intro-volume-popup {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 128px;
+  padding: 12px 0;
+  z-index: 5;
+  background: #0f172a;
+  border-color: #475569;
+  color: #fff;
+}
+html .intro-video-stage input[type='range'] {
+  appearance: auto;
+  -webkit-appearance: auto;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 104px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  accent-color: #c4b5fd;
+  cursor: pointer;
+  touch-action: none;
+}
+html .intro-video-stage .intro-video-name { color: #fff; }
