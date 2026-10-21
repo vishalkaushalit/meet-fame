@@ -6,7 +6,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   const dialog = useRef(null);
   const [name, setName] = useState(admin?.name || '');
   const [email, setEmail] = useState(admin?.email || '');
-  const [phone, setPhone] = useState(admin?.phone || '');
+  const [phone, setPhone] = useState(() => (admin?.phone || '').replace(/[^0-9]/g, '').slice(0, 15));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
@@ -89,11 +89,13 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
           Phone
           <input
             type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
             autoComplete="tel"
-            maxLength={40}
+            maxLength={15}
             value={phone}
             disabled={saving}
-            onChange={(event) => setPhone(event.target.value)}
+            onChange={(event) => setPhone(event.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
             className={field}
           />
         </label>

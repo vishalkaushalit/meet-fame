@@ -388,6 +388,10 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     )}
                     <input
                       type="tel"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={15}
+                      autoComplete="tel"
                       required={role === 'influencer'}
                       id="auth-phone"
                       name="phone"
@@ -396,8 +400,8 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         fieldErrors.phone ? 'auth-phone-error' : undefined
                       }
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+1 (555) 000-0000"
+                      onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
+                      placeholder="15550000000"
                       className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                     />
                   </div>
