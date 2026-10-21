@@ -100,7 +100,7 @@ function AppContent() {
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <Logo size="header" className="shrink-0" />
               <span className="hidden md:inline-flex shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
-                {role === 'influencer' ? 'Creator Dashboard' : 'Client Portal'}
+                {role === 'influencer' ? 'Influencer Dashboard' : 'User Portal'}
               </span>
             </div>
 

@@ -104,7 +104,7 @@ export default function ChatModal({
               <p className="text-[11px] text-slate-400">
                 {targetRole === 'influencer'
                   ? targetUser.specialization || 'Influencer'
-                  : 'Client'}
+                  : 'User'}
               </p>
             </div>
           </div>

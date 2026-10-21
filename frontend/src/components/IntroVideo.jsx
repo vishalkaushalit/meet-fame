@@ -30,7 +30,7 @@ export default function IntroVideo({ influencer, card = false }) {
   const src = influencer.introVideoUrl.startsWith('/uploads/')
     ? `${apiBase.replace(/\/api\/?$/, '')}${influencer.introVideoUrl}`
     : influencer.introVideoUrl;
-  const firstName = influencer.name?.trim().split(/\s+/)[0] || 'your creator';
+  const firstName = influencer.name?.trim().split(/\s+/)[0] || 'your influencer';
   return (
     <div className="my-3">
       {!card && <p className="mb-2 text-xs font-semibold text-slate-300">Meet {influencer.name}</p>}

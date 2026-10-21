@@ -75,7 +75,7 @@ export default function ConversationsView({ detailId }) {
             </div>
             <div className="admin-records-table-wrap">
               <table className="dashboard-table conversation-table">
-                <thead><tr><th>S.No.</th><th>User</th><th>Creator</th><th>Messages</th><th>Latest message</th><th>Last activity</th><th>Action</th></tr></thead>
+                <thead><tr><th>S.No.</th><th>User</th><th>Influencer</th><th>Messages</th><th>Latest message</th><th>Last activity</th><th>Action</th></tr></thead>
                 <tbody>
                   {threadPagination.items.map((conv, index) => (
                     <tr key={conv.conversationId}>
@@ -107,7 +107,7 @@ export default function ConversationsView({ detailId }) {
                       </span>
                       <span className="text-slate-500">•</span>
                       <span className="font-semibold text-brand-purple text-sm">
-                        Creator: {selectedConv.influencerName}
+                        Influencer: {selectedConv.influencerName}
                       </span>
                     </div>
                     <p className="text-[10px] text-slate-500 font-mono mt-0.5 break-all">

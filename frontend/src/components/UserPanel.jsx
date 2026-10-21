@@ -134,7 +134,7 @@ export default function UserPanel({
               </span>
             </div>
             <p className="text-slate-400 text-xs mt-1">
-              Connect 1-on-1 with verified creators, executives, and mentors.
+              Connect 1-on-1 with verified influencers, executives, and mentors.
             </p>
           </div>
         </div>
@@ -343,7 +343,7 @@ export default function UserPanel({
           ) : bookingsError &&
             myBookings.length === 0 ? null : myBookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              You haven't booked any sessions yet. Browse creators to schedule
+              You haven't booked any sessions yet. Browse influencers to schedule
               your first 1-hour slot!
             </div>
           ) : (

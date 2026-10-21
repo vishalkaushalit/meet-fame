@@ -47,7 +47,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [step, setStep] = useState(0);
   const isInfluencerSignup = isRegister && role === 'influencer';
-  const steps = ['Account details', 'Creator profile', 'Video & certification'];
+  const steps = ['Account details', 'Influencer profile', 'Video & certification'];
   const stepHeading = useRef(null);
   useEffect(() => {
     if (isInfluencerSignup) stepHeading.current?.focus();
@@ -244,7 +244,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
               }`}
             >
               <Sparkles className="w-4 h-4" />
-              <span>Influencer / Creator</span>
+              <span>Influencer</span>
             </a>
           </div>
 
@@ -450,7 +450,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                   hidden={step !== 1}
                   disabled={loading || step !== 1}
                 >
-                  <legend className="sr-only">Creator profile</legend>
+                  <legend className="sr-only">Influencer profile</legend>
                   <h4 className="text-sm font-semibold text-brand-purple flex items-center gap-1.5">
                     <Briefcase className="w-4 h-4" />
                     <span>Influencer Profile & Specialization</span>

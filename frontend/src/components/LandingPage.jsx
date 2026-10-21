@@ -189,7 +189,7 @@ export default function LandingPage({
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-purple uppercase tracking-wider mb-2">
                 <Sparkles className="w-4 h-4" />
-                <span>Certified Creators</span>
+                <span>Certified Influencers</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-semibold text-white">
                 Featured Verified Experts
@@ -203,7 +203,7 @@ export default function LandingPage({
               href="/login"
               className="mt-4 md:mt-0 text-xs font-semibold text-brand-purple hover:text-brand-pink flex items-center gap-1 transition-colors"
             >
-              <span>View all creators &rarr;</span>
+              <span>View all influencers &rarr;</span>
             </a>
           </div>
 
@@ -308,7 +308,7 @@ export default function LandingPage({
                 Influencer Sets Time
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Creators enter their day-wise windows (e.g. Mon 9am-12pm &
+                Influencers enter their day-wise windows (e.g. Mon 9am-12pm &
                 5pm-8pm). The engine automatically slices them into 1-hour
                 slots.
               </p>

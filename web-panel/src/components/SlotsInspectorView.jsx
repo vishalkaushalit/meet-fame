@@ -365,7 +365,7 @@ export default function SlotsInspectorView() {
                 {selected.booking ? (
                   <>
                     <dl>
-                      <dt>Client</dt>
+                      <dt>User</dt>
                       <dd>{selected.booking.userName}</dd>
                       <dt>Topic</dt>
                       <dd>
@@ -383,7 +383,7 @@ export default function SlotsInspectorView() {
                   </>
                 ) : (
                   <p className="availability-open-note">
-                    This slot is available in the creator’s schedule.
+                    This slot is available in the influencer’s schedule.
                   </p>
                 )}
                 <div className="availability-recurring">

@@ -251,7 +251,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 {user?.isVerified ? (
                   <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-semibold">
                     <VerifiedBadge size="sm" />
-                    <span>Verified Creator</span>
+                    <span>Verified Influencer</span>
                   </div>
                 ) : (
                   <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-semibold border border-slate-700">
@@ -261,7 +261,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               </div>
 
               <p className="text-brand-purple text-sm font-semibold mt-0.5">
-                {user?.specialization || 'Content Creator & Consultant'}
+                {user?.specialization || 'Content Influencer & Consultant'}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 mt-2 text-xs text-slate-400">
@@ -320,7 +320,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       <div
         className="creator-tabs flex items-center gap-2 overflow-x-auto"
         role="tablist"
-        aria-label="Creator dashboard sections"
+        aria-label="Influencer dashboard sections"
       >
         <button
           role="tab"
@@ -574,7 +574,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 <span>My Bookings</span>
               </h3>
               <p className="text-slate-400 text-xs mt-1">
-                Manage your sessions and connect with your clients.
+                Manage your sessions and connect with your users.
               </p>
             </div>
           </div>
@@ -600,7 +600,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           ) : bookingsError &&
             bookings.length === 0 ? null : bookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              No sessions booked yet. Once clients book your slots, they will
+              No sessions booked yet. Once users book your slots, they will
               appear here!
             </div>
           ) : (
@@ -662,7 +662,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                       }
                     >
                       <MessageSquare size={17} aria-hidden="true" />
-                      Chat with Client
+                      Chat with User
                     </button>
                   </div>
                 </article>
@@ -675,7 +675,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           <p className="creator-session-note">
             <Info size={18} aria-hidden="true" />
             You can join the meeting at the scheduled time or chat with the
-            client for any updates.
+            user for any updates.
           </p>
         </div>
       )}

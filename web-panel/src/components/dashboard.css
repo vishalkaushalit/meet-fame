@@ -251,6 +251,18 @@ html button.dashboard-button.admin-back-button:hover { background: #8b5cf633; co
 .admin-heading-copy { min-width: 0; }
 .admin-heading-leading .admin-back-icon { margin-top: 1px; }
 html button.dashboard-button.admin-back-icon { width: 34px; height: 34px; padding: 0; flex-shrink: 0; }
+html:not([data-theme='light']) button.dashboard-button.admin-back-icon {
+  position: relative;
+  z-index: 1;
+  background: #27213c;
+  border-color: #59447f;
+  color: #ddd6fe;
+}
+html:not([data-theme='light']) button.dashboard-button.admin-back-icon:hover {
+  background: #3b2e59;
+  border-color: #a78bfa;
+  color: #fff;
+}
 html[data-theme='light'] button.dashboard-button.admin-back-button { background: #ede9fe; color: #6d28d9; border-color: #ddd6fe; }
 html[data-theme='light'] button.dashboard-button.admin-back-button:hover { background: #ddd6fe; color: #5b21b6; }
 .dashboard-button:disabled {

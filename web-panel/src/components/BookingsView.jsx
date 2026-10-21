@@ -51,8 +51,8 @@ export default function BookingsView({ detailId }) {
   if (selectedBooking) {
     const b = selectedBooking;
     const details = [
-      ['Booking ID', b.id], ['Client', b.userName], ['Client email', b.userEmail],
-      ['Creator', b.influencerName], ['Date', formatDate(b.date)], ['Day', b.dayOfWeek],
+      ['Booking ID', b.id], ['User', b.userName], ['User email', b.userEmail],
+      ['Influencer', b.influencerName], ['Date', formatDate(b.date)], ['Day', b.dayOfWeek],
       ['Time (IST)', <span className="time-slot-badge">{b.slotLabel || b.slot || '—'}</span>], ['Meeting type', b.meetingType],
       ['Status', <StatusBadge status={b.status} />],
       ['Fee', `$${b.price ?? 0}`], ['Topic', b.topic],
@@ -136,8 +136,8 @@ export default function BookingsView({ detailId }) {
                 <tr>
                   {[
                     'S.No.',
-                    'Client',
-                    'Creator',
+                    'User',
+                    'Influencer',
                     'Date',
                     'Time (IST)',
                     'Status',
@@ -157,7 +157,7 @@ export default function BookingsView({ detailId }) {
                       {bookingPagination.start + index}
                     </td>
                     <td>
-                      <strong>{b.userName}</strong>
+                      <span>{b.userName}</span>
                     </td>
                     <td>{b.influencerName}</td>
                     <td>

@@ -61,7 +61,7 @@ const navigation = [
     id: 'slots',
     label: 'Availability',
     icon: Clock,
-    description: 'Explore creator schedules and booked time slots.',
+    description: 'Explore influencer schedules and booked time slots.',
   },
   {
     id: 'announcements',
@@ -73,7 +73,7 @@ const navigation = [
     id: 'conversations',
     label: 'Conversations',
     icon: MessageSquare,
-    description: 'Review conversations between clients and creators.',
+    description: 'Review conversations between users and influencers.',
   },
 ];
 const money = (value) =>
@@ -181,10 +181,10 @@ export default function AdminDashboard({
     : null;
   const metrics = [
     {
-      label: 'Total creators',
+      label: 'Total influencers',
       value: stats?.totalInfluencers,
       detail: stats
-        ? `${stats.verifiedInfluencers || 0} verified creators`
+        ? `${stats.verifiedInfluencers || 0} verified influencers`
         : 'Waiting for platform data',
       icon: Sparkles,
       color: 'violet',
@@ -206,7 +206,7 @@ export default function AdminDashboard({
       color: 'green',
     },
     {
-      label: 'Total clients',
+      label: 'Total users',
       value: stats?.totalUsers,
       detail: stats
         ? `${stats.pendingUsers || 0} awaiting approval`
@@ -539,7 +539,7 @@ export default function AdminDashboard({
                   </div>
                   {[
                     {
-                      label: 'Creator registrations',
+                      label: 'Influencer registrations',
                       value: stats?.pendingInfluencers,
                       icon: Users,
                     },
@@ -549,7 +549,7 @@ export default function AdminDashboard({
                       icon: ShieldCheck,
                     },
                     {
-                      label: 'Client registrations',
+                      label: 'User registrations',
                       value: stats?.pendingUsers,
                       icon: CheckCircle2,
                     },
@@ -591,7 +591,7 @@ export default function AdminDashboard({
                     <thead>
                       <tr>
                         <th>S.No.</th>
-                        <th>Client / Creator</th>
+                        <th>User / Influencer</th>
                         <th>Session</th>
                         <th>Date</th>
                         <th>Amount</th>
@@ -640,7 +640,7 @@ export default function AdminDashboard({
                       </strong>
                       <p>
                         {stats
-                          ? 'New sessions will appear here as clients make bookings.'
+                          ? 'New sessions will appear here as users make bookings.'
                           : 'Refresh the dashboard to load your latest bookings.'}
                       </p>
                     </div>
