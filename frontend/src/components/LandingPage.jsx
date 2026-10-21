@@ -276,7 +276,7 @@ export default function LandingPage({
                     className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-2"
                   >
                     <Clock className="w-3.5 h-3.5" />
-                    <span>Book 1-Hour Time Slot</span>
+                    <span>Book Slot</span>
                   </button>
                 </div>
               </div>
