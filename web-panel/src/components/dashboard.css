@@ -1585,12 +1585,13 @@ html[data-theme='light'] .time-slot-badge {
 .sidebar-brand > a > span { margin-top: 8px; line-height: 1.5; }
 .workspace-label {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 16px;
+  grid-template-columns: 36px minmax(0, 1fr) 20px;
   align-items: center;
   gap: 10px;
   padding: 12px;
 }
-.workspace-label .workspace-mark { width: 28px; height: 28px; }
+.workspace-label .workspace-mark { width: 36px; height: 36px; border-radius: 10px; font-size: 16px; line-height: 1; }
+html[data-theme='light'] .workspace-label .workspace-mark { background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe; }
 .workspace-label .workspace-copy { min-width: 0; }
 .workspace-label .workspace-title {
   display: block;
@@ -1599,7 +1600,7 @@ html[data-theme='light'] .time-slot-badge {
   line-height: 1.4;
 }
 .workspace-label small { margin-top: 4px; font-size: 12px; line-height: 1.4; }
-.workspace-label > svg { width: 16px; height: 16px; margin: 0; }
+.workspace-label > svg { width: 20px; height: 20px; margin: 0; justify-self: center; }
 html:not([data-theme='light']) .dashboard-sidebar :is(
   .workspace-title, .workspace-label small, .workspace-mark,
   .workspace-label > svg, .nav-caption, .nav-item,
