@@ -123,7 +123,7 @@ export default function UsersView({ refreshKey = 0 }) {
           <p>All user, influencer and administrator accounts.</p>
         </div>
       </div>
-      <div className="users-toolbar">
+      <div className="users-toolbar admin-list-toolbar">
         <div className="users-search">
           <Search size={16} />
           <input
@@ -137,6 +137,8 @@ export default function UsersView({ refreshKey = 0 }) {
           />
         </div>
         <div className="users-filters">
+          <label className="approval-status-filter flex items-center gap-3 text-sm">
+          Role:
           <select
             aria-label="Filter accounts by role"
             value={role}
@@ -151,6 +153,9 @@ export default function UsersView({ refreshKey = 0 }) {
               </option>
             ))}
           </select>
+          </label>
+          <label className="approval-status-filter flex items-center gap-3 text-sm">
+          Status:
           <select
             aria-label="Filter users by status"
             value={status}
@@ -165,6 +170,7 @@ export default function UsersView({ refreshKey = 0 }) {
               </option>
             ))}
           </select>
+          </label>
         </div>
       </div>
       {notice && (

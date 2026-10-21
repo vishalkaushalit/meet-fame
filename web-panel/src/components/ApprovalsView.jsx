@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
 import { navigateAccountDetails } from '../routes';
 import VerifiedBadge from './VerifiedBadge';
+import AccountDetailsPage from './AccountDetailsPage';
 import {
   Eye,
+  Search,
   Ban,
   LockOpen,
   CheckCircle,
@@ -17,11 +19,14 @@ import {
   AlertTriangle,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   Filter,
   Sparkles,
 } from 'lucide-react';
 
 export default function ApprovalsView({ onChange }) {
+  const [inspectedId, setInspectedId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('influencers'); // 'influencers' | 'users'
   const [influencers, setInfluencers] = useState([]);
@@ -170,8 +175,143 @@ export default function ApprovalsView({ onChange }) {
     }
   };
 
-  const creatorPagination = usePagination(influencers, statusFilter);
-  const userPagination = usePagination(users, statusFilter);
+  const matchesSearch = (item) => [item.name, item.email, item.phone, item.specialization].some((value) => String(value || '').toLowerCase().includes(searchTerm.toLowerCase()));
+  const creatorPagination = usePagination(influencers.filter(matchesSearch), `${statusFilter}:${searchTerm}`);
+  const userPagination = usePagination(users.filter(matchesSearch), `${statusFilter}:${searchTerm}`);
+
+  const inspected = influencers.find((item) => item.id === inspectedId);
+  const renderInfluencerActions = (inf) => {
+    const isPending = inf.status === 'pending_review';
+    const isApproved = inf.status === 'approved';
+    const isRejected = inf.status === 'rejected';
+    return <>
+                            {isPending && (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleApproveInfluencer(inf.id, inf.name)
+                                  }
+                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
+                                >
+                                  <CheckCircle className="w-4 h-4" />
+                                  <span>Approve Application</span>
+                                </button>
+
+                                <button
+                                  onClick={() => setRejectingItem(inf)}
+                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                  <span>Decline</span>
+                                </button>
+                              </>
+                            )}
+
+                            {inf.status !== 'blocked' && (
+                              <button
+                                onClick={() => openBlock(inf, 'influencer')}
+                                title="Block influencer"
+                                aria-label={`Block ${inf.name}`}
+                                className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"
+                              >
+                                <Ban size={16} aria-hidden="true" /><span>Block account</span>
+                              </button>
+                            )}
+                            {inf.status === 'blocked' && (
+                              <button
+                                onClick={() =>
+                                  handleApproveInfluencer(inf.id, inf.name)
+                                }
+                                title="Unblock influencer"
+                                aria-label={`Unblock ${inf.name}`}
+                                className="approval-icon-button rounded-xl bg-emerald-600 text-white"
+                              >
+                                <LockOpen size={16} aria-hidden="true" /><span>Unblock account</span>
+                              </button>
+                            )}
+
+                            {isRejected && (
+                              <button
+                                onClick={() =>
+                                  handleApproveInfluencer(inf.id, inf.name)
+                                }
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
+                              >
+                                Re-Approve
+                              </button>
+                            )}
+{inf.certification && <>{inf.isVerified ? (
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyCertificate(
+                                        inf.id,
+                                        inf.name,
+                                        false,
+                                      )
+                                    }
+                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-semibold"
+                                  >
+                                    Revoke Blue Badge
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() =>
+                                      handleVerifyCertificate(
+                                        inf.id,
+                                        inf.name,
+                                        true,
+                                      )
+                                    }
+                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-semibold flex items-center gap-1 shadow-sm"
+                                  >
+                                    <VerifiedBadge size="sm" />
+                                    <span>Verify Certificate</span>
+                                  </button>
+                                )}</>}
+    </>;
+  };
+  const renderInfluencerReview = (inf) => {
+    const isPending = inf.status === 'pending_review';
+    const isApproved = inf.status === 'approved';
+    const isRejected = inf.status === 'rejected';
+    return <div className="dashboard-card p-5 space-y-4">
+      <h3 className="font-semibold">Application and certificate review</h3>
+<section className="record-certification">
+                          {' '}
+                          {inf.certification && (
+                            <div className="mt-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs">
+                              <div className="flex items-center gap-2">
+                                <FileCheck className="w-4 h-4 text-[#0095F6]" />
+                                <span className="text-slate-300">
+                                  Credential:{' '}
+                                  <strong>
+                                    {inf.certification.title ||
+                                      'Specialization Certificate'}
+                                  </strong>
+                                </span>
+                                {inf.certification.fileUrl && (
+                                  <a
+                                    href={inf.certification.fileUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[11px] text-brand-purple hover:underline flex items-center gap-1"
+                                  >
+                                    <span>Preview Document</span>
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                )}
+                              </div>
+
+                              {/* Certificate verified status */}
+                              <div className="flex items-center gap-2">
+
+                              </div>
+                            </div>
+                          )}
+                          {!inf.certification && '—'}
+                        </section>
+<div className="approval-actions flex flex-wrap items-center gap-2">{renderInfluencerActions(inf)}</div></div>;
+  };
 
   return (
     <div className="space-y-6">
@@ -220,6 +360,12 @@ export default function ApprovalsView({ onChange }) {
           <span>Users ({users.length})</span>
         </button>
         </div>
+      </div>
+      <div className="admin-list-toolbar">
+        <div className="users-search">
+          <Search size={16} aria-hidden="true" />
+          <input aria-label="Search approvals" placeholder="Search name, email, phone..." value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} />
+        </div>
         <label className="approval-status-filter ml-auto flex shrink-0 items-center gap-3 text-sm text-slate-300">
           Status:
           <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}
@@ -234,7 +380,12 @@ export default function ApprovalsView({ onChange }) {
       </div>
 
       {/* QUEUE CONTENT */}
-      {loading ? (
+      {inspected ? (
+        <div className="space-y-6">
+          <AccountDetailsPage account={{ ...inspected, role: 'influencer' }} onBack={() => setInspectedId(null)} />
+          {renderInfluencerReview(inspected)}
+        </div>
+      ) : loading ? (
         <LogoLoader variant="inline" label="Loading registrations..." />
       ) : activeTab === 'influencers' ? (
         influencers.length === 0 ? (
@@ -251,12 +402,9 @@ export default function ApprovalsView({ onChange }) {
                     {[
                       'S.No.',
                       'Influencer',
-                      'Contact',
                       'Category',
                       'Rate',
                       'Status',
-                      'Certification',
-                      'Blocking remark',
                       'Actions',
                     ].map((label) => (
                       <th scope="col" key={label}>
@@ -290,13 +438,8 @@ export default function ApprovalsView({ onChange }) {
                                 {inf.name}
                                 {inf.isVerified && <VerifiedBadge size="sm" />}
                               </strong>
-                              <small>{inf.specialization}</small>
                             </div>
                           </div>
-                        </td>
-                        <td>
-                          {inf.email}
-                          <small>{inf.phone || '—'}</small>
                         </td>
                         <td>{inf.category}</td>
                         <td className="whitespace-nowrap">
@@ -316,72 +459,6 @@ export default function ApprovalsView({ onChange }) {
                             {inf.status?.replace('_', ' ')}
                           </span>
                         </td>
-                        <td className="record-certification">
-                          {' '}
-                          {inf.certification && (
-                            <div className="mt-3 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3 text-xs">
-                              <div className="flex items-center gap-2">
-                                <FileCheck className="w-4 h-4 text-[#0095F6]" />
-                                <span className="text-slate-300">
-                                  Credential:{' '}
-                                  <strong>
-                                    {inf.certification.title ||
-                                      'Specialization Certificate'}
-                                  </strong>
-                                </span>
-                                {inf.certification.fileUrl && (
-                                  <a
-                                    href={inf.certification.fileUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-[11px] text-brand-purple hover:underline flex items-center gap-1"
-                                  >
-                                    <span>Preview Document</span>
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                )}
-                              </div>
-
-                              {/* Certificate verified status */}
-                              <div className="flex items-center gap-2">
-                                {inf.isVerified ? (
-                                  <button
-                                    onClick={() =>
-                                      handleVerifyCertificate(
-                                        inf.id,
-                                        inf.name,
-                                        false,
-                                      )
-                                    }
-                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-semibold"
-                                  >
-                                    Revoke Blue Badge
-                                  </button>
-                                ) : (
-                                  <button
-                                    onClick={() =>
-                                      handleVerifyCertificate(
-                                        inf.id,
-                                        inf.name,
-                                        true,
-                                      )
-                                    }
-                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-semibold flex items-center gap-1 shadow-sm"
-                                  >
-                                    <VerifiedBadge size="sm" />
-                                    <span>Verify Certificate</span>
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          {!inf.certification && '—'}
-                        </td>
-                        <td className="record-description">
-                          {inf.status === 'blocked'
-                            ? inf.statusReason || 'No remark recorded'
-                            : '—'}
-                        </td>
                         <td>
                           {' '}
                           <div className="approval-actions flex items-center gap-2 self-start lg:self-center">
@@ -390,77 +467,18 @@ export default function ApprovalsView({ onChange }) {
                               className="user-view-button approval-icon-button"
                               title="View details"
                               aria-label={`View details for ${inf.name}`}
-                              onClick={() =>
-                                navigateAccountDetails({
-                                  ...inf,
-                                  role: 'influencer',
-                                })
-                              }
+                              onClick={() => setInspectedId(inf.id)}
                             >
                               <Eye size={16} aria-hidden="true" />
                             </button>
-                            {isPending && (
-                              <>
-                                <button
-                                  onClick={() =>
-                                    handleApproveInfluencer(inf.id, inf.name)
-                                  }
-                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
-                                >
-                                  <CheckCircle className="w-4 h-4" />
-                                  <span>Approve Application</span>
-                                </button>
-
-                                <button
-                                  onClick={() => setRejectingItem(inf)}
-                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
-                                >
-                                  <XCircle className="w-4 h-4" />
-                                  <span>Decline</span>
-                                </button>
-                              </>
-                            )}
-
-                            {isApproved && (
-                              <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                                <CheckCircle className="w-4 h-4" />
-                                <span>Active for Login</span>
-                              </span>
-                            )}
-
-                            {inf.status !== 'blocked' && (
-                              <button
-                                onClick={() => openBlock(inf, 'influencer')}
-                                title="Block influencer"
-                                aria-label={`Block ${inf.name}`}
-                                className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"
-                              >
-                                <Ban size={16} aria-hidden="true" />
-                              </button>
-                            )}
-                            {inf.status === 'blocked' && (
-                              <button
-                                onClick={() =>
-                                  handleApproveInfluencer(inf.id, inf.name)
-                                }
-                                title="Unblock influencer"
-                                aria-label={`Unblock ${inf.name}`}
-                                className="approval-icon-button rounded-xl bg-emerald-600 text-white"
-                              >
-                                <LockOpen size={16} aria-hidden="true" />
-                              </button>
-                            )}
-
-                            {isRejected && (
-                              <button
-                                onClick={() =>
-                                  handleApproveInfluencer(inf.id, inf.name)
-                                }
-                                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
-                              >
-                                Re-Approve
-                              </button>
-                            )}
+                            <details className="approval-action-menu">
+                              <summary>More actions <ChevronDown size={15} aria-hidden="true" /></summary>
+                              <div className="approval-action-menu-items" onClick={(event) => {
+                                if (event.target.closest('button')) event.currentTarget.closest('details').open = false;
+                              }}>
+                                {renderInfluencerActions(inf)}
+                              </div>
+                            </details>
                           </div>
                         </td>
                       </tr>

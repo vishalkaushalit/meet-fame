@@ -2,21 +2,11 @@ import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
-import {
-  Calendar,
-  Clock,
-  User,
-  Sparkles,
-  Filter,
-  DollarSign,
-  Video,
-  Users,
-  Search,
-  CheckCircle2,
-} from 'lucide-react';
+import { Calendar, DollarSign, Search, Eye } from 'lucide-react';
 
 export default function BookingsView() {
   const [bookings, setBookings] = useState([]);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,7 +29,8 @@ export default function BookingsView() {
   const filtered = bookings.filter((b) => {
     if (!searchTerm) return true;
     const q = searchTerm.toLowerCase();
-    return (
+
+  return (
       b.influencerName?.toLowerCase().includes(q) ||
       b.userName?.toLowerCase().includes(q) ||
       b.topic?.toLowerCase().includes(q) ||
@@ -53,6 +44,31 @@ export default function BookingsView() {
     filtered,
     `${statusFilter}:${searchTerm}`,
   );
+
+  if (selectedBooking) {
+    const b = selectedBooking;
+    const details = [
+      ['Booking ID', b.id], ['Client', b.userName], ['Client email', b.userEmail],
+      ['Creator', b.influencerName], ['Date', b.date], ['Day', b.dayOfWeek],
+      ['Time (IST)', b.slotLabel || b.slot], ['Meeting type', b.meetingType],
+      ['Status', <span className={`booking-status ${b.status}`}>{b.status}</span>],
+      ['Fee', `$${b.price ?? 0}`], ['Topic', b.topic],
+    ];
+    return (
+      <section className="account-details-dialog account-details-page" aria-labelledby="booking-details-title">
+        <div className="card-heading">
+          <h2 id="booking-details-title">Booking details</h2>
+          <button type="button" className="dashboard-button" onClick={() => setSelectedBooking(null)}>Back to bookings</button>
+        </div>
+        <div className="account-details-body">
+          <dl className="account-details-fields">
+            {details.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || '—'}</dd></div>)}
+          </dl>
+        </div>
+      </section>
+    );
+  }
+
 
   return (
     <div className="space-y-6">
@@ -70,7 +86,7 @@ export default function BookingsView() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900 border border-slate-800">
+      <div className="admin-list-toolbar">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
           <input
@@ -82,21 +98,20 @@ export default function BookingsView() {
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          {['all', 'confirmed', 'completed', 'cancelled'].map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
-                statusFilter === s
-                  ? 'bg-brand-purple text-white shadow-sm'
-                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+        <label className="approval-status-filter ml-auto flex items-center gap-3 text-sm text-slate-300">
+          Status:
+          <select
+            aria-label="Filter bookings by status"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white"
+          >
+            <option value="all">All statuses</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </label>
       </div>
 
       {/* Bookings Table / Cards */}
@@ -115,15 +130,13 @@ export default function BookingsView() {
                 <tr>
                   {[
                     'S.No.',
-                    'Booking',
                     'Client',
                     'Creator',
-                    'Topic',
                     'Date',
                     'Time (IST)',
-                    'Meeting',
                     'Status',
                     'Fee',
+                    'Action',
                   ].map((label) => (
                     <th scope="col" key={label}>
                       {label}
@@ -138,30 +151,22 @@ export default function BookingsView() {
                       {bookingPagination.start + index}
                     </td>
                     <td>
-                      <code className="record-id" title={b.id}>
-                        {b.id}
-                      </code>
-                    </td>
-                    <td>
                       <strong>{b.userName}</strong>
-                      <small>{b.userEmail}</small>
                     </td>
                     <td>{b.influencerName}</td>
-                    <td className="record-description">{b.topic || '—'}</td>
                     <td>
                       {b.date}
-                      <small className="capitalize">{b.dayOfWeek}</small>
                     </td>
                     <td className="whitespace-nowrap">
                       {b.slotLabel || b.slot}
                     </td>
-                    <td className="capitalize">{b.meetingType}</td>
                     <td>
                       <span className={`booking-status ${b.status}`}>
                         {b.status}
                       </span>
                     </td>
                     <td>${b.price ?? 0}</td>
+                    <td><div className="account-icon-actions"><button type="button" className="user-view-button" title="View booking details" aria-label={`View booking details for ${b.userName} with ${b.influencerName}`} onClick={() => setSelectedBooking(b)}><Eye size={18} aria-hidden="true" /></button></div></td>
                   </tr>
                 ))}
               </tbody>

@@ -53,8 +53,9 @@ export default function ConversationsView() {
       ) : (
         <div className="space-y-4">
           {!selectedConv ? (
-          <div className="bg-slate-900 rounded-3xl border border-slate-800 p-4">
-            <div className="conversation-search relative mb-3">
+          <div className="space-y-6">
+            <div className="admin-list-toolbar">
+            <div className="conversation-search relative">
               <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
               <input
                 type="text"
@@ -65,7 +66,8 @@ export default function ConversationsView() {
               />
             </div>
 
-            <div className="dashboard-table-wrap">
+            </div>
+            <div className="admin-records-table-wrap">
               <table className="dashboard-table conversation-table">
                 <thead><tr><th>S.No.</th><th>User</th><th>Creator</th><th>Messages</th><th>Latest message</th><th>Last activity</th><th>Action</th></tr></thead>
                 <tbody>
