@@ -43,7 +43,7 @@ export default function ConversationsView() {
   const threadPagination = usePagination(filtered, searchTerm);
 
   return (
-    <div className="space-y-6">
+    <div className="conversations-view space-y-6">
       {loading ? (
         <LogoLoader variant="inline" label="Loading conversation threads..." />
       ) : conversations.length === 0 ? (

@@ -542,6 +542,10 @@ html .chart-column > span { background: transparent; height: 40px; padding-top: 
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+html:not([data-theme='light']) .conversations-view .conversation-table :is(th, td, .conversation-preview),
+html:not([data-theme='light']) .conversations-view .admin-record-pagination > span {
+  color: #fff;
+}
 .conversation-search { width: 100%; max-width: 340px; }
 html .conversation-search input {
   min-height: 42px;
