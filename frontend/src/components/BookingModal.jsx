@@ -1,3 +1,4 @@
+import DatePicker from '../../../shared/DatePicker.jsx';
 import IntroVideo from './IntroVideo';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect, useRef } from 'react';
@@ -25,7 +26,6 @@ export default function BookingModal({
 }) {
   const { user } = useAuth();
 
-  const dateInput = useRef(null);
   const indiaDate = (days = 0) =>
     new Date(Date.now() + 19800000 + days * 86400000)
       .toISOString()
@@ -37,16 +37,7 @@ export default function BookingModal({
         timeZone: 'Asia/Kolkata',
       })
     : '';
-  const openDatePicker = () => {
-    const input = dateInput.current;
-    if (!input) return;
-    try {
-      if (typeof input.showPicker === 'function') input.showPicker();
-      else input.focus();
-    } catch {
-      input.focus();
-    }
-  };
+
 
   const [slotsData, setSlotsData] = useState(null);
   const [clock, setClock] = useState(null);
@@ -246,15 +237,11 @@ export default function BookingModal({
                   </span>
                 )}
               </label>
-              <div className="booking-date-picker">
-                <input
-                  ref={dateInput}
+                <DatePicker
                   id="booking-date"
-                  type="date"
                   required
                   value={date}
                   min={indiaDate()}
-                  onClick={openDatePicker}
                   onChange={(e) => {
                     setDate(e.target.value);
                     setSlotsData(null);
@@ -262,15 +249,7 @@ export default function BookingModal({
                   }}
                   className="w-full bg-slate-950/80 border border-slate-700 rounded-xl pl-4 pr-14 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                 />
-                <button
-                  type="button"
-                  aria-label="Open booking date picker"
-                  title="Choose date"
-                  onClick={openDatePicker}
-                >
-                  <Calendar size={19} aria-hidden="true" />
-                </button>
-              </div>
+
             </div>
 
             {/* 1-Hour Slots Dropdown (Per Prompt Requirement) */}

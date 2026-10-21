@@ -1746,9 +1746,24 @@ html[data-theme='light'] .dashboard-shell .nav-item:focus-visible {
 
 .admin-edit-profile.admin-edit-profile-page {
   width: 100%;
-  max-width: 760px;
+  max-width: none;
   max-height: none;
   overflow: visible;
+}
+.admin-announcement-form,
+.admin-profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+  width: 100%;
+}
+.admin-announcement-form > :is(p, button, .announcement-message-field, .announcement-date-fields),
+.admin-profile-form > :is(p, footer) { grid-column: 1 / -1; }
+.admin-announcement-form > button { justify-self: start; }
+.admin-profile-form > :is(label, div) { min-width: 0; margin-bottom: 0; }
+html :is(.admin-announcement-form, .admin-profile-form) :is(input, textarea, select) { font-weight: 400; }
+@media (max-width: 700px) {
+  .admin-announcement-form, .admin-profile-form { grid-template-columns: minmax(0, 1fr); }
 }
 .admin-edit-profile-page header > button {
   display: inline-flex;

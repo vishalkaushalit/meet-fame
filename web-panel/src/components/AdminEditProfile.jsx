@@ -28,7 +28,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
     'w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white mt-2';
   return (
     <section className="admin-edit-profile admin-edit-profile-page" aria-labelledby="admin-edit-profile-title">
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className="admin-profile-form">
         <h2 id="admin-edit-profile-title" className="sr-only">Edit profile</h2>
         <label className="block text-xs text-slate-300 mb-4">
           Name

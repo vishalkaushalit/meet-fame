@@ -1,3 +1,4 @@
+import { ANNOUNCEMENT_DETAILS_API } from './endpoints';
 import { client } from './client';
 import {
   ADMIN_LOGIN_API,
@@ -19,7 +20,12 @@ import {
 
 export const adminApi = {
   profile: { update: (profile) => client.put(ADMIN_PROFILE_API, profile) },
-  announcements: { send: (payload) => client.post(ANNOUNCEMENTS_API, payload) },
+  announcements: {
+    getAll: () => client.get(ANNOUNCEMENTS_API),
+    getById: (id) => client.get(ANNOUNCEMENT_DETAILS_API(id)),
+    update: (id, payload) => client.put(ANNOUNCEMENT_DETAILS_API(id), payload),
+    remove: (id) => client.delete(ANNOUNCEMENT_DETAILS_API(id)),
+    send: (payload) => client.post(ANNOUNCEMENTS_API, payload) },
   accounts: {
     getDetails: (role, id) => client.get(ACCOUNT_DETAILS_API(role, id)),
     getAll: () => client.get(ACCOUNTS_API),

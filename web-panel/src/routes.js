@@ -27,14 +27,18 @@ export function matchAdminPage(path, base = import.meta.env?.BASE_URL || '/') {
 export function matchAdminRecord(path, base = import.meta.env?.BASE_URL || '/') {
   const prefix = base.endsWith('/') ? base : base + '/';
   if (!path.startsWith(prefix)) return null;
+  const announcement = /^announcements\/(?!new\/?$)([^/]+)(\/edit)?\/?$/.exec(path.slice(prefix.length));
+  if (announcement) {
+    try { return { page: 'announcements', id: decodeURIComponent(announcement[1]), edit: Boolean(announcement[2]) }; } catch { return null; }
+  }
   const match = /^(bookings|conversations|approvals\/influencers)\/([^/]+)\/?$/.exec(path.slice(prefix.length));
   if (!match) return null;
   try { return { page: match[1] === 'approvals/influencers' ? 'approvals' : match[1], id: decodeURIComponent(match[2]) }; }
   catch { return null; }
 }
-export function navigateAdminRecord(page, id) {
+export function navigateAdminRecord(page, id, { edit = false } = {}) {
   const segment = page === 'approvals' ? 'approvals/influencers' : page;
-  window.history.pushState({}, '', `${adminPath(null)}${segment}/${encodeURIComponent(id)}`);
+  window.history.pushState({}, '', `${adminPath(null)}${segment}/${encodeURIComponent(id)}${edit ? "/edit" : ""}`);
   window.dispatchEvent(new PopStateEvent('popstate'));
   window.scrollTo(0, 0);
 }

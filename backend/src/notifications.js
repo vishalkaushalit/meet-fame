@@ -1,5 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { bookingWindow } from '../../shared/bookingTime.js';
+export function activeAnnouncements(data, session, now = Date.now()) {
+  if (!['user', 'influencer'].includes(session.role)) return [];
+  return (data.announcements || [])
+    .filter(item => (item.audience === 'all' || item.audience === session.role)
+      && Date.parse(item.activeFrom || item.createdAt) <= now
+      && (!item.expiresAt || Date.parse(item.expiresAt) > now))
+    .sort((a, b) => Date.parse(b.activeFrom || b.createdAt) - Date.parse(a.activeFrom || a.createdAt))
+    .map(({ id, title, message, activeFrom, expiresAt, createdAt }) => ({ id, title, message, activeFrom, expiresAt, createdAt }));
+}
 
 export function notifyNewBooking(data, booking) {
   data.notifications ||= [];
@@ -60,8 +69,20 @@ export function notificationFeed(data, session, now = Date.now()) {
       item.recipientRole === session.role &&
       ['booking', 'reminder', 'update'].includes(item.kind),
   );
+  for (const announcement of activeAnnouncements(data, session, now)) {
+    if (own.some(item => item.announcementId === announcement.id)) continue;
+    own.push({
+      id: `announcement:${announcement.id}:${session.role}:${session.id}`,
+      announcementId: announcement.id,
+      kind: 'update', recipientId: session.id, recipientRole: session.role,
+      title: announcement.title, message: announcement.message,
+      createdAt: announcement.activeFrom || announcement.createdAt,
+      expiresAt: announcement.expiresAt ? Date.parse(announcement.expiresAt) : null,
+      readAt: null,
+    });
+  }
   const valid = own.filter((item) => {
-    if (item.kind !== 'reminder') return true;
+    if (item.kind !== 'reminder') return !item.expiresAt || now < item.expiresAt;
     const booking = data.bookings.find(
       (booking) => booking.id === item.bookingId,
     );

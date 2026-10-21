@@ -1,3 +1,4 @@
+import DatePicker from '../../../shared/DatePicker.jsx';
 import { formatDate } from '../../../shared/dateFormat';
 import React, { useEffect, useState } from 'react';
 import {
@@ -140,8 +141,7 @@ export default function SlotsInspectorView() {
           </label>
           <label>
             Date
-            <input
-              type="date"
+            <DatePicker
               value={date}
               onChange={(event) => changeDate(event.target.value)}
             />

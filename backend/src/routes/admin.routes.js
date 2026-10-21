@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { phoneError, normalizePhone } from '../../../shared/phoneValidation.js';
 import express from 'express';
 import { dayRanges } from '../../../shared/availability.js';
@@ -79,7 +80,50 @@ router.put('/profile', (req, res) => {
 /**
  * ADMIN PLATFORM STATS & METRICS
  */
+const announcementDates = (body) => {
+  if (!body.activeFrom) return null;
+  const activeFrom = Date.parse(body.activeFrom);
+  const expiresAt = body.expiresAt ? Date.parse(body.expiresAt) : null;
+  if (!Number.isFinite(activeFrom) || (expiresAt !== null && (!Number.isFinite(expiresAt) || expiresAt <= activeFrom))) return null;
+  return { activeFrom: new Date(activeFrom).toISOString(), expiresAt: expiresAt === null ? null : new Date(expiresAt).toISOString() };
+};
+router.get('/announcements', (req, res) => {
+  const announcements = [...(db.read().announcements || [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  res.json({ announcements });
+});
+router.get('/announcements/:id', (req, res) => {
+  const announcement = (db.read().announcements || []).find((item) => item.id === req.params.id);
+  if (!announcement) return res.status(404).json({ error: 'Announcement not found.' });
+  res.json({ announcement });
+});
+router.put('/announcements/:id', (req, res) => {
+  const dates = announcementDates(req.body);
+  if (!dates) return res.status(400).json({ error: 'Choose an activation date. If provided, expiry must be after activation.' });
+  const { title, message } = req.body;
+  if (typeof title !== 'string' || !title.trim() || title.trim().length > 100 || typeof message !== 'string' || !message.trim() || message.trim().length > 2000)
+    return res.status(400).json({ error: 'Provide a valid title and message.' });
+  const data = db.read();
+  const announcement = (data.announcements || []).find((item) => item.id === req.params.id);
+  if (!announcement) return res.status(404).json({ error: 'Announcement not found.' });
+  Object.assign(announcement, { ...dates, title: title.trim(), message: message.trim(), updatedAt: new Date().toISOString() });
+  for (const notification of data.notifications || []) {
+    if (notification.announcementId === announcement.id) Object.assign(notification, { title: announcement.title, message: announcement.message, dueAt: Date.parse(dates.activeFrom), expiresAt: dates.expiresAt ? Date.parse(dates.expiresAt) : null });
+  }
+  if (!db.write(data)) return res.status(500).json({ error: 'Unable to update announcement.' });
+  res.json({ announcement });
+});
+router.delete('/announcements/:id', (req, res) => {
+  const data = db.read();
+  if (!(data.announcements || []).some((item) => item.id === req.params.id)) return res.status(404).json({ error: 'Announcement not found.' });
+  data.announcements = data.announcements.filter((item) => item.id !== req.params.id);
+  data.notifications = (data.notifications || []).filter((item) => item.announcementId !== req.params.id);
+  if (!db.write(data)) return res.status(500).json({ error: 'Unable to delete announcement.' });
+  res.json({ success: true });
+});
+
 router.post('/announcements', (req, res) => {
+  const dates = announcementDates(req.body);
+  if (!dates) return res.status(400).json({ error: 'Choose an activation date. If provided, expiry must be after activation.' });
   const { title, message, audience } = req.body;
   if (
     typeof title !== 'string' ||
@@ -94,6 +138,7 @@ router.post('/announcements', (req, res) => {
       .status(400)
       .json({ error: 'Provide a title, message and valid audience.' });
   const data = db.read();
+  const announcementId = randomUUID();
   let sent = 0;
   for (const [role, accounts] of [
     ['user', data.users],
@@ -103,10 +148,15 @@ router.post('/announcements', (req, res) => {
     for (const account of accounts.filter(
       (item) => item.status === 'approved',
     )) {
-      addNotification(data, account.id, role, title.trim(), message.trim());
+      const notification = addNotification(data, account.id, role, title.trim(), message.trim());
+      notification.announcementId = announcementId;
+      notification.dueAt = Date.parse(dates.activeFrom);
+      notification.expiresAt = dates.expiresAt ? Date.parse(dates.expiresAt) : null;
       sent++;
     }
   }
+  data.announcements ||= [];
+  data.announcements.push({ ...dates, id: announcementId, title: title.trim(), message: message.trim(), audience, sent, adminId: req.adminId, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
   if (!db.write(data))
     return res.status(500).json({ error: 'Unable to save announcement.' });
   return res.status(201).json({ success: true, sent });

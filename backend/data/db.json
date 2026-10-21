@@ -1317,5 +1317,17 @@
       "text": "Hello Marcus Vance! I have booked a 1-hour session on 2026-10-16 (10:00 AM - 11:00 AM) regarding: \"1-on-1 Strategy & Mentorship Session\". Looking forward to meeting!",
       "timestamp": "2026-10-15T12:38:30.540Z"
     }
+  ],
+  "announcements": [
+    {
+      "id": "demo-announcement-oct-2026",
+      "title": "Welcome to MeetFame",
+      "message": "Discover influencers, explore their availability, and book your next one-on-one session. This is a demo announcement.",
+      "audience": "all",
+      "sent": 0,
+      "activeFrom": "2026-10-20T18:30:00.000Z",
+      "expiresAt": "2026-10-28T18:29:59.000Z",
+      "createdAt": "2026-10-21T12:30:48.945Z"
+    }
   ]
 }

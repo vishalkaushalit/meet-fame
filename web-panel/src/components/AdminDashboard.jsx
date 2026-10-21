@@ -1,3 +1,4 @@
+import AnnouncementsIndex from './AnnouncementsIndex';
 import { formatDate } from '../../../shared/dateFormat';
 import AuthSocialBackground from '@shared/AuthSocialBackground';
 import { adminPath, matchAdminRecord, navigateAdmin, navigateAccountDetails, matchAccountDetails, accountDetailsParent, navigateAdminAction } from '../routes';
@@ -670,12 +671,7 @@ export default function AdminDashboard({
                     navigateAdmin(accountDetailsParent());
                   }} />
               )}
-              {activeTab === 'announcements' && (
-                <section className="dashboard-card p-6 space-y-4">
-                  <p className="text-sm text-slate-400">Send an in-app announcement to users, influencers, or both.</p>
-                  <button type="button" className="dashboard-button button-primary" onClick={() => navigateAdminAction('add-announcement')}>Add announcement</button>
-                </section>
-              )}
+              {activeTab === 'announcements' && <AnnouncementsIndex detailId={recordDetails?.id} edit={recordDetails?.edit} />}
               {activeTab === 'add-announcement' && (
                 <div className="space-y-4">
                   <AnnouncementsView />

@@ -1,10 +1,15 @@
+import DatePicker from '../../../shared/DatePicker.jsx';
 import React, { useState } from 'react';
 import { Send } from 'lucide-react';
 import { adminApi } from '../api';
-export default function AnnouncementsView() {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [audience, setAudience] = useState('all');
+import { navigateAdminRecord } from '../routes';
+export default function AnnouncementsView({ announcement }) {
+  const [title, setTitle] = useState(announcement?.title || '');
+  const [message, setMessage] = useState(announcement?.message || '');
+  const [audience, setAudience] = useState(announcement?.audience || 'all');
+  const localDate = value => value ? new Date(Date.parse(value) + 19800000).toISOString().slice(0, 10) : '';
+  const [activeFrom, setActiveFrom] = useState(localDate(announcement?.activeFrom));
+  const [expiresAt, setExpiresAt] = useState(localDate(announcement?.expiresAt));
   const [sending, setSending] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
@@ -15,14 +20,20 @@ export default function AnnouncementsView() {
     setNotice('');
     setError('');
     try {
-      const result = await adminApi.announcements.send({
-        title: title.trim(),
-        message: message.trim(),
-        audience,
-      });
-      setNotice(`Announcement sent to ${result.sent} active accounts.`);
+      const payload = { title: title.trim(), message: message.trim(), audience,
+        activeFrom: activeFrom ? new Date(`${activeFrom}T00:00:00+05:30`).toISOString() : undefined,
+        expiresAt: expiresAt ? new Date(`${expiresAt}T23:59:59.999+05:30`).toISOString() : null };
+      if (announcement) {
+        await adminApi.announcements.update(announcement.id, payload);
+        navigateAdminRecord('announcements', announcement.id);
+        return;
+      }
+      const result = await adminApi.announcements.send(payload);
+      setNotice(Date.parse(payload.activeFrom) > Date.now() ? `Announcement scheduled for ${activeFrom}.` : `Announcement sent to ${result.sent} active accounts.`);
       setTitle('');
       setMessage('');
+      setActiveFrom('');
+      setExpiresAt('');
     } catch (err) {
       setError(err.error || 'Unable to send announcement. Please try again.');
     } finally {
@@ -32,23 +43,10 @@ export default function AnnouncementsView() {
   const field =
     'w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white mt-2';
   return (
-    <form onSubmit={submit} className="dashboard-card p-6 max-w-2xl space-y-5">
+    <form onSubmit={submit} className="dashboard-card admin-announcement-form p-6">
       <p className="text-xs text-slate-400">
         Send an in-app notification to approved users, influencers, or both.
       </p>
-      <label className="block text-xs text-slate-300">
-        Audience
-        <select
-          disabled={sending}
-          value={audience}
-          onChange={(event) => setAudience(event.target.value)}
-          className={field}
-        >
-          <option value="all">Users and influencers</option>
-          <option value="user">Users only</option>
-          <option value="influencer">Influencers only</option>
-        </select>
-      </label>
       <label className="block text-xs text-slate-300">
         Title
         <input
@@ -62,6 +60,19 @@ export default function AnnouncementsView() {
         />
       </label>
       <label className="block text-xs text-slate-300">
+        Audience
+        <select
+          disabled={sending || Boolean(announcement)}
+          value={audience}
+          onChange={(event) => setAudience(event.target.value)}
+          className={field}
+        >
+          <option value="all">Users and influencers</option>
+          <option value="user">Users only</option>
+          <option value="influencer">Influencers only</option>
+        </select>
+      </label>
+      <label className="announcement-message-field block text-xs text-slate-300">
         Announcement
         <textarea
           required
@@ -74,6 +85,10 @@ export default function AnnouncementsView() {
           className={field}
         />
       </label>
+      <div className="announcement-date-fields grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <label>Activation (IST)<DatePicker required className={field} value={activeFrom} onChange={event => setActiveFrom(event.target.value)} disabled={sending} /></label>
+        <label>Expiry (optional, IST)<DatePicker className={field} value={expiresAt} min={activeFrom || undefined} onChange={event => setExpiresAt(event.target.value)} disabled={sending} /></label>
+      </div>
       {notice && (
         <p role="status" className="text-xs text-emerald-400">
           {notice}
@@ -85,11 +100,11 @@ export default function AnnouncementsView() {
         </p>
       )}
       <button
-        disabled={sending || !title.trim() || !message.trim()}
+        disabled={sending || !title.trim() || !message.trim() || !activeFrom}
         className="dashboard-button button-primary disabled:opacity-50"
       >
         <Send size={15} />
-        {sending ? <span>Sending…</span> : 'Send announcement'}
+        {sending ? <span>Sending…</span> : announcement ? 'Save changes' : activeFrom && Date.parse(`${activeFrom}T00:00:00+05:30`) > Date.now() ? 'Schedule announcement' : 'Send announcement'}
       </button>
     </form>
   );

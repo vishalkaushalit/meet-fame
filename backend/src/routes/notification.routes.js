@@ -16,12 +16,12 @@ router.get('/', (req, res) => {
 });
 router.put('/read-all', (req, res) => {
   const data = db.read();
-  const visible = new Set(
-    notificationFeed(data, req.session).notifications.map((item) => item.id),
-  );
-  for (const item of data.notifications || [])
-    if (visible.has(item.id) && !item.readAt)
-      item.readAt = new Date().toISOString();
+  const visible = notificationFeed(data, req.session).notifications;
+  data.notifications ||= [];
+  for (const item of visible) {
+    item.readAt ||= new Date().toISOString();
+    if (!data.notifications.some(stored => stored.id === item.id)) data.notifications.push(item);
+  }
   if (!db.write(data))
     return res.status(500).json({ error: 'Unable to save read status.' });
   res.json({ success: true });
@@ -34,6 +34,8 @@ router.put('/:id/read', (req, res) => {
   if (!visible)
     return res.status(404).json({ error: 'Notification not found.' });
   visible.readAt ||= new Date().toISOString();
+  data.notifications ||= [];
+  if (!data.notifications.some(item => item.id === visible.id)) data.notifications.push(visible);
   if (!db.write(data))
     return res.status(500).json({ error: 'Unable to save read status.' });
   res.json({ success: true });

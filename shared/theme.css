@@ -1261,6 +1261,13 @@ html[data-theme='light'] [class~='focus-within:border-brand-purple']:focus-withi
 
 /* Keep native emphasis consistent with the semibold typography limit. */
 b, strong { font-weight: 600; }
+html .required-field-star { color: #ef4444; font-weight: 600; white-space: pre; }
+
+/* Form values stay normal weight even inside semibold labels. */
+html body :is(input, textarea, select, option),
+html body :is(input, textarea)::placeholder {
+  font-weight: 400;
+}
 
 /* Keep creator names readable over the dark video poster gradient. */
 html[data-theme='light'] .intro-video-name {

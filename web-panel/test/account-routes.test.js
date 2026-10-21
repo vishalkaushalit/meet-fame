@@ -40,3 +40,10 @@ test('booking, conversation, and influencer detail pages have separate routes', 
   }
   assert.equal(matchAdminRecord('/bookings/%bad', '/'), null);
 });
+
+test('announcements have separate index, add, view and edit routes', () => {
+  assert.equal(matchAdminPage('/announcements', '/'), 'announcements');
+  assert.equal(matchAdminPage('/announcements/new', '/'), 'add-announcement');
+  assert.deepEqual(matchAdminRecord('/admin/announcements/demo', '/admin/'), { page: 'announcements', id: 'demo', edit: false });
+  assert.deepEqual(matchAdminRecord('/admin/announcements/demo/edit', '/admin/'), { page: 'announcements', id: 'demo', edit: true });
+});

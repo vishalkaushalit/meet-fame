@@ -17,3 +17,5 @@ export const ADMIN_USERS_API = '/admin/users';
 export const USER_STATUS_API = (value) => `/admin/users/${id(value)}/status`;
 export const ADMIN_BOOKINGS_API = '/admin/bookings';
 export const CONVERSATIONS_API = '/admin/conversations';
+
+export const ANNOUNCEMENT_DETAILS_API = (announcementId) => `/admin/announcements/${id(announcementId)}`;

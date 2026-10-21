@@ -10,6 +10,7 @@ const schema = new mongoose.Schema({
     required: true,
   },
   bookingId: String,
+  announcementId: String,
   title: { type: String, required: true },
   message: { type: String, required: true },
   startsAt: Number,

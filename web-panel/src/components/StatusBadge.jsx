@@ -2,7 +2,7 @@ export default function StatusBadge({ status, children }) {
   const value = String(status || '').toLowerCase();
   const color = ['active', 'approved', 'confirmed', 'verified'].includes(value)
     ? 'status-approved'
-    : ['pending', 'pending_review', 'submitted'].includes(value)
+    : ['pending', 'pending_review', 'submitted', 'scheduled'].includes(value)
       ? 'status-pending'
       : ['blocked', 'rejected', 'revoked', 'cancelled'].includes(value)
         ? 'status-blocked' : 'status-neutral';
