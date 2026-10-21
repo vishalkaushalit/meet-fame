@@ -9,6 +9,9 @@ export default function IntroVideo({ influencer, card = false }) {
   const [muted, setMuted] = useState(false);
   const [volumeOpen, setVolumeOpen] = useState(false);
   const [playbackVisible, setPlaybackVisible] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [keyboardFocused, setKeyboardFocused] = useState(false);
+  const controlsVisible = hovered || playbackVisible || keyboardFocused;
   useEffect(() => {
     if (!playing || !playbackVisible) return;
     const timer = setTimeout(() => setPlaybackVisible(false), 2500);
@@ -33,7 +36,12 @@ export default function IntroVideo({ influencer, card = false }) {
   return (
     <div className="my-3">
       {!card && <p className="mb-2 text-xs font-semibold text-slate-300">Meet {influencer.name}</p>}
-      <div className={`relative overflow-hidden rounded-2xl bg-slate-950 ${card ? 'aspect-square' : 'aspect-video'}`}>
+      <div
+        onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHovered(true); }}
+        onPointerLeave={(e) => { if (e.pointerType === 'mouse') { setHovered(false); setVolumeOpen(false); } }}
+        onFocus={(e) => { if (e.target.matches(':focus-visible')) setKeyboardFocused(true); }}
+        onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) { setKeyboardFocused(false); setPlaybackVisible(false); setVolumeOpen(false); } }}
+        className={`relative overflow-hidden rounded-2xl bg-slate-950 ${card ? 'aspect-square' : 'aspect-video'}`}>
         <video key={src} ref={videoRef} playsInline preload="none" src={src} poster={influencer.avatar}
           onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
           onEnded={() => { setPlaying(false); setStarted(false); }} onError={() => setFailed(true)}
@@ -66,14 +74,14 @@ export default function IntroVideo({ influencer, card = false }) {
               onClick={() => setPlaybackVisible((visible) => !visible)}
               className="absolute inset-0 h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-purple" />
             <button type="button" onClick={togglePlayback} aria-label={playing ? 'Pause video' : 'Play video'}
-              onFocus={() => setPlaybackVisible(true)}
-              className={`absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-opacity focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${!playing || playbackVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
+
+              className={`absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-opacity focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${!playing || controlsVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
               {playing ? <Pause className="h-5 w-5" strokeWidth={1.5} /> : <Play className="ml-0.5 h-5 w-5" strokeWidth={1.5} />}
             </button>
           </>
         )}
         {(!card || started) && (
-          <div role="group" aria-label="Video controls" className="absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/90 to-transparent px-3 pb-3 pt-6 text-white">
+          <div role="group" aria-label="Video controls" className={`absolute inset-x-0 bottom-0 flex items-center gap-3 bg-gradient-to-t from-black/90 to-transparent px-3 pb-3 pt-6 text-white transition-opacity ${controlsVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
             <div className="relative ml-auto flex items-center gap-2"
               onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setVolumeOpen(false); }}
               onKeyDown={(e) => { if (e.key === 'Escape') { setVolumeOpen(false); e.currentTarget.querySelector('button')?.focus(); } }}>
