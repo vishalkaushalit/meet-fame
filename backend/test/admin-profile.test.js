@@ -51,12 +51,12 @@ test('admin profile updates only the signed-in account and rejects invalid or du
       password: 'changed',
       name: ' Updated ',
       email: ' UPDATED@example.com ',
-      phone: ' 123 ',
+      phone: ' +91 98765 43210 ',
     });
     assert.equal(saved.code, 200);
     assert.equal(saved.body.user.email, 'updated@example.com');
     assert.equal(saved.body.user.name, 'Updated');
-    assert.equal(saved.body.user.phone, '123');
+    assert.equal(saved.body.user.phone, '+919876543210');
     assert.equal(saved.body.user.id, 'a1');
     assert.equal(saved.body.user.role, 'admin');
     assert.equal(saved.body.user.password, undefined);

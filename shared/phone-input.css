@@ -1,0 +1,32 @@
+.phone-input {
+  gap: 10px;
+  padding-left: 14px;
+}
+.phone-input .phone-country {
+  width: 34px;
+  border-right: 0;
+}
+.phone-input .phone-prefix {
+  padding: 0;
+  line-height: 1.5;
+}
+.phone-input input.phone-national {
+  appearance: none;
+  background: transparent !important;
+  color: inherit;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 12px 10px 0;
+  margin: 0;
+  min-width: 0;
+  width: 0;
+  flex: 1 1 0%;
+  box-shadow: none;
+}
+.phone-input input.phone-national::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+.phone-input:focus-within {
+  border-color: var(--focus-border-color, #c4b5fd);
+}

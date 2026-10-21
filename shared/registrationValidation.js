@@ -1,3 +1,4 @@
+import { phoneError } from './phoneValidation.js';
 export const REGISTRATION_CATEGORIES = [
   'Technology & AI',
   'Health & Fitness',
@@ -41,13 +42,8 @@ export function registrationErrors(values, role = 'user') {
     errors.name = 'Enter a name between 2 and 80 characters.';
   if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     errors.email = 'Enter a valid email address.';
-  if (
-    (role === 'influencer' || phone) &&
-    (!/^\+?[\d\s().-]+$/.test(phone) ||
-      phone.replace(/\D/g, '').length < 7 ||
-      phone.replace(/\D/g, '').length > 15)
-  )
-    errors.phone = 'Enter a valid phone number with 7–15 digits.';
+  const phoneIssue = phoneError(phone, role === 'influencer');
+  if (phoneIssue) errors.phone = phoneIssue;
   if (
     typeof values.password !== 'string' ||
     values.password.length < 8 ||

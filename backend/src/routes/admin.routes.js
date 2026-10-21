@@ -1,3 +1,4 @@
+import { phoneError, normalizePhone } from '../../../shared/phoneValidation.js';
 import express from 'express';
 import { dayRanges } from '../../../shared/availability.js';
 import { addNotification } from '../notifications.js';
@@ -47,6 +48,8 @@ router.put('/profile', (req, res) => {
       error:
         'Enter a valid name, email and phone number (up to 40 characters).',
     });
+  const phoneIssue = phoneError(phone);
+  if (phoneIssue) return res.status(400).json({ error: phoneIssue });
   const data = db.read();
   const account = data.admins.find((item) => item.id === req.adminId);
   if (!account)
@@ -63,7 +66,7 @@ router.put('/profile', (req, res) => {
       .json({ error: 'This email is already used by another administrator.' });
   account.name = name.trim();
   account.email = normalizedEmail;
-  account.phone = phone.trim();
+  account.phone = normalizePhone(phone);
   account.updatedAt = new Date().toISOString();
   if (!db.write(data))
     return res

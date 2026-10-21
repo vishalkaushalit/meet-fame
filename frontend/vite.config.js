@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   resolve: {
+    dedupe: ['react', 'react-dom'],
     alias: { '@shared': fileURLToPath(new URL('../shared', import.meta.url)) },
   },
   server: {

@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
                 : 'Account Status Notice',
           message:
             err.message ||
-            'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+            'Your account is under review. You will be able to access your dashboard once approved.',
           status: err.status,
         });
       }
@@ -102,7 +102,7 @@ export function AuthProvider({ children }) {
       title: 'Registration Submitted',
       message:
         res.message ||
-        'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+        'Your account is under review. You will be able to access your dashboard once approved.',
       status: 'pending_review',
     });
     return res;

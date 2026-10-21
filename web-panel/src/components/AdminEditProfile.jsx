@@ -1,3 +1,5 @@
+import PhoneInput from '../../../shared/PhoneInput';
+import { phoneError } from '../../../shared/phoneValidation';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Save } from 'lucide-react';
@@ -6,7 +8,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   const dialog = useRef(null);
   const [name, setName] = useState(admin?.name || '');
   const [email, setEmail] = useState(admin?.email || '');
-  const [phone, setPhone] = useState(() => (admin?.phone || '').replace(/[^0-9]/g, '').slice(0, 15));
+  const [phone, setPhone] = useState(admin?.phone || '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
@@ -22,6 +24,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   const submit = async (event) => {
     event.preventDefault();
     if (saving) return;
+    if (phoneError(phone)) { setError(phoneError(phone)); return; }
     setSaving(true);
     setError('');
     try {
@@ -85,20 +88,10 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             className={field}
           />
         </label>
-        <label className="block text-xs text-slate-300 mb-4">
-          Phone
-          <input
-            type="tel"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            autoComplete="tel"
-            maxLength={15}
-            value={phone}
-            disabled={saving}
-            onChange={(event) => setPhone(event.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
-            className={field}
-          />
-        </label>
+        <div className="mb-4">
+          <label htmlFor="admin-phone" className="mb-2 block text-xs text-slate-300">Phone</label>
+          <PhoneInput id="admin-phone" value={phone} onChange={setPhone} disabled={saving} />
+        </div>
         <p className="text-xs text-slate-400 mb-4">
           Use your updated email the next time you sign in.
         </p>

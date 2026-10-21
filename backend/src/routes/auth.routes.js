@@ -1,3 +1,4 @@
+import { normalizePhone } from '../../../shared/phoneValidation.js';
 import { handleUpload } from '@vercel/blob/client';
 import { parseBuffer } from 'music-metadata';
 import {
@@ -168,7 +169,7 @@ router.post(
         id: `inf_${Date.now()}`,
         name: name.trim(),
         email: email.trim().toLowerCase(),
-        phone: phone.trim(),
+        phone: normalizePhone(phone),
         password: bcrypt.hashSync(password, salt),
         role: 'influencer',
         specialization: specialization || 'Content Creator & Expert',
@@ -195,7 +196,7 @@ router.post(
         success: true,
         status: 'pending_review',
         message:
-          'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+          'Your account is under review. You will be able to access your dashboard once approved.',
         influencer: {
           id: newInfluencer.id,
           name: newInfluencer.name,
@@ -237,7 +238,7 @@ router.post('/register-user', (req, res) => {
       id: `usr_${Date.now()}`,
       name: name.trim(),
       email: email.trim().toLowerCase(),
-      phone: phone?.trim() || '',
+      phone: normalizePhone(phone),
       password: bcrypt.hashSync(password, salt),
       role: 'user',
       status: 'approved', // Active user
@@ -360,7 +361,7 @@ router.post('/login', (req, res) => {
       // Prompt rule: "When the admin approves the influencer request only then the influencer will be active for login otherwise a popup is shown that the account is under selected status by the admin"
       if (influencer.status === 'blocked') {
         const reason = influencer.statusReason || 'Please contact support.';
-        const message = `Your account has been blocked by an administrator. Reason: ${reason}`;
+        const message = `Your account has been blocked. Reason: ${reason}`;
         return res.status(403).json({
           success: false,
           status: 'blocked',
@@ -377,7 +378,7 @@ router.post('/login', (req, res) => {
           status: 'pending_review',
           role: 'influencer',
           message:
-            'Your account is under review by the admin. You will be able to access your dashboard once approved.',
+            'Your account is under review. You will be able to access your dashboard once approved.',
         });
       }
 
@@ -388,7 +389,7 @@ router.post('/login', (req, res) => {
           role: 'influencer',
           message: influencer.statusReason
             ? `Your account application was declined: ${influencer.statusReason}`
-            : 'Your account has been rejected by the admin. Please contact support.',
+            : 'Your account has been rejected. Please contact support.',
         });
       }
 
@@ -425,8 +426,8 @@ router.post('/login', (req, res) => {
       if (['blocked', 'rejected'].includes(user.status)) {
         const message =
           user.status === 'blocked'
-            ? `Your account has been blocked by an administrator. Reason: ${user.statusReason || 'Please contact support.'}`
-            : 'Your account has been rejected by an administrator. Please contact support.';
+            ? `Your account has been blocked. Reason: ${user.statusReason || 'Please contact support.'}`
+            : 'Your account has been rejected. Please contact support.';
         return res.status(403).json({
           success: false,
           status: user.status,
@@ -442,7 +443,7 @@ router.post('/login', (req, res) => {
           success: false,
           status: 'pending_review',
           role: 'user',
-          message: 'Your user account is currently under review by the admin.',
+          message: 'Your user account is currently under review.',
         });
       }
 
@@ -527,7 +528,7 @@ router.get('/me', (req, res) => {
       ['blocked', 'rejected', 'pending_review'].includes(account.status)
     ) {
       return res.status(403).json({
-        error: 'Account access is restricted by an administrator.',
+        error: 'Account access is restricted.',
         status: account.status,
       });
     }

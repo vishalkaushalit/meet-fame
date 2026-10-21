@@ -222,7 +222,7 @@ router.post(
       return res.json({
         success: true,
         message:
-          'Certificate submitted for admin verification. Once verified, your profile will display the Instagram-style blue verified badge!',
+          'Certificate submitted for verification. Once verified, your profile will display the Instagram-style blue verified badge!',
         certification: certificate,
         certificateStatus: 'pending',
       });

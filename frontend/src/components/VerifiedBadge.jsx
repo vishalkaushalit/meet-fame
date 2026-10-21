@@ -11,7 +11,7 @@ export default function VerifiedBadge({ size = 'md', className = '' }) {
 
   return (
     <span
-      title="Verified Influencer - Specialization Certificate Approved by Admin"
+      title="Verified Influencer - Specialization Certificate Approved"
       className={`inline-flex items-center justify-center flex-shrink-0 cursor-pointer ${className}`}
     >
       <svg

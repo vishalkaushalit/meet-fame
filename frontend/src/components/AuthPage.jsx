@@ -1,3 +1,4 @@
+import PhoneInput from '../../../shared/PhoneInput';
 import {
   registrationErrors,
   registrationStep,
@@ -13,8 +14,9 @@ import {
   Sparkles,
   FileCheck,
   Lock,
+  Eye,
+  EyeOff,
   Mail,
-  Phone,
   Briefcase,
   DollarSign,
   Upload,
@@ -53,6 +55,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Influencer specific
   const [specialization, setSpecialization] = useState(
@@ -201,7 +204,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             <h1
               ref={heading}
               tabIndex={-1}
-              className="outline-none text-2xl font-black text-white mt-2"
+              className="outline-none text-2xl font-semibold text-white mt-2"
             >
               {isRegister ? 'Join MeetFame' : 'Login'}
             </h1>
@@ -243,7 +246,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
 
           {registered && (
             <p className="auth-page-notice" role="status">
-              Registration submitted. Your account is pending admin approval.
+              Registration submitted. Your account is pending approval.
               You can sign in once approved.
             </p>
           )}
@@ -376,7 +379,6 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     Phone Number
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
                     {fieldErrors.phone && (
                       <p
                         id="auth-phone-error"
@@ -386,24 +388,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         {fieldErrors.phone}
                       </p>
                     )}
-                    <input
-                      type="tel"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={15}
-                      autoComplete="tel"
-                      required={role === 'influencer'}
-                      id="auth-phone"
-                      name="phone"
-                      aria-invalid={Boolean(fieldErrors.phone)}
-                      aria-describedby={
-                        fieldErrors.phone ? 'auth-phone-error' : undefined
-                      }
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 15))}
-                      placeholder="15550000000"
-                      className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
-                    />
+                    <PhoneInput id="auth-phone" value={phone} onChange={setPhone}
+                      required={role === 'influencer'} invalid={Boolean(fieldErrors.phone)}
+                      describedBy={fieldErrors.phone ? 'auth-phone-error' : undefined} />
                   </div>
                 </div>
               )}
@@ -428,7 +415,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     </p>
                   )}
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     id="auth-password"
                     name="password"
@@ -439,8 +426,14 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
+                    className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   />
+                  <button type="button" onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-pressed={showPassword}
+                    className="absolute right-2 bottom-1.5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-purple">
+                    {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                  </button>
                 </div>
               </div>
             </fieldset>
@@ -583,10 +576,13 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                   <div className="space-y-2">
                     <label htmlFor="auth-introVideoFile" className="text-sm font-semibold text-slate-200">Introduction video (required)</label>
                     <p id="intro-video-help" className="text-xs text-slate-400">Introduce yourself and what you offer. Users can watch this on your card before booking. MP4 or WebM, up to 5 MB and 15 seconds.</p>
+                    <label className="cursor-pointer flex w-full items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple focus-within:border-brand-purple bg-slate-900/50 text-xs text-slate-400 hover:text-white transition-colors">
+                      <Upload className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      <span className="min-w-0 break-all">{introVideoFile ? introVideoFile.name : 'Upload Introduction Video (MP4, WebM)'}</span>
                     <input id="auth-introVideoFile" type="file" accept=".mp4,.webm,video/mp4,video/webm"
                       aria-required="true" aria-invalid={Boolean(fieldErrors.introVideoFile)}
                       aria-describedby="intro-video-help auth-introVideoFile-error"
-                      className="w-full text-sm text-slate-300"
+                      className="sr-only"
                       onChange={async (e) => {
                         const input = e.currentTarget;
                         const file = input.files?.[0] || null;
@@ -612,6 +608,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         if (!issue) setIntroVideoFile(file);
                         setFieldErrors((current) => ({ ...current, introVideoFile: issue }));
                       }} />
+                    </label>
                     <p id="auth-introVideoFile-error" className="auth-field-error" role="alert">{fieldErrors.introVideoFile}</p>
                   </div>
                   {/* Certification Upload for Verified Badge */}
@@ -702,7 +699,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       )}
                     </div>
                     <p className="text-[11px] text-slate-500 mt-1.5">
-                      Uploaded certificates will be reviewed by admin to grant
+                      Uploaded certificates will be reviewed to grant
                       your profile the official Blue Verified badge.
                     </p>
                   </div>
@@ -729,7 +726,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3.5 px-6 rounded-[10px] font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
               >
                 {loading ? (
                   <span>Processing...</span>

@@ -76,13 +76,13 @@ export default function StatusAlertModal() {
             <span>
               {statusAlert.status === 'blocked'
                 ? 'Account access'
-                : 'Admin Review Process'}
+                : 'Review Process'}
             </span>
           </div>
           <p>
             {statusAlert.status === 'blocked'
-              ? 'Contact support if you need help with this decision. Access can be restored by an administrator.'
-              : 'Our administration team verifies credentials, categories, and specialization certificates to keep MeetFame trusted. Once approved, full access is granted immediately.'}
+              ? 'Contact support if you need help with this decision or want to request restored access.'
+              : 'Credentials, categories, and specialization certificates are verified to keep MeetFame trusted. Once approved, full access is granted immediately.'}
           </p>
         </div>
 

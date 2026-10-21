@@ -196,7 +196,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
       const res = await api.influencers.uploadCertificate(user.id, formData);
       setCertMessage(
-        'Certificate submitted! Admin will review to award your Instagram-style blue verified badge.',
+        'Certificate submitted! Your credentials will be reviewed for your Instagram-style blue verified badge.',
       );
       updateUserProfile({
         certification: res.certification,
@@ -691,7 +691,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 Instagram-Style Verified Badge
               </h3>
               <p className="text-slate-400 text-xs">
-                Upload your specialization credentials. Upon admin approval, the
+                Upload your specialization credentials. Upon approval, the
                 blue badge is displayed next to your name platform-wide.
               </p>
             </div>
@@ -716,9 +716,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 )}
                 <span className="font-bold text-sm">
                   {user?.isVerified
-                    ? 'Verified Badge Active (Approved by Admin)'
+                    ? 'Verified Badge Active'
                     : user?.certificateStatus === 'pending'
-                      ? 'Certificate Under Admin Review'
+                      ? 'Certificate Under Review'
                       : 'No Certificate Submitted Yet'}
                 </span>
               </div>

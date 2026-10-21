@@ -1215,3 +1215,12 @@ html[data-theme='light'] {
   border-color: var(--focus-border-color) !important;
   box-shadow: inset 0 0 0 1px var(--focus-border-color) !important;
 }
+
+/* Shared corner radius for action buttons in both applications. */
+button:not(.rounded-full),
+[role='button']:not(.rounded-full),
+a[class*='rounded-']:not(.rounded-full),
+a[class*='button']:not(.rounded-full),
+input::file-selector-button {
+  border-radius: 10px !important;
+}
