@@ -1,3 +1,4 @@
+import './intro-video-controls.css';
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 
@@ -50,8 +51,8 @@ export default function IntroVideo({ influencer, card = false }) {
             {influencer.avatar && <img src={influencer.avatar} alt="" className="h-full w-full object-cover" />}
             <span className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-black/10 to-transparent" aria-hidden="true" />
             <span className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/25">
-                <Play className="ml-0.5 h-5 w-5" strokeWidth={1.5} />
+              <span className="intro-play-control flex h-14 w-14 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-colors hover:bg-white/25">
+                <Play className="ml-0.5 h-5 w-5" strokeWidth={2} />
               </span>
             </span>
             <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-4 text-xs text-white">
@@ -67,8 +68,8 @@ export default function IntroVideo({ influencer, card = false }) {
               className="absolute inset-0 h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-purple" />
             <button type="button" onClick={togglePlayback} aria-label={playing ? 'Pause video' : 'Play video'}
               onFocus={() => setPlaybackVisible(true)}
-              className={`absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-opacity focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${!playing || playbackVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
-              {playing ? <Pause className="h-5 w-5" strokeWidth={1.5} /> : <Play className="ml-0.5 h-5 w-5" strokeWidth={1.5} />}
+              className={`intro-play-control absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-opacity focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${!playing || playbackVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
+              {playing ? <Pause className="h-5 w-5" strokeWidth={2} /> : <Play className="ml-0.5 h-5 w-5" strokeWidth={2} />}
             </button>
           </>
         )}

@@ -1,0 +1,93 @@
+{
+  "status": "drafts-awaiting-video-service",
+  "syntheticDemo": true,
+  "maximumDurationSeconds": 15,
+  "maximumBytes": 5242880,
+  "style": "Single continuous talking-head shot. Lip-synced speech, natural facial movement. No slides or text cards.",
+  "profiles": [
+    {
+      "id": "inf_1",
+      "name": "Marcus Vance",
+      "avatarUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/marcus-vance-i67OGtrohqWmmtNDv5jS7iSL9yewYH.jpg",
+      "script": "Hi, I'm Marcus. Let's explore AI product strategy and building your startup. Book a slot and bring your questions."
+    },
+    {
+      "id": "inf_2",
+      "name": "Dr. Sophia Reyes",
+      "avatarUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/sophia-reyes-Qg5DvsqDv5rMhFTmshTYXs5ihtfY0O.jpg",
+      "script": "Hi, I'm Sophia. Let's talk about wellness, nutrition, and building healthier habits. Book a slot to discuss your goals."
+    },
+    {
+      "id": "inf_3",
+      "name": "Jordan Sterling",
+      "avatarUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/jordan-sterling-ZBSC9MsE695xR4meWYtdz31go3dEGb.jpg",
+      "script": "Hi, I'm Jordan. Let's explore fashion, creative direction, and building your personal brand. Book a slot and let's connect."
+    },
+    {
+      "id": "inf_4",
+      "name": "Kavita Patel",
+      "avatarUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/avatars/kavita-patel-zREHzJ3owxhE4zobtDjZSvjSVJ5APQ.jpg",
+      "script": "Hi, I'm Kavita. Let's discuss your startup, monetization, and growth ideas. Book a slot and bring your business questions."
+    },
+    {
+      "id": "inf_demo_ananya",
+      "name": "Ananya Sharma",
+      "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Ananya. I share beauty tips and personal styling ideas. Book a slot to explore your style with me."
+    },
+    {
+      "id": "inf_demo_rohan",
+      "name": "Rohan Mehta",
+      "avatarUrl": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Rohan. Let's discuss fitness routines and creating engaging workout content. Book a slot to get started."
+    },
+    {
+      "id": "inf_demo_zara",
+      "name": "Zara Khan",
+      "avatarUrl": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Zara. I love travel storytelling and photography. Book a slot to bring your next adventure to life."
+    },
+    {
+      "id": "inf_demo_arjun",
+      "name": "Arjun Kapoor",
+      "avatarUrl": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Arjun. Let's talk gaming streams and building your community. Book a slot and grow your creator journey."
+    },
+    {
+      "id": "inf_demo_priya",
+      "name": "Priya Nair",
+      "avatarUrl": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Priya. Let's make your food photos and recipe videos stand out. Book a slot to explore creative ideas."
+    },
+    {
+      "id": "inf_demo_kabir",
+      "name": "Kabir Sethi",
+      "avatarUrl": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Kabir. Let's explore budgeting and planning your creator income. Book a slot and bring your questions."
+    },
+    {
+      "id": "inf_demo_meera",
+      "name": "Meera Joshi",
+      "avatarUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Meera. I create mindful movement and wellness content. Book a slot to explore your own content journey."
+    },
+    {
+      "id": "inf_demo_dev",
+      "name": "Dev Malhotra",
+      "avatarUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Dev. Let's improve your tech reviews and smartphone videos. Book a slot for practical filming tips."
+    },
+    {
+      "id": "inf_demo_isha",
+      "name": "Isha Verma",
+      "avatarUrl": "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Isha. Let's bring your creator brand to life through illustration and design. Book a slot to get creative."
+    },
+    {
+      "id": "inf_demo_aman",
+      "name": "Aman Gupta",
+      "avatarUrl": "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=600&q=80",
+      "script": "Hi, I'm Aman. Let's build your speaking confidence and personal brand. Book a slot and find your on-camera voice."
+    }
+  ]
+}
