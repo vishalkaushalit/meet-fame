@@ -1,3 +1,4 @@
+import { upload } from '@vercel/blob/client';
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ||
   (import.meta.env.PROD ? '/api' : 'http://localhost:5001/api');
@@ -72,6 +73,14 @@ export const api = {
     },
 
     registerInfluencer: async (formData) => {
+      if (import.meta.env.PROD) {
+        const file = formData.get('introVideoFile');
+        const blob = await upload(`meetfame/intro-${Date.now()}.${file.name.split('.').pop()}`, file, {
+          access: 'public', handleUploadUrl: `${API_BASE}/auth/intro-video-upload`,
+        });
+        formData.delete('introVideoFile');
+        formData.append('introVideoUrl', blob.url);
+      }
       const res = await fetch(`${API_BASE}/auth/register-influencer`, {
         method: 'POST',
         body: formData, // FormData with file & fields

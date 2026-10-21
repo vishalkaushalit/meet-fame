@@ -604,15 +604,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {bookingPagination.items.map((b, index) => (
+              {bookingPagination.items.map((b) => (
                 <article key={b.id} className="creator-appointment">
                   <div className="creator-client">
-                    <span
-                      className="record-serial"
-                      aria-label={`Serial number ${bookingPagination.start + index}`}
-                    >
-                      Sr. No. {bookingPagination.start + index}
-                    </span>
                     <span className="creator-client-avatar" aria-hidden="true">
                       {b.userName?.charAt(0) || 'U'}
                     </span>

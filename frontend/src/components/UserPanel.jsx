@@ -1,3 +1,4 @@
+import IntroVideo from './IntroVideo';
 import Pagination, { usePagination } from './Pagination';
 import './creator-dashboard.css';
 import LogoLoader from './LogoLoader';
@@ -216,15 +217,12 @@ export default function UserPanel({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {creatorPagination.items.map((inf, index) => (
+              {creatorPagination.items.map((inf) => (
                 <div
                   key={inf.id}
                   className="rounded-3xl bg-slate-900 border border-slate-800 hover:border-brand-purple/40 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 group"
                 >
                   <div>
-                    <span className="record-serial">
-                      Sr. No. {creatorPagination.start + index}
-                    </span>
                     {/* Header: Avatar, Name, Verified Badge, Category */}
                     <div className="flex items-start gap-4 mb-4">
                       <div className="relative flex-shrink-0">
@@ -264,6 +262,8 @@ export default function UserPanel({
                       {inf.bio}
                     </p>
 
+                    <IntroVideo influencer={inf} card />
+
                     {/* Rate & Slots metadata */}
                     <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 mb-5 text-xs">
                       <div>
@@ -285,7 +285,7 @@ export default function UserPanel({
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
+                    {/* Action Buttons */}
                   <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
                     <button
                       onClick={() => onBookInfluencer(inf)}
@@ -346,15 +346,9 @@ export default function UserPanel({
             </div>
           ) : (
             <div className="space-y-3">
-              {bookingPagination.items.map((b, index) => (
+              {bookingPagination.items.map((b) => (
                 <article key={b.id} className="creator-appointment">
                   <div className="creator-client">
-                    <span
-                      className="record-serial"
-                      aria-label={`Serial number ${bookingPagination.start + index}`}
-                    >
-                      Sr. No. {bookingPagination.start + index}
-                    </span>
                     <span className="creator-client-avatar" aria-hidden="true">
                       {b.influencerName?.charAt(0) || 'I'}
                     </span>

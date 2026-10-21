@@ -1,14 +1,15 @@
+import { handleUpload } from '@vercel/blob/client';
+import { parseBuffer } from 'music-metadata';
 import {
   registrationErrors,
   certificateError,
+  introVideoError,
 } from '../../../shared/registrationValidation.js';
 import express from 'express';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { db } from '../db.js';
 import { uploadToStorage } from '../blobStorage.js';
 
@@ -17,34 +18,54 @@ const router = express.Router();
 const getJwtSecret = () =>
   process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadDir = path.join(__dirname, '../../data/uploads');
-
-// Multer storage for certificates and avatars
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-  },
-});
-
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024, files: 2, fields: 15 },
   fileFilter: (_req, file, cb) => {
-    const issue = certificateError({ ...file, size: 0 });
-    cb(issue ? new Error(issue) : null, !issue);
+    const issue = file.fieldname === 'introVideoFile'
+      ? introVideoError({ ...file, size: 1 })
+      : certificateError({ ...file, size: 0 });
+    cb(issue ? Object.assign(new Error(issue), { field: file.fieldname }) : null, !issue);
   },
 });
 
 // Helper to sign JWT
 function generateToken(payload) {
   return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' });
+}
+
+// Videos upload directly to Blob to avoid the serverless request body limit.
+router.post('/intro-video-upload', async (req, res) => {
+  try {
+    const result = await handleUpload({
+      body: req.body,
+      request: req,
+      onBeforeGenerateToken: async (pathname) => {
+        if (!pathname.startsWith('meetfame/intro-')) throw new Error('Invalid video path.');
+        return { allowedContentTypes: ['video/mp4', 'video/webm'], maximumSizeInBytes: 5 * 1024 * 1024, addRandomSuffix: true };
+      },
+      onUploadCompleted: async () => {},
+    });
+    res.json(result);
+  } catch {
+    res.status(400).json({ error: 'Unable to upload introduction video.' });
+  }
+});
+
+async function readIntroVideo(url) {
+  const parsed = new URL(url);
+  if (parsed.protocol !== 'https:' || !/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/.test(parsed.hostname) || !parsed.pathname.startsWith('/meetfame/intro-'))
+    throw new Error('Invalid introduction video URL.');
+  const response = await fetch(parsed, { redirect: 'error', signal: AbortSignal.timeout(15000) });
+  if (!response.ok) throw new Error('Video unavailable.');
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of response.body) {
+    size += chunk.length;
+    if (size > 5 * 1024 * 1024) throw new Error('Video exceeds 5 MB.');
+    chunks.push(chunk);
+  }
+  return { buffer: Buffer.concat(chunks), size, mimetype: response.headers.get('content-type')?.split(';')[0], originalname: parsed.pathname };
 }
 
 /**
@@ -54,15 +75,13 @@ function generateToken(payload) {
 router.post(
   '/register-influencer',
   (req, res, next) =>
-    upload.single('certificateFile')(req, res, (error) => {
+    upload.fields([{ name: 'certificateFile', maxCount: 1 }, { name: 'introVideoFile', maxCount: 1 }])(req, res, (error) => {
       if (!error) return next();
-      const issue =
-        error.code === 'LIMIT_FILE_SIZE'
-          ? 'Certificate must be 10 MB or smaller.'
-          : 'Upload a PDF, PNG, or JPG certificate.';
-      return res
-        .status(400)
-        .json({ error: issue, fields: { certificateFile: issue } });
+      const issue = error.code === 'LIMIT_FILE_SIZE'
+        ? 'Each upload must be 10 MB or smaller (video maximum: 5 MB).'
+        : error.message || 'Invalid upload.';
+      const field = error.field || 'introVideoFile';
+      return res.status(400).json({ error: issue, fields: { [field]: issue } });
     }),
   async (req, res) => {
     try {
@@ -79,8 +98,26 @@ router.post(
         availability,
       } = req.body;
 
+      const certificateFile = req.files?.certificateFile?.[0];
+      let introVideoFile = req.files?.introVideoFile?.[0];
+      try {
+        if (req.body.introVideoUrl) introVideoFile = await readIntroVideo(req.body.introVideoUrl);
+        if (introVideoFile && !introVideoError(introVideoFile)) {
+          const metadata = await parseBuffer(introVideoFile.buffer, { mimeType: introVideoFile.mimetype }, { duration: true });
+          const duration = Math.max(
+            metadata.format.containerDuration || 0,
+            metadata.format.duration || 0,
+            ...(metadata.format.trackInfo || []).map((track) => track.duration || 0),
+          );
+          if (!metadata.format.hasVideo || !Number.isFinite(duration) || duration <= 0 || duration > 15)
+            throw new Error('Introduction video must be 15 seconds or shorter.');
+        }
+      } catch {
+        const issue = 'Upload a valid video, up to 5 MB and 15 seconds long.';
+        return res.status(400).json({ error: issue, fields: { introVideoFile: issue } });
+      }
       const fields = registrationErrors(
-        { ...req.body, certificateFile: req.file },
+        { ...req.body, certificateFile, introVideoFile },
         'influencer',
       );
       if (Object.keys(fields).length)
@@ -109,14 +146,16 @@ router.post(
       }
 
       let fileUrl = '/uploads/sample_cert.pdf';
-      if (req.file) {
-        fileUrl = await uploadToStorage(req.file, 'cert');
+      if (certificateFile) {
+        fileUrl = await uploadToStorage(certificateFile, 'cert');
       }
+
+      const introVideoUrl = req.body.introVideoUrl || await uploadToStorage(introVideoFile, 'intro');
 
       const certData = {
         title: certificateTitle || 'Specialization Certificate',
-        fileName: req.file
-          ? req.file.originalname
+        fileName: certificateFile
+          ? certificateFile.originalname
           : certificateTitle
             ? 'certificate_declared.pdf'
             : null,
@@ -138,11 +177,12 @@ router.post(
           bio ||
           'Passionate professional connecting with community and clients.',
         hourlyRate: Number(hourlyRate) || 150,
+        introVideoUrl,
         avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80`,
         status: 'pending_review', // Important: initially under review
         isVerified: false,
-        certificateStatus: req.file || certificateTitle ? 'pending' : 'none',
-        certification: req.file || certificateTitle ? certData : null,
+        certificateStatus: certificateFile || certificateTitle ? 'pending' : 'none',
+        certification: certificateFile || certificateTitle ? certData : null,
         availability: normalizeAvailability(parsedAvailability),
         createdAt: new Date().toISOString(),
       };

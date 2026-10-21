@@ -1,3 +1,4 @@
+import IntroVideo from './IntroVideo';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -205,6 +206,7 @@ export default function BookingModal({
           </div>
         </div>
 
+        <IntroVideo influencer={influencer} />
         {success ? (
           <div className="py-12 text-center">
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">

@@ -165,7 +165,8 @@
           ]
         }
       },
-      "createdAt": "2026-10-15T12:29:16.666Z"
+      "createdAt": "2026-10-15T12:29:16.666Z",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_1-A3xdqL9c5Q1l6DpgnAAuLTlUZ52yik.mp4"
     },
     {
       "id": "inf_2",
@@ -240,7 +241,8 @@
           "ranges": []
         }
       },
-      "createdAt": "2026-10-15T12:29:16.666Z"
+      "createdAt": "2026-10-15T12:29:16.666Z",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_2-mBpYWxoYKnXrq37WCeY2KBhbv32TfZ.mp4"
     },
     {
       "id": "inf_3",
@@ -320,7 +322,8 @@
           "ranges": []
         }
       },
-      "createdAt": "2026-10-15T12:29:16.666Z"
+      "createdAt": "2026-10-15T12:29:16.666Z",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_3-HfuLwdSlCGJb2IyWII5LMANcR4prc2.mp4"
     },
     {
       "id": "inf_4",
@@ -395,7 +398,8 @@
           "ranges": []
         }
       },
-      "createdAt": "2026-10-15T12:29:16.666Z"
+      "createdAt": "2026-10-15T12:29:16.666Z",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_4-xIDi4TgD3sG1Pm5IJhJAV7QrlJeRVr.mp4"
     }
   ],
   "bookings": [

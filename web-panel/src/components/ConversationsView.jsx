@@ -84,7 +84,7 @@ export default function ConversationsView() {
             </div>
 
             <div className="space-y-2 flex-1 overflow-y-auto max-h-[500px]">
-              {threadPagination.items.map((conv, index) => {
+              {threadPagination.items.map((conv) => {
                 const isSelected =
                   selectedConv?.conversationId === conv.conversationId;
                 return (
@@ -98,9 +98,6 @@ export default function ConversationsView() {
                         : 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-800/40 text-slate-300'
                     }`}
                   >
-                    <span className="record-serial">
-                      Sr. No. {threadPagination.start + index}
-                    </span>
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-1.5 font-bold text-xs text-white">
                         <span>{conv.userName}</span>

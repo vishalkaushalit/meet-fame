@@ -35,18 +35,23 @@ export async function uploadToStorage(file, filenamePrefix = 'upload') {
 
       const blob = await put(pathname, buffer, {
         access: 'public',
+        contentType: file.mimetype,
         token: process.env.BLOB_READ_WRITE_TOKEN,
       });
 
       console.log(`[Vercel Blob] Upload successful! URL:`, blob.url);
       return blob.url;
     } catch (err) {
+      if (process.env.VERCEL) throw err;
       console.error(
         '[Vercel Blob] Error uploading to Vercel Blob, falling back to local storage:',
         err.message,
       );
     }
   }
+
+  if (process.env.VERCEL) throw new Error('Cloud upload storage is unavailable.');
+  fs.mkdirSync(uploadDir, { recursive: true });
 
   // Local storage fallback (saved in data/uploads)
   if (file.filename) {

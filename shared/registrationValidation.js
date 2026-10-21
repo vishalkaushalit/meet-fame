@@ -22,6 +22,16 @@ export function certificateError(file) {
     return 'Certificate must be 10 MB or smaller.';
   return '';
 }
+export function introVideoError(file) {
+  if (!file) return 'Upload an introduction video.';
+  const name = file.name || file.originalname || '';
+  if (!/\.(mp4|webm)$/i.test(name) ||
+      !['video/mp4', 'video/webm'].includes(file.type || file.mimetype))
+    return 'Upload an MP4 or WebM video.';
+  if (!file.size || file.size > 5 * 1024 * 1024)
+    return 'Introduction video must be non-empty and 5 MB or smaller.';
+  return '';
+}
 export function registrationErrors(values, role = 'user') {
   const errors = {};
   const name = text(values.name),
@@ -63,6 +73,8 @@ export function registrationErrors(values, role = 'user') {
     if (text(values.certificateTitle).length > 160)
       errors.certificateTitle =
         'Certificate title must be 160 characters or fewer.';
+    const videoIssue = introVideoError(values.introVideoFile);
+    if (videoIssue) errors.introVideoFile = videoIssue;
     const issue = certificateError(values.certificateFile);
     if (issue) errors.certificateFile = issue;
   }

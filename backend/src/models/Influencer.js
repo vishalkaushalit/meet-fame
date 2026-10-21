@@ -53,6 +53,7 @@ const influencerSchema = new mongoose.Schema(
     specialization: { type: String, required: true },
     category: { type: String, required: true },
     bio: { type: String, default: '' },
+    introVideoUrl: { type: String, default: '' },
     hourlyRate: { type: Number, default: 150 },
     avatar: {
       type: String,

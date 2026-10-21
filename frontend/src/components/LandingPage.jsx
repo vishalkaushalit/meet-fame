@@ -1,3 +1,4 @@
+import IntroVideo from './IntroVideo';
 import ThemeToggle from './ThemeToggle';
 import React from 'react';
 import Logo from './Logo';
@@ -243,6 +244,8 @@ export default function LandingPage({
                   <p className="text-slate-300 text-xs leading-relaxed line-clamp-3 mb-4">
                     {inf.bio}
                   </p>
+
+                  <IntroVideo influencer={inf} card />
 
                   <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 mb-5 text-xs">
                     <div>

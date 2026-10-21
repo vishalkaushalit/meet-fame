@@ -2,6 +2,7 @@ import {
   registrationErrors,
   registrationStep,
   certificateError,
+  introVideoError,
 } from '../../../shared/registrationValidation';
 import './auth-page.css';
 import React, { useEffect, useRef, useState } from 'react';
@@ -41,7 +42,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [step, setStep] = useState(0);
   const isInfluencerSignup = isRegister && role === 'influencer';
-  const steps = ['Account details', 'Creator profile', 'Certification'];
+  const steps = ['Account details', 'Creator profile', 'Video & certification'];
   const stepHeading = useRef(null);
   useEffect(() => {
     if (isInfluencerSignup) stepHeading.current?.focus();
@@ -61,6 +62,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   const [bio, setBio] = useState('');
   const [hourlyRate, setHourlyRate] = useState(200);
   const [certificateTitle, setCertificateTitle] = useState('');
+  const [introVideoFile, setIntroVideoFile] = useState(null);
   const [certificateFile, setCertificateFile] = useState(null);
 
   const categories = [
@@ -89,6 +91,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
           hourlyRate,
           certificateTitle,
           certificateFile,
+          introVideoFile,
         },
         role,
       );
@@ -132,6 +135,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
           formData.append('bio', bio);
           formData.append('hourlyRate', hourlyRate);
           formData.append('certificateTitle', certificateTitle);
+          formData.append('introVideoFile', introVideoFile);
           if (certificateFile) {
             formData.append('certificateFile', certificateFile);
           }
@@ -570,9 +574,42 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 >
                   <legend className="sr-only">Certification</legend>
                   <p className="text-xs text-slate-400">
-                    Add your certification for verification, or skip this
-                    optional step and upload it later from your dashboard.
+                    Upload your required introduction video. Certification is optional and can be added later from your dashboard.
                   </p>
+                  <div className="space-y-2">
+                    <label htmlFor="auth-introVideoFile" className="text-sm font-semibold text-slate-200">Introduction video (required)</label>
+                    <p id="intro-video-help" className="text-xs text-slate-400">Introduce yourself and what you offer. Users can watch this on your card before booking. MP4 or WebM, up to 5 MB and 15 seconds.</p>
+                    <input id="auth-introVideoFile" type="file" accept=".mp4,.webm,video/mp4,video/webm"
+                      aria-required="true" aria-invalid={Boolean(fieldErrors.introVideoFile)}
+                      aria-describedby="intro-video-help auth-introVideoFile-error"
+                      className="w-full text-sm text-slate-300"
+                      onChange={async (e) => {
+                        const input = e.currentTarget;
+                        const file = input.files?.[0] || null;
+                        setIntroVideoFile(null);
+                        let issue = introVideoError(file);
+                        if (!issue) {
+                          const url = URL.createObjectURL(file);
+                          try {
+                            const duration = await new Promise((resolve, reject) => {
+                              const video = document.createElement('video');
+                              const timeout = setTimeout(() => { video.removeAttribute('src'); reject(); }, 10000);
+                              video.preload = 'metadata';
+                              video.onloadedmetadata = () => { clearTimeout(timeout); resolve(video.duration); video.removeAttribute('src'); };
+                              video.onerror = () => { clearTimeout(timeout); reject(); };
+                              video.src = url;
+                            });
+                            if (!Number.isFinite(duration) || duration <= 0 || duration > 15)
+                              issue = 'Introduction video must be 15 seconds or shorter.';
+                          } catch { issue = 'Unable to read this video. Choose a valid MP4 or WebM.'; }
+                          finally { URL.revokeObjectURL(url); }
+                        }
+                        if (input.files?.[0] !== file) return;
+                        if (!issue) setIntroVideoFile(file);
+                        setFieldErrors((current) => ({ ...current, introVideoFile: issue }));
+                      }} />
+                    <p id="auth-introVideoFile-error" className="auth-field-error" role="alert">{fieldErrors.introVideoFile}</p>
+                  </div>
                   {/* Certification Upload for Verified Badge */}
                   <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
                     <div className="flex items-center justify-between mb-2">
