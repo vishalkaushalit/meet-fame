@@ -105,6 +105,7 @@ export default function UserPanel({
   const creatorPagination = usePagination(
     influencers,
     `${selectedCategory}:${searchQuery}`,
+    12,
   );
 
   return (
@@ -124,10 +125,10 @@ export default function UserPanel({
           />
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-white">
+              <h1 className="text-2xl font-bold text-white">
                 Hello, {user?.name || 'Explorer'}
               </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                 User
               </span>
             </div>
@@ -141,7 +142,7 @@ export default function UserPanel({
         <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 relative z-10">
           <button
             onClick={() => setActiveTab('browse')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'browse'
                 ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
@@ -153,7 +154,7 @@ export default function UserPanel({
 
           <button
             onClick={() => setActiveTab('my-bookings')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'my-bookings'
                 ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
@@ -188,7 +189,7 @@ export default function UserPanel({
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
                   aria-pressed={selectedCategory === cat}
-                  className={`px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-inset ${
+                  className={`px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-all whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-inset ${
                     selectedCategory === cat
                       ? 'bg-gradient-to-r from-brand-indigo to-brand-purple border-transparent text-white shadow-sm'
                       : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
@@ -243,7 +244,7 @@ export default function UserPanel({
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3 className="font-bold text-white text-base truncate">
+                          <h3 className="font-semibold text-white text-base truncate">
                             {inf.name}
                           </h3>
                           {inf.isVerified && <VerifiedBadge size="sm" />}
@@ -270,7 +271,7 @@ export default function UserPanel({
                         <span className="text-[10px] text-slate-500 uppercase block font-semibold">
                           1-Hour Session
                         </span>
-                        <span className="font-black text-emerald-400 text-sm">
+                        <span className="font-semibold text-emerald-400 text-sm">
                           ${inf.hourlyRate || 150}
                         </span>
                       </div>
@@ -289,7 +290,7 @@ export default function UserPanel({
                   <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
                     <button
                       onClick={() => onBookInfluencer(inf)}
-                      className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-1.5"
                     >
                       <Clock className="w-3.5 h-3.5" />
                       <span>Book Slot</span>
@@ -310,7 +311,7 @@ export default function UserPanel({
         <div className="user-bookings creator-appointments p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-purple" />
                 <span>My Bookings</span>
               </h3>

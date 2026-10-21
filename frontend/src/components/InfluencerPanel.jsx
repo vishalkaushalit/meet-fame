@@ -246,9 +246,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
             <div>
               <div className="creator-name flex items-center gap-2">
-                <h1 className="text-2xl font-black text-white">{user?.name}</h1>
+                <h1 className="text-2xl font-semibold text-white">{user?.name}</h1>
                 {user?.isVerified ? (
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-bold">
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-semibold">
                     <VerifiedBadge size="sm" />
                     <span>Verified Creator</span>
                   </div>
@@ -292,7 +292,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <span className="text-[11px] text-slate-400 uppercase font-semibold">
                 <Calendar size={20} aria-hidden="true" /> Weekly Slots
               </span>
-              <div className="text-2xl font-black text-white mt-0.5">
+              <div className="text-2xl font-semibold text-white mt-0.5">
                 {totalSlotsCount}
               </div>
             </div>
@@ -300,7 +300,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <span className="text-[11px] text-slate-400 uppercase font-semibold">
                 <Users size={20} aria-hidden="true" /> Bookings
               </span>
-              <div className="text-2xl font-black text-brand-purple mt-0.5">
+              <div className="text-2xl font-semibold text-brand-purple mt-0.5">
                 {bookings.length}
               </div>
             </div>
@@ -308,7 +308,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <span className="text-[11px] text-slate-400 uppercase font-semibold">
                 <DollarSign size={20} aria-hidden="true" /> Revenue
               </span>
-              <div className="text-2xl font-black text-emerald-400 mt-0.5">
+              <div className="text-2xl font-semibold text-emerald-400 mt-0.5">
                 ${totalEarnings}
               </div>
             </div>
@@ -325,7 +325,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           role="tab"
           aria-selected={activeTab === 'slots'}
           onClick={() => setActiveTab('slots')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
             activeTab === 'slots'
               ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -339,7 +339,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           role="tab"
           aria-selected={activeTab === 'bookings'}
           onClick={() => setActiveTab('bookings')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
             activeTab === 'bookings'
               ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -353,7 +353,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           role="tab"
           aria-selected={activeTab === 'certificate'}
           onClick={() => setActiveTab('certificate')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
             activeTab === 'certificate'
               ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -379,7 +379,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div>
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                   <Clock className="w-5 h-5 text-brand-purple" />
                   <span>Day-Wise Availability & 1-Hour Slot Generator</span>
                 </h3>
@@ -393,7 +393,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <button
                 onClick={handleSaveAvailability}
                 disabled={savingSlots}
-                className="py-2.5 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md flex items-center gap-2 self-start md:self-auto disabled:opacity-50"
+                className="py-2.5 px-6 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md flex items-center gap-2 self-start md:self-auto disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>
@@ -423,7 +423,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                     key={d}
                     type="button"
                     onClick={() => setActiveDay(d)}
-                    className={`px-4 py-3 rounded-2xl font-bold capitalize text-xs transition-all whitespace-nowrap border text-left min-w-[120px] ${
+                    className={`px-4 py-3 rounded-2xl font-semibold capitalize text-xs transition-all whitespace-nowrap border text-left min-w-[120px] ${
                       activeDay === d
                         ? 'bg-slate-800 border-brand-purple text-white shadow-lg'
                         : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -448,7 +448,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             {/* Time Window Editor for Active Day */}
             <div className="p-6 rounded-2xl bg-slate-950 border border-slate-800/80 mb-6">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <h4 className="text-sm font-semibold text-white uppercase tracking-wider flex items-center gap-2">
                   <span>Time Ranges for</span>
                   <span className="text-brand-purple capitalize">
                     {activeDay}
@@ -457,7 +457,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 <button
                   type="button"
                   onClick={() => handleAddRange(activeDay)}
-                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center gap-1.5 transition-colors border border-slate-700"
+                  className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white flex items-center gap-1.5 transition-colors border border-slate-700"
                 >
                   <Plus className="w-3.5 h-3.5 text-brand-coral" />
                   <span>Add Time Window</span>
@@ -530,10 +530,10 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             {/* Generated 1-Hour Slots Showcase */}
             <div className="p-6 rounded-2xl bg-slate-950/80 border border-slate-800">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
                   Live Preview: Auto-Generated 1-Hour Slots for {activeDay}
                 </span>
-                <span className="text-xs text-indigo-400 font-bold">
+                <span className="text-xs text-indigo-400 font-semibold">
                   {generatedSlots[activeDay]?.length || 0} Total 1-Hour Slots
                 </span>
               </div>
@@ -568,7 +568,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
         <div className="creator-appointments p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-purple" />
                 <span>My Bookings</span>
               </h3>
@@ -687,7 +687,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
               <VerifiedBadge size="lg" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-semibold text-white">
                 Instagram-Style Verified Badge
               </h3>
               <p className="text-slate-400 text-xs">
@@ -714,7 +714,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 ) : (
                   <ShieldAlert className="w-5 h-5 text-amber-400" />
                 )}
-                <span className="font-bold text-sm">
+                <span className="font-semibold text-sm">
                   {user?.isVerified
                     ? 'Verified Badge Active'
                     : user?.certificateStatus === 'pending'
@@ -787,7 +787,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             <button
               type="submit"
               disabled={certUploading || (!certTitle && !certFile)}
-              className="py-3 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md disabled:opacity-40 flex items-center gap-2"
+              className="py-3 px-6 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo to-brand-purple hover:opacity-95 shadow-md disabled:opacity-40 flex items-center gap-2"
             >
               <Upload className="w-4 h-4" />
               <span>

@@ -96,7 +96,7 @@ export default function ChatModal({
             />
             <div>
               <div className="flex items-center gap-1.5">
-                <h4 className="font-bold text-white text-sm">
+                <h4 className="font-semibold text-white text-sm">
                   {targetUser.name}
                 </h4>
                 {targetUser.isVerified && <VerifiedBadge size="sm" />}

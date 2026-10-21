@@ -7,13 +7,10 @@ export function usePagination(items, resetKey = '') {
   return { ...result, setPage: (page) => setState({ key: resetKey, page }) };
 }
 export default function Pagination({ pagination, label = 'records' }) {
-  const { page, pages, total, start, end, setPage } = pagination;
+  const { page, pages, total, setPage } = pagination;
   if (total === 0) return null;
   return (
     <nav className="record-pagination" aria-label={`${label} pagination`}>
-      <span role="status">
-        {start}–{end} of {total} {label}
-      </span>
       <div>
         <button
           type="button"
@@ -22,7 +19,7 @@ export default function Pagination({ pagination, label = 'records' }) {
           aria-label={`Previous page of ${label}`}
         >
           <ChevronLeft size={15} />
-          Previous
+          Prev
         </button>
         {paginationNumbers(page, pages).map((number) =>
           typeof number === 'number' ? (

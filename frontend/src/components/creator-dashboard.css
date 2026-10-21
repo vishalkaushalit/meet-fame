@@ -31,7 +31,7 @@
 }
 .creator-name h1 {
   font-size: 25px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .creator-metrics {
   align-self: stretch;
@@ -61,7 +61,7 @@
 }
 .creator-metrics > div > div {
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.2;
 }
 .creator-tabs {

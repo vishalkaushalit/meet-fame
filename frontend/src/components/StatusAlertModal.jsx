@@ -45,7 +45,7 @@ export default function StatusAlertModal() {
         </div>
 
         {/* Title */}
-        <h3 className="text-2xl font-bold text-white mb-2">
+        <h3 className="text-2xl font-semibold text-white mb-2">
           {statusAlert.title || (isPending ? 'Account Under Review' : 'Notice')}
         </h3>
 
@@ -89,7 +89,7 @@ export default function StatusAlertModal() {
         {/* Action Button */}
         <button
           onClick={() => setStatusAlert(null)}
-          className="w-full py-3 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.99]"
+          className="w-full py-3 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.99]"
         >
           Understood
         </button>

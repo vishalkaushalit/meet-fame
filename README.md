@@ -60,42 +60,9 @@ meet-fame/
 
 ---
 
-## ⚙️ Environment Variables (.env Files)
+## ⚙️ Environment Setup
 
-### `backend/.env`
-```env
-PORT=5001
-NODE_ENV=development
-
-# MongoDB Atlas Database
-MONGODB_URI=mongodb+srv://vishalkaushalit_db_user:iybDJ7XRhQVs9JKk@meet-fame-db.keuvht8.mongodb.net/meetfame?retryWrites=true&w=majority
-
-# Vercel Blob Storage Token (Paste your token from Vercel Dashboard -> Storage -> Blob)
-BLOB_READ_WRITE_TOKEN=
-
-# JWT Secret
-JWT_SECRET=meetfame_super_secret_jwt_key_production_2026
-
-# Client URLs
-FRONTEND_URL=http://localhost:5173
-ADMIN_URL=http://localhost:5174
-CORS_ORIGIN=*
-```
-
-### `frontend/.env`
-```env
-VITE_API_BASE_URL=http://localhost:5001/api
-VITE_APP_NAME=MeetFame
-VITE_APP_TAGLINE=Connect • Book • Meet
-VITE_ADMIN_PANEL_URL=http://localhost:5174
-```
-
-### `web-panel/.env`
-```env
-VITE_API_BASE_URL=http://localhost:5001/api
-VITE_APP_NAME=MeetFame Admin Command Center
-VITE_FRONTEND_URL=http://localhost:5173
-```
+Configure each application's environment privately using local environment files or your deployment provider's settings. Keep credentials, tokens, connection strings, and secret values out of this README and version control.
 
 ---
 

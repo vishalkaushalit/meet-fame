@@ -224,7 +224,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             <a
               href={authPath('user', tab)}
               aria-current={role === 'user' ? 'page' : undefined}
-              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 role === 'user'
                   ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
@@ -237,7 +237,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             <a
               href={authPath('influencer', tab)}
               aria-current={role === 'influencer' ? 'page' : undefined}
-              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 role === 'influencer'
                   ? 'bg-gradient-to-r from-brand-purple to-brand-coral text-white shadow-md'
                   : 'text-slate-400 hover:text-white'
@@ -451,7 +451,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                   disabled={loading || step !== 1}
                 >
                   <legend className="sr-only">Creator profile</legend>
-                  <h4 className="text-sm font-bold text-brand-purple flex items-center gap-1.5">
+                  <h4 className="text-sm font-semibold text-brand-purple flex items-center gap-1.5">
                     <Briefcase className="w-4 h-4" />
                     <span>Influencer Profile & Specialization</span>
                   </h4>
@@ -619,7 +619,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                   {/* Certification Upload for Verified Badge */}
                   <details open={fieldErrors.certificateTitle || fieldErrors.certificateFile ? true : undefined} className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
                     <summary className="cursor-pointer flex items-center justify-between gap-2">
-                      <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                      <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
                         <FileCheck className="w-4 h-4 text-[#0095F6]" />
                         <span>
                           Specialization Certification (For Blue Verified Badge)
@@ -733,7 +733,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 px-6 rounded-[10px] font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
+                className="w-full py-3.5 px-6 rounded-[10px] font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2 mt-4"
               >
                 {loading ? (
                   <span>Processing...</span>
@@ -788,7 +788,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 onClick={() => handleDemoLogin('alex@example.com', 'user')}
                 className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
               >
-                <div className="font-bold text-white text-[11px]">
+                <div className="font-semibold text-white text-[11px]">
                   Alex Rivera
                 </div>
                 <div className="text-[10px] text-indigo-400">
@@ -803,7 +803,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 }
                 className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
               >
-                <div className="font-bold text-white text-[11px]">
+                <div className="font-semibold text-white text-[11px]">
                   Marcus Vance
                 </div>
                 <div className="text-[10px] text-purple-400">
@@ -819,7 +819,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
                 title="Click to see Under Review Popup"
               >
-                <div className="font-bold text-white text-[11px]">
+                <div className="font-semibold text-white text-[11px]">
                   Kavita Patel
                 </div>
                 <div className="text-[10px] text-amber-400">

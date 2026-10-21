@@ -58,7 +58,7 @@
   background: #28213e;
   border-radius: 7px;
   color: #c3b5ff;
-  font-weight: 700;
+  font-weight: 600;
 }
 .nav-caption {
   font-size: 9px;
@@ -177,7 +177,7 @@
   background: #342746;
   color: #d7c2ff;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
 }
 .admin-profile strong {
   font-size: 11px;
@@ -206,13 +206,13 @@
   color: #a68cda !important;
   font-size: 9px !important;
   letter-spacing: 0.17em;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 9px !important;
 }
 .dashboard-page-heading h1 {
   font-size: 27px;
   letter-spacing: -1px;
-  font-weight: 650;
+  font-weight: 600;
   margin: 0 0 8px;
 }
 .dashboard-page-heading p {
@@ -443,7 +443,7 @@
   border: 1px solid #b99aef;
   border-radius: 7px;
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 600;
 }
 .primary-dashboard-button:hover {
   background: #bea0f3;
@@ -588,7 +588,7 @@
 .dashboard-detail .rounded-3xl {
   border-radius: 12px;
 }
-.dashboard-detail .font-black {
+.dashboard-detail .font-semibold {
   font-weight: 600;
 }
 .dashboard-detail h2 {

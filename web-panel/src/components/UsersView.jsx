@@ -346,7 +346,7 @@ export default function UsersView({ refreshKey = 0 }) {
                 updateStatus(blockingUser, 'blocked', reason.trim());
             }}
           >
-            <h3 id="directory-block-title" className="text-lg font-bold">
+            <h3 id="directory-block-title" className="text-lg font-semibold">
               Block {blockingUser.name}
             </h3>
             <p className="text-xs text-slate-400 mt-2 mb-4">
@@ -391,7 +391,7 @@ export default function UsersView({ refreshKey = 0 }) {
               <button
                 type="submit"
                 disabled={saving !== null || !reason.trim()}
-                className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50"
               >
                 {saving !== null ? 'Blocking…' : 'Block user'}
               </button>

@@ -187,7 +187,7 @@ export default function BookingModal({
           />
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-semibold text-white">
                 {influencer.name}
               </h3>
               {influencer.isVerified && <VerifiedBadge size="md" />}
@@ -199,7 +199,7 @@ export default function BookingModal({
               <span className="px-2 py-0.5 rounded-full text-[11px] bg-slate-800 text-slate-300 font-medium">
                 {influencer.category}
               </span>
-              <span className="text-xs font-bold text-emerald-400">
+              <span className="text-xs font-semibold text-emerald-400">
                 ${influencer.hourlyRate || 150} / 1-Hour Slot
               </span>
             </div>
@@ -212,7 +212,7 @@ export default function BookingModal({
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
               <CheckCircle className="w-8 h-8" />
             </div>
-            <h4 className="text-2xl font-bold text-white mb-2">
+            <h4 className="text-2xl font-semibold text-white mb-2">
               Slot Booked Successfully!
             </h4>
             <p className="text-slate-300 text-sm max-w-md mx-auto">
@@ -234,7 +234,7 @@ export default function BookingModal({
             <div>
               <label
                 htmlFor="booking-date"
-                className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between"
+                className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between"
               >
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-brand-coral" />
@@ -275,7 +275,7 @@ export default function BookingModal({
 
             {/* 1-Hour Slots Dropdown (Per Prompt Requirement) */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5 flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-brand-purple" />
                   Select 1-Hour Slot
@@ -367,14 +367,14 @@ export default function BookingModal({
 
             {/* Meeting Type */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                 Meeting Preference
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setMeetingType('video')}
-                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all ${
                     meetingType === 'video'
                       ? 'bg-brand-indigo/20 border-brand-indigo text-brand-indigo'
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
@@ -387,7 +387,7 @@ export default function BookingModal({
                 <button
                   type="button"
                   onClick={() => setMeetingType('in-person')}
-                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-bold transition-all ${
+                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all ${
                     meetingType === 'in-person'
                       ? 'bg-brand-coral/20 border-brand-coral text-brand-coral'
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
@@ -401,7 +401,7 @@ export default function BookingModal({
 
             {/* Consultation Topic */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
                 Session Objective / Topic
               </label>
               <textarea
@@ -419,7 +419,7 @@ export default function BookingModal({
                 <span className="text-xs text-slate-400">
                   Total Investment:
                 </span>
-                <div className="text-xl font-black text-white">
+                <div className="text-xl font-semibold text-white">
                   ${influencer.hourlyRate || 150}
                   <span className="text-xs font-normal text-slate-400 ml-1">
                     / 1 hour
@@ -430,7 +430,7 @@ export default function BookingModal({
               <button
                 type="submit"
                 disabled={submitting || !selectedSlot || loadingSlots}
-                className="py-3 px-6 rounded-2xl font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center gap-2 text-sm"
+                className="py-3 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center gap-2 text-sm"
               >
                 {submitting ? (
                   <span>Confirming...</span>

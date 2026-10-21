@@ -1,3 +1,4 @@
+import AuthSocialBackground from '@shared/AuthSocialBackground';
 import { adminPath, navigateAdmin } from '../routes';
 import ThemeToggle from './ThemeToggle';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -394,7 +395,8 @@ export default function AdminDashboard({
             </div>
           </div>
         </header>
-        <main className="dashboard-main">
+        <main className="dashboard-main social-background-host">
+          <AuthSocialBackground page />
           {activeTab !== 'slots' && (
             <div className="dashboard-page-heading">
               <div>

@@ -1024,7 +1024,7 @@ html[data-theme='light'] .website-sign-in:focus-visible {
 .record-pagination {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 14px;
   padding: 18px 12px;
   margin-top: 12px;
@@ -1036,6 +1036,7 @@ html[data-theme='light'] .website-sign-in:focus-visible {
 .record-pagination > div {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   flex-wrap: wrap;
 }
@@ -1256,4 +1257,12 @@ html[data-theme='light'] [class~='focus-within:border-brand-purple']:focus-withi
 }
 :is(input[type='text'], input[type='email'], input[type='password'], input[type='tel'], input[type='number'], textarea):not(:disabled):not(:focus):hover {
   border-color: var(--control-hover-border);
+}
+
+/* Keep native emphasis consistent with the semibold typography limit. */
+b, strong { font-weight: 600; }
+
+/* Keep creator names readable over the dark video poster gradient. */
+html[data-theme='light'] .intro-video-name {
+  color: #fff;
 }

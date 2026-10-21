@@ -400,6 +400,756 @@
       },
       "createdAt": "2026-10-15T12:29:16.666Z",
       "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_4-xIDi4TgD3sG1Pm5IJhJAV7QrlJeRVr.mp4"
+    },
+    {
+      "email": "inf_demo_ananya@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+      "bio": "Practical skincare routines, everyday makeup, and styling guidance for aspiring beauty creators.",
+      "category": "Fashion & Lifestyle",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:08.454Z",
+      "hourlyRate": 120,
+      "id": "inf_demo_ananya",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_ananya-TxXvuZzEiMngnJYN8WISk5TeWkkaUM.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Ananya Sharma",
+      "password": "$2a$10$c9MuRN1.NNSufRoQ5uTffuyoKQrra7kH5HyKbAhK/dZn6wWDTYMX.",
+      "phone": "+12025550100",
+      "role": "influencer",
+      "specialization": "Beauty Tutorials & Personal Styling",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:08.454Z"
+    },
+    {
+      "email": "inf_demo_rohan@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80",
+      "bio": "Build sustainable workout habits and learn to plan engaging fitness videos for your community.",
+      "category": "Health & Fitness",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:11.098Z",
+      "hourlyRate": 150,
+      "id": "inf_demo_rohan",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_rohan-3Rlwp1d6QegVTPbyxK3cPfWBPP7Zkt.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Rohan Mehta",
+      "password": "$2a$10$jFgroEknPA1/AGnOrfFNH.GeSSFilFdliUc2kRRZUmTlNStkO52jO",
+      "phone": "+12025550101",
+      "role": "influencer",
+      "specialization": "Strength Training & Fitness Content",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:11.098Z"
+    },
+    {
+      "email": "inf_demo_zara@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=600&q=80",
+      "bio": "Turn your travel experiences into compelling stories through thoughtful photography and short-form video.",
+      "category": "Content Creation & Media",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:13.109Z",
+      "hourlyRate": 180,
+      "id": "inf_demo_zara",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_zara-WOZV5N05xThRho2gdaHqMYwMeILQMZ.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Zara Khan",
+      "password": "$2a$10$3wvTHwZhw329MurbrK406O3QXEVXdrXxfl5SN9Cpz1wYPrWT16u4u",
+      "phone": "+12025550102",
+      "role": "influencer",
+      "specialization": "Travel Storytelling & Photography",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:13.109Z"
+    },
+    {
+      "email": "inf_demo_arjun@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80",
+      "bio": "Plan interactive livestreams, improve your on-camera confidence, and grow an engaged gaming community.",
+      "category": "Content Creation & Media",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:15.678Z",
+      "hourlyRate": 130,
+      "id": "inf_demo_arjun",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_arjun-Re2G2vmXf46O6eQlNBBluiOObCQLeH.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Arjun Kapoor",
+      "password": "$2a$10$pBhK8SjbVpOsBUyJw6CxOOof8zYFXaseINDWxrQDSnGUC8cQJ4UvK",
+      "phone": "+12025550103",
+      "role": "influencer",
+      "specialization": "Gaming Streams & Community Building",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:15.678Z"
+    },
+    {
+      "email": "inf_demo_priya@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80",
+      "bio": "Learn lighting, composition, and simple editing techniques to make your recipes stand out on social media.",
+      "category": "Design & Creative",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:17.851Z",
+      "hourlyRate": 160,
+      "id": "inf_demo_priya",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_priya-HtNWMk9dAThz1jpVCu3WmW46j1XzKk.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Priya Nair",
+      "password": "$2a$10$A8UHFTWqDj7DCxUk2dsn.OX1tMgQvMvjy6n8IDCA4qZBvXkazShWm",
+      "phone": "+12025550104",
+      "role": "influencer",
+      "specialization": "Food Photography & Recipe Videos",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:17.851Z"
+    },
+    {
+      "email": "inf_demo_kabir@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=600&q=80",
+      "bio": "Explore budgeting for freelance work, planning creator income, and communicating finance topics clearly.",
+      "category": "Business & Finance",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:20.351Z",
+      "hourlyRate": 200,
+      "id": "inf_demo_kabir",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_kabir-lPR81lzlAxhU2nkS44ssB2SQtLJ42M.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Kabir Sethi",
+      "password": "$2a$10$L1T.EmUlK3Cr0J4/ffpOJe5SLHnGdgoLkXcDD57yfGwCzSI15nECG",
+      "phone": "+12025550105",
+      "role": "influencer",
+      "specialization": "Personal Finance Content & Creator Income",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:20.351Z"
+    },
+    {
+      "email": "inf_demo_meera@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
+      "bio": "Create approachable wellness content, develop a consistent posting routine, and connect authentically with viewers.",
+      "category": "Health & Fitness",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:44.277Z",
+      "hourlyRate": 140,
+      "id": "inf_demo_meera",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_meera-9Tp3dbhQoAhf1gr48XIwo9x1Cht35t.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Meera Joshi",
+      "password": "$2a$10$qGxhkuZZuK.cKzTqZjoOPevNlz1Q4wYQBWtrgl842KSxWjqbZCvKW",
+      "phone": "+12025550106",
+      "role": "influencer",
+      "specialization": "Mindful Movement & Wellness Content",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:44.277Z"
+    },
+    {
+      "email": "inf_demo_dev@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+      "bio": "Structure useful product reviews and improve your filming setup with practical smartphone production tips.",
+      "category": "Technology & AI",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:46.721Z",
+      "hourlyRate": 170,
+      "id": "inf_demo_dev",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_dev-drS8OL3obHCz3F1yAVnfC7YsjnErQG.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Dev Malhotra",
+      "password": "$2a$10$jPywpFb0c9y5E2F2eP5R3.p/ZmbXl4OSsDREkwN5/j.HjYNOSmMnC",
+      "phone": "+12025550107",
+      "role": "influencer",
+      "specialization": "Tech Reviews & Smartphone Filmmaking",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:46.721Z"
+    },
+    {
+      "email": "inf_demo_isha@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=600&q=80",
+      "bio": "Develop a recognizable visual style and bring your creator brand to life through illustration and design.",
+      "category": "Design & Creative",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:49.186Z",
+      "hourlyRate": 190,
+      "id": "inf_demo_isha",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_isha-Q3dIyKF0DnSIoZ5SAHsoAKI7OSUeF7.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Isha Verma",
+      "password": "$2a$10$KZhZMv.OmAM/E2ykBo5mlurCjpl0pjdmvShNMuks/QcErPNh5s.Rq",
+      "phone": "+12025550108",
+      "role": "influencer",
+      "specialization": "Illustration & Visual Brand Identity",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:49.186Z"
+    },
+    {
+      "email": "inf_demo_aman@demo.meetfame.example",
+      "_version": 0,
+      "availability": {
+        "monday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "tuesday": {
+          "ranges": [
+            {
+              "start": "14:00",
+              "end": "18:00"
+            }
+          ]
+        },
+        "wednesday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "thursday": {
+          "ranges": [
+            {
+              "start": "15:00",
+              "end": "19:00"
+            }
+          ]
+        },
+        "friday": {
+          "ranges": [
+            {
+              "start": "09:00",
+              "end": "12:00"
+            }
+          ]
+        },
+        "saturday": {
+          "ranges": [
+            {
+              "start": "10:00",
+              "end": "13:00"
+            }
+          ]
+        },
+        "sunday": {
+          "ranges": []
+        }
+      },
+      "avatar": "https://images.unsplash.com/photo-1463453091185-61582044d556?auto=format&fit=crop&w=600&q=80",
+      "bio": "Practice clear communication, find your on-camera voice, and build a personal brand around your strengths.",
+      "category": "Career & Leadership",
+      "certificateStatus": "none",
+      "createdAt": "2026-10-21T08:36:51.576Z",
+      "hourlyRate": 220,
+      "id": "inf_demo_aman",
+      "introVideoUrl": "https://qzry9joicmtnw6bu.public.blob.vercel-storage.com/meetfame/intro-demo-inf_demo_aman-oMxaeFAYbEQ3s66DpsmppUsK6a0Xlc.mp4",
+      "isDemo": true,
+      "isVerified": false,
+      "name": "Aman Gupta",
+      "password": "$2a$10$9kWEDprEcKbah5pjO3/JP.3stWG1VAtRTA3gg01ReOsDeS/HpxNs6",
+      "phone": "+12025550109",
+      "role": "influencer",
+      "specialization": "Public Speaking & Personal Branding",
+      "status": "approved",
+      "statusReason": "",
+      "updatedAt": "2026-10-21T08:36:51.576Z"
     }
   ],
   "bookings": [

@@ -55,7 +55,7 @@ export default function IntroVideo({ influencer, card = false }) {
               </span>
             </span>
             <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 p-4 text-xs text-white">
-              <span className="font-semibold">Meet {firstName}</span>
+              <span className="intro-video-name font-semibold">Meet {firstName}</span>
               <span className="rounded-lg bg-slate-950/70 px-2 py-1 text-[10px]">Intro video</span>
             </span>
           </button>

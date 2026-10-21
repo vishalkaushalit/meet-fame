@@ -51,3 +51,22 @@ html:not([data-theme='light']) .auth-social-icon {
 @media (max-width: 700px) {
   html:not([data-theme='light']) .auth-social-icon { opacity: .5; }
 }
+
+/* Each content section owns a decorative layer behind its cards and text. */
+.social-background-host {
+  position: relative;
+  isolation: isolate;
+}
+.social-page-background {
+  z-index: -1;
+}
+.social-page-background .auth-social-icon {
+  width: clamp(36px, 4vw, 60px);
+  height: clamp(36px, 4vw, 60px);
+}
+html:not([data-theme='light']) .social-page-background .auth-social-icon {
+  opacity: .55;
+}
+html[data-theme='light'] .social-page-background .auth-social-icon {
+  opacity: .28;
+}

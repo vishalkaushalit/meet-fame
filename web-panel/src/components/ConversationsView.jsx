@@ -52,7 +52,7 @@ export default function ConversationsView() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-black text-white flex items-center gap-2">
+        <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
           <MessageSquare className="w-6 h-6 text-brand-purple" />
           <span>User & Influencer Conversations Monitor</span>
         </h2>
@@ -99,7 +99,7 @@ export default function ConversationsView() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-1.5 font-bold text-xs text-white">
+                      <div className="flex items-center gap-1.5 font-semibold text-xs text-white">
                         <span>{conv.userName}</span>
                         <span className="text-slate-500 font-normal">↔</span>
                         <span className="text-brand-purple">
@@ -132,11 +132,11 @@ export default function ConversationsView() {
                 <div className="conversation-header p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-bold text-white text-sm">
+                      <span className="font-semibold text-white text-sm">
                         Client: {selectedConv.userName}
                       </span>
                       <span className="text-slate-500">•</span>
-                      <span className="font-bold text-brand-purple text-sm">
+                      <span className="font-semibold text-brand-purple text-sm">
                         Creator: {selectedConv.influencerName}
                       </span>
                     </div>
@@ -145,7 +145,7 @@ export default function ConversationsView() {
                     </p>
                   </div>
 
-                  <span className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <span className="shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                     Live Audit Log
                   </span>
                 </div>

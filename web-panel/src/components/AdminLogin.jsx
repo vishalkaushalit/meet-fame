@@ -63,7 +63,7 @@ export default function AdminLogin({ onLoginSuccess }) {
             <div className="admin-login-brand flex justify-center mb-3">
               <Logo size="sm" />
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2">
               <Shield className="w-3.5 h-3.5" />
               <span>Master Administration Access</span>
             </div>
@@ -123,7 +123,7 @@ export default function AdminLogin({ onLoginSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-6 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-2 transition-all active:scale-[0.99]"
+              className="w-full py-3 px-6 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 shadow-lg shadow-indigo-500/20 disabled:opacity-50 flex items-center justify-center gap-2 mt-2 transition-all active:scale-[0.99]"
             >
               {loading ? (
                 <span>Authenticating...</span>

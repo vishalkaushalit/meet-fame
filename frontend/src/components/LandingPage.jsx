@@ -1,3 +1,4 @@
+import AuthSocialBackground from '@shared/AuthSocialBackground';
 import IntroVideo from './IntroVideo';
 import ThemeToggle from './ThemeToggle';
 import React from 'react';
@@ -49,7 +50,7 @@ export default function LandingPage({
               }
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-1.5 text-brand-purple hover:text-brand-pink transition-colors font-bold"
+              className="flex items-center gap-1.5 text-brand-purple hover:text-brand-pink transition-colors font-semibold"
             >
               <span>Admin Command Center</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -61,14 +62,14 @@ export default function LandingPage({
             <ThemeToggle />
             <a
               href="/login"
-              className="website-sign-in py-2.5 px-4 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"
+              className="website-sign-in py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"
             >
               Sign In
             </a>
 
             <a
               href="/influencer/signup"
-              className="py-2.5 px-5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
+              className="py-2.5 px-5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
             >
               Join as Influencer
             </a>
@@ -77,7 +78,8 @@ export default function LandingPage({
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative pt-16 pb-20 overflow-hidden">
+      <section className="social-background-host relative pt-16 pb-20 overflow-hidden">
+        <AuthSocialBackground page />
         {/* Ambient Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-brand-glow pointer-events-none" />
 
@@ -85,13 +87,13 @@ export default function LandingPage({
           {/* Eyebrow badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 mb-6 shadow-md backdrop-blur-md">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-bold tracking-wide text-slate-200">
+            <span className="text-xs font-semibold tracking-wide text-slate-200">
               MEETFAME PLATFORM • VERIFIED 1-HOUR CONSULTATIONS
             </span>
           </div>
 
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight leading-[1.1] max-w-4xl mx-auto">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold text-white tracking-tight leading-[1.1] max-w-4xl mx-auto">
             Connect. Book. <br />
             <span className="text-gradient">Meet Your Idols.</span>
           </h1>
@@ -110,7 +112,7 @@ export default function LandingPage({
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
               href="/signup"
-              className="w-full sm:w-auto py-3.5 px-8 rounded-2xl font-bold text-sm text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto py-3.5 px-8 rounded-2xl font-semibold text-sm text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-xl shadow-indigo-500/30 flex items-center justify-center gap-2"
             >
               <span>Explore Verified Influencers</span>
               <ArrowRight className="w-4 h-4" />
@@ -118,7 +120,7 @@ export default function LandingPage({
 
             <a
               href="/influencer/signup"
-              className="w-full sm:w-auto py-3.5 px-8 rounded-2xl font-bold text-sm text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto py-3.5 px-8 rounded-2xl font-semibold text-sm text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 transition-all flex items-center justify-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-brand-coral" />
               <span>Register as Influencer</span>
@@ -131,7 +133,7 @@ export default function LandingPage({
               <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mx-auto mb-3">
                 <Users className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-white text-sm">
+              <h3 className="font-semibold text-white text-sm">
                 Discover Influencers
               </h3>
               <p className="text-[11px] text-slate-400 mt-1">
@@ -143,7 +145,7 @@ export default function LandingPage({
               <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto mb-3">
                 <Calendar className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-white text-sm">Book Time Slots</h3>
+              <h3 className="font-semibold text-white text-sm">Book Time Slots</h3>
               <p className="text-[11px] text-slate-400 mt-1">
                 Autogenerated 1-hour slots with real-time disabled booked slots
               </p>
@@ -153,7 +155,7 @@ export default function LandingPage({
               <div className="w-12 h-12 rounded-2xl bg-pink-500/10 text-pink-400 flex items-center justify-center mx-auto mb-3">
                 <Video className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-white text-sm">
+              <h3 className="font-semibold text-white text-sm">
                 Video / In-Person Meetings
               </h3>
               <p className="text-[11px] text-slate-400 mt-1">
@@ -165,7 +167,7 @@ export default function LandingPage({
               <div className="w-12 h-12 rounded-2xl bg-coral-500/10 text-brand-coral flex items-center justify-center mx-auto mb-3">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-white text-sm">
+              <h3 className="font-semibold text-white text-sm">
                 Secure & Trusted Community
               </h3>
               <p className="text-[11px] text-slate-400 mt-1">
@@ -179,16 +181,17 @@ export default function LandingPage({
       {/* FEATURED INFLUENCERS SHOWCASE */}
       <section
         id="creators"
-        className="py-16 bg-slate-950/60 border-t border-slate-800/80"
+        className="social-background-host py-16 bg-slate-950/60 border-t border-slate-800/80"
       >
+        <AuthSocialBackground page />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-purple uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-purple uppercase tracking-wider mb-2">
                 <Sparkles className="w-4 h-4" />
                 <span>Certified Creators</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-white">
+              <h2 className="text-3xl md:text-4xl font-semibold text-white">
                 Featured Verified Experts
               </h2>
               <p className="text-slate-400 text-sm mt-1">
@@ -198,7 +201,7 @@ export default function LandingPage({
 
             <a
               href="/login"
-              className="mt-4 md:mt-0 text-xs font-bold text-brand-purple hover:text-brand-pink flex items-center gap-1 transition-colors"
+              className="mt-4 md:mt-0 text-xs font-semibold text-brand-purple hover:text-brand-pink flex items-center gap-1 transition-colors"
             >
               <span>View all creators &rarr;</span>
             </a>
@@ -227,7 +230,7 @@ export default function LandingPage({
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <h3 className="font-bold text-white text-base truncate">
+                        <h3 className="font-semibold text-white text-base truncate">
                           {inf.name}
                         </h3>
                         {inf.isVerified && <VerifiedBadge size="sm" />}
@@ -252,7 +255,7 @@ export default function LandingPage({
                       <span className="text-[10px] text-slate-500 uppercase block font-semibold">
                         1-Hour Session
                       </span>
-                      <span className="font-black text-emerald-400 text-sm">
+                      <span className="font-semibold text-emerald-400 text-sm">
                         ${inf.hourlyRate || 150}
                       </span>
                     </div>
@@ -270,7 +273,7 @@ export default function LandingPage({
                 <div className="pt-2 border-t border-slate-800/60">
                   <button
                     onClick={() => onBookInfluencer(inf)}
-                    className="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-2"
+                    className="w-full py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-2"
                   >
                     <Clock className="w-3.5 h-3.5" />
                     <span>Book 1-Hour Time Slot</span>
@@ -283,10 +286,11 @@ export default function LandingPage({
       </section>
 
       {/* HOW IT WORKS SECTION */}
-      <section id="how-it-works" className="py-20 bg-[#0A0F1D]">
+      <section id="how-it-works" className="social-background-host py-20 bg-[#0A0F1D]">
+        <AuthSocialBackground page />
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-white">
+            <h2 className="text-3xl md:text-4xl font-semibold text-white">
               How MeetFame Works
             </h2>
             <p className="text-slate-400 text-sm mt-2">
@@ -297,10 +301,10 @@ export default function LandingPage({
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 relative">
-              <div className="text-4xl font-black text-indigo-500/20 mb-3">
+              <div className="text-4xl font-semibold text-indigo-500/20 mb-3">
                 01
               </div>
-              <h3 className="font-bold text-white text-base mb-1">
+              <h3 className="font-semibold text-white text-base mb-1">
                 Influencer Sets Time
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -311,10 +315,10 @@ export default function LandingPage({
             </div>
 
             <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 relative">
-              <div className="text-4xl font-black text-purple-500/20 mb-3">
+              <div className="text-4xl font-semibold text-purple-500/20 mb-3">
                 02
               </div>
-              <h3 className="font-bold text-white text-base mb-1">
+              <h3 className="font-semibold text-white text-base mb-1">
                 Admin Review & Badge
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -324,10 +328,10 @@ export default function LandingPage({
             </div>
 
             <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 relative">
-              <div className="text-4xl font-black text-pink-500/20 mb-3">
+              <div className="text-4xl font-semibold text-pink-500/20 mb-3">
                 03
               </div>
-              <h3 className="font-bold text-white text-base mb-1">
+              <h3 className="font-semibold text-white text-base mb-1">
                 User Selects Slot
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
@@ -337,10 +341,10 @@ export default function LandingPage({
             </div>
 
             <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 relative">
-              <div className="text-4xl font-black text-coral-500/20 mb-3">
+              <div className="text-4xl font-semibold text-coral-500/20 mb-3">
                 04
               </div>
-              <h3 className="font-bold text-white text-base mb-1">
+              <h3 className="font-semibold text-white text-base mb-1">
                 Connect & Chat
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">

@@ -59,7 +59,7 @@ export default function BookingsView() {
       {/* View Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-white flex items-center gap-2">
+          <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
             <Calendar className="w-6 h-6 text-brand-purple" />
             <span>All Platform Bookings</span>
           </h2>
@@ -102,7 +102,7 @@ export default function BookingsView() {
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                 statusFilter === s
                   ? 'bg-brand-purple text-white shadow-sm'
                   : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'

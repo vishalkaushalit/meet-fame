@@ -1,3 +1,4 @@
+import AuthSocialBackground from '@shared/AuthSocialBackground';
 import ThemeToggle from './components/ThemeToggle';
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -98,7 +99,7 @@ function AppContent() {
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 h-20 py-4 flex items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
               <Logo size="header" className="shrink-0" />
-              <span className="hidden md:inline-flex shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
+              <span className="hidden md:inline-flex shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
                 {role === 'influencer' ? 'Creator Dashboard' : 'Client Portal'}
               </span>
             </div>
@@ -130,7 +131,7 @@ function AppContent() {
                   className="w-9 h-9 shrink-0 rounded-xl object-cover ring-1 ring-slate-700"
                 />
                 <div className="hidden sm:block min-w-0 max-w-[160px] xl:max-w-[220px] text-left text-xs">
-                  <div className="font-bold text-white flex min-w-0 items-center gap-1">
+                  <div className="font-semibold text-white flex min-w-0 items-center gap-1">
                     <span className="truncate" title={user.name}>
                       {user.name}
                     </span>
@@ -160,7 +161,8 @@ function AppContent() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1">
+      <main className="flex-1 social-background-host">
+        {user && <AuthSocialBackground page />}
         {!user ? (
           <LandingPage
             onBookInfluencer={handleBookInfluencer}

@@ -175,7 +175,7 @@ export default function ApprovalsView() {
       {/* View Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-white flex items-center gap-2">
+          <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
             <Shield className="w-6 h-6 text-brand-purple" />
             <span>Registration & Certificate Approvals</span>
           </h2>
@@ -192,7 +192,7 @@ export default function ApprovalsView() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                   statusFilter === s
                     ? 'bg-brand-purple text-white shadow-md'
                     : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
@@ -227,7 +227,7 @@ export default function ApprovalsView() {
             setActiveTab('influencers');
             setStatusFilter('all');
           }}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'influencers'
               ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
               : 'text-slate-400 hover:text-white'
@@ -239,7 +239,7 @@ export default function ApprovalsView() {
 
         <button
           onClick={() => setActiveTab('users')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'users'
               ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
               : 'text-slate-400 hover:text-white'
@@ -322,7 +322,7 @@ export default function ApprovalsView() {
                         <td>
                           {' '}
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
                               isApproved
                                 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                                 : isPending
@@ -370,7 +370,7 @@ export default function ApprovalsView() {
                                         false,
                                       )
                                     }
-                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-bold"
+                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-semibold"
                                   >
                                     Revoke Blue Badge
                                   </button>
@@ -383,7 +383,7 @@ export default function ApprovalsView() {
                                         true,
                                       )
                                     }
-                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm"
+                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-semibold flex items-center gap-1 shadow-sm"
                                   >
                                     <VerifiedBadge size="sm" />
                                     <span>Verify Certificate</span>
@@ -422,7 +422,7 @@ export default function ApprovalsView() {
                                   onClick={() =>
                                     handleApproveInfluencer(inf.id, inf.name)
                                   }
-                                  className="px-4 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
+                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                   <span>Approve Application</span>
@@ -430,7 +430,7 @@ export default function ApprovalsView() {
 
                                 <button
                                   onClick={() => setRejectingItem(inf)}
-                                  className="px-4 py-2.5 rounded-xl font-bold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
+                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
                                 >
                                   <XCircle className="w-4 h-4" />
                                   <span>Decline</span>
@@ -521,7 +521,7 @@ export default function ApprovalsView() {
                     <td>
                       <div className="flex items-center gap-3">
                         <div
-                          className="w-10 h-10 shrink-0 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold flex items-center justify-center text-sm"
+                          className="w-10 h-10 shrink-0 rounded-xl bg-indigo-500/20 text-indigo-400 font-semibold flex items-center justify-center text-sm"
                           aria-hidden="true"
                         >
                           {u.name?.charAt(0) || 'U'}
@@ -534,7 +534,7 @@ export default function ApprovalsView() {
                     <td>
                       {' '}
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
                           u.status === 'approved'
                             ? 'bg-emerald-500/10 text-emerald-400'
                             : u.status === 'blocked'
@@ -568,7 +568,7 @@ export default function ApprovalsView() {
                           <button
                             onClick={() => openBlock(u, 'user')}
                             disabled={updatingUser === u.id}
-                            className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold disabled:opacity-50"
+                            className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold disabled:opacity-50"
                           >
                             {updatingUser === u.id ? (
                               <span>Saving…</span>
@@ -581,7 +581,7 @@ export default function ApprovalsView() {
                           <button
                             onClick={() => handleUserStatus(u, 'approved')}
                             disabled={updatingUser === u.id}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
                           >
                             {updatingUser === u.id ? (
                               <span>Saving…</span>
@@ -618,7 +618,7 @@ export default function ApprovalsView() {
             aria-labelledby="block-title"
             className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border border-slate-700"
           >
-            <h3 id="block-title" className="text-lg font-bold text-white">
+            <h3 id="block-title" className="text-lg font-semibold text-white">
               Block {blockingItem.name}
             </h3>
             <p className="text-xs text-slate-400 mt-2 mb-4">
@@ -663,7 +663,7 @@ export default function ApprovalsView() {
               <button
                 type="submit"
                 disabled={blocking || !blockReason.trim()}
-                className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold disabled:opacity-50"
+                className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-semibold disabled:opacity-50"
               >
                 {blocking ? 'Blocking…' : 'Block account'}
               </button>
@@ -675,7 +675,7 @@ export default function ApprovalsView() {
       {rejectingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
           <div className="w-full max-w-md p-6 rounded-3xl bg-slate-900 border border-slate-700 shadow-2xl text-slate-100">
-            <h3 className="text-lg font-bold text-white mb-2">
+            <h3 className="text-lg font-semibold text-white mb-2">
               Decline Influencer Application
             </h3>
             <p className="text-xs text-slate-400 mb-4">
@@ -703,7 +703,7 @@ export default function ApprovalsView() {
               <button
                 type="button"
                 onClick={handleConfirmRejectInfluencer}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-white bg-rose-600 hover:bg-rose-500"
               >
                 Confirm Decline
               </button>

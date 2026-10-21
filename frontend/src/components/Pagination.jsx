@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { paginate, paginationNumbers } from '../../../shared/pagination';
-export function usePagination(items, resetKey = '') {
+export function usePagination(items, resetKey = '', pageSize = 10) {
   const [state, setState] = useState({ key: resetKey, page: 1 });
-  const result = paginate(items, state.key === resetKey ? state.page : 1);
+  const result = paginate(items, state.key === resetKey ? state.page : 1, pageSize);
   return { ...result, setPage: (page) => setState({ key: resetKey, page }) };
 }
 export default function Pagination({ pagination, label = 'records' }) {
-  const { page, pages, total, start, end, setPage } = pagination;
+  const { page, pages, total, setPage } = pagination;
   if (total === 0) return null;
   return (
     <nav className="record-pagination" aria-label={`${label} pagination`}>
-      <span role="status">
-        {start}–{end} of {total} {label}
-      </span>
       <div>
         <button
           type="button"
@@ -22,7 +19,7 @@ export default function Pagination({ pagination, label = 'records' }) {
           aria-label={`Previous page of ${label}`}
         >
           <ChevronLeft size={15} />
-          Previous
+          Prev
         </button>
         {paginationNumbers(page, pages).map((number) =>
           typeof number === 'number' ? (
