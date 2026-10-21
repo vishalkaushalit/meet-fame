@@ -52,7 +52,7 @@ html .availability-filters :is(input, select, option) {
 .availability-filters > button {
   border: 1px solid var(--cal-line);
   border-radius: 9px;
-  background: var(--cal-panel);
+  background-color: var(--cal-panel);
   color: var(--cal-text);
   padding: 10px;
   font-size: 14px;
@@ -430,7 +430,7 @@ html[data-theme='light']
   .availability-calendar
   .availability-filters
   :is(select, input) {
-  background: #fff;
+  background-color: #fff;
   border-color: var(--cal-line);
   color: var(--cal-text);
 }
