@@ -1057,6 +1057,14 @@ html[data-theme='light'] .website-sign-in:focus-visible {
   opacity: 0.4;
   cursor: not-allowed;
 }
+html .record-pagination button[aria-label^='Page '] {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
 .record-pagination button:focus-visible {
   outline: 2px solid #a78bfa;
   outline-offset: 2px;
