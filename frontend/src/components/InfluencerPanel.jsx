@@ -744,7 +744,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 required
                 value={certTitle}
                 onChange={(e) => setCertTitle(e.target.value)}
-                placeholder="e.g. Stanford AI Fellow, NASM Certified Master Trainer"
+                placeholder="Enter your certificate name"
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
               />
             </div>

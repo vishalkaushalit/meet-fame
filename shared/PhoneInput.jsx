@@ -18,7 +18,7 @@ export default function PhoneInput({ id, value, onChange, required = false, disa
   useEffect(() => { input.current?.setCustomValidity(error); }, [error]);
   return (
     <div className="phone-input flex w-full items-center overflow-hidden rounded-xl border border-slate-700 bg-slate-950/70 text-sm text-white focus-within:border-brand-purple">
-      <div className="phone-country relative flex w-16 shrink-0 items-center justify-center self-stretch border-r border-slate-700 focus-within:bg-slate-800">
+      <div className="phone-country relative flex w-16 shrink-0 items-center justify-center self-stretch border-r border-slate-700">
         <span aria-hidden="true" className="flex items-center gap-1.5 text-base">{flag(country)}<span className="text-[10px] text-slate-400">▾</span></span>
       <select aria-label="Phone country" value={country} disabled={disabled}
         onChange={(e) => {
@@ -34,7 +34,7 @@ export default function PhoneInput({ id, value, onChange, required = false, disa
       <input ref={input} id={id} name="phone" type="tel" inputMode="numeric" pattern="[0-9]*"
         autoComplete="tel-national" required={required} disabled={disabled}
         maxLength={15 - prefix.length + 1} value={national}
-        aria-invalid={invalid} aria-describedby={describedBy} placeholder="Phone number"
+        aria-invalid={invalid} aria-describedby={describedBy} placeholder="Enter your phone number"
         onChange={(e) => {
           const digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 15 - prefix.length + 1);
           onChange(digits ? `${prefix}${digits}` : '');

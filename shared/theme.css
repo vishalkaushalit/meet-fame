@@ -1224,3 +1224,36 @@ a[class*='button']:not(.rounded-full),
 input::file-selector-button {
   border-radius: 10px !important;
 }
+
+/* Keep interactive states readable after the light-theme utility overrides. */
+:root {
+  --control-hover-border: #64748b;
+  --interactive-hover-text: #a78bfa;
+}
+html[data-theme='light'] {
+  --control-hover-border: #94a3b8;
+  --interactive-hover-text: #6d28d9;
+}
+html[data-theme='light'] .theme-toggle:hover {
+  background-color: #f1f5f9;
+  border-color: #7c3aed;
+  color: #6d28d9;
+}
+html[data-theme='light'] [class~='hover:bg-slate-800']:hover,
+html[data-theme='light'] [class~='hover:bg-slate-800/40']:hover,
+html[data-theme='light'] [class~='hover:bg-slate-800/60']:hover,
+html[data-theme='light'] [class~='hover:bg-slate-900']:hover {
+  background-color: #e2e8f0;
+}
+html[data-theme='light'] [class~='hover:text-white']:hover {
+  color: #0f172a;
+}
+html[data-theme='light'] [class~='hover:border-brand-purple']:hover {
+  border-color: #7c3aed;
+}
+html[data-theme='light'] [class~='focus-within:border-brand-purple']:focus-within {
+  border-color: var(--focus-border-color);
+}
+:is(input[type='text'], input[type='email'], input[type='password'], input[type='tel'], input[type='number'], textarea):not(:disabled):not(:focus):hover {
+  border-color: var(--control-hover-border);
+}

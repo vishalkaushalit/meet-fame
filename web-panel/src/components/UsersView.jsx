@@ -366,6 +366,7 @@ export default function UsersView({ refreshKey = 0 }) {
               rows={4}
               maxLength={1000}
               disabled={saving !== null}
+              placeholder="Enter your reason for blocking"
               value={reason}
               onChange={(event) => setReason(event.target.value)}
               className="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-xs"

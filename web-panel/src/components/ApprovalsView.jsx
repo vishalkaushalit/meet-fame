@@ -637,6 +637,7 @@ export default function ApprovalsView() {
               required
               maxLength={1000}
               rows={4}
+              placeholder="Enter your reason for blocking"
               value={blockReason}
               disabled={blocking}
               onChange={(event) => setBlockReason(event.target.value)}
@@ -685,6 +686,7 @@ export default function ApprovalsView() {
 
             <textarea
               rows={3}
+              placeholder="Enter your reason for declining"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-purple mb-4"

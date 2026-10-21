@@ -68,6 +68,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             autoFocus
             required
             autoComplete="name"
+            placeholder="Enter your full name"
             maxLength={100}
             value={name}
             disabled={saving}
@@ -81,6 +82,7 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             required
             type="email"
             autoComplete="email"
+            placeholder="Enter your email address"
             maxLength={254}
             value={email}
             disabled={saving}

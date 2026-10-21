@@ -171,7 +171,7 @@ export default function ChatModal({
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={`Message ${targetUser.name}...`}
+            placeholder={`Enter your message to ${targetUser.name}`}
             className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
           />
           <button

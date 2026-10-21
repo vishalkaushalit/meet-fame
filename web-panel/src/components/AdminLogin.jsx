@@ -7,7 +7,7 @@ import { Shield, Lock, Eye, EyeOff, Mail, ArrowRight, CheckCircle2 } from 'lucid
 
 export default function AdminLogin({ onLoginSuccess }) {
   const [email, setEmail] = useState('admin@meetfame.com');
-  const [password, setPassword] = useState('admin123');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -87,7 +87,7 @@ export default function AdminLogin({ onLoginSuccess }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@meetfame.com"
+                  placeholder="Enter your email address"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
                 />
               </div>
@@ -104,7 +104,7 @@ export default function AdminLogin({ onLoginSuccess }) {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-12 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
                 />
                 <button type="button" onClick={() => setShowPassword((visible) => !visible)}

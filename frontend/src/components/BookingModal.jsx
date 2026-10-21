@@ -408,7 +408,7 @@ export default function BookingModal({
                 rows={2}
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder="Briefly describe what you'd like to discuss or seek advice on..."
+                placeholder="Enter what you would like to discuss"
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-purple"
               />
             </div>

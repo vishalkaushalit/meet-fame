@@ -30,3 +30,33 @@
 .phone-input:focus-within {
   border-color: var(--focus-border-color, #c4b5fd);
 }
+
+.phone-input .phone-country {
+  background: transparent;
+  border-radius: 6px;
+}
+.phone-input .phone-country:focus-within {
+  box-shadow: none;
+}
+html[data-theme='light'] .phone-input .phone-country {
+  background: transparent;
+}
+
+.phone-input:not(:focus-within):has(input:not(:disabled)):hover {
+  border-color: var(--control-hover-border, #64748b);
+}
+html[data-theme] .phone-input:focus-within {
+  border-color: var(--focus-border-color, #c4b5fd);
+}
+.phone-input .phone-country select,
+.phone-input .phone-country option {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  color-scheme: dark;
+}
+html[data-theme='light'] .phone-input .phone-country select,
+html[data-theme='light'] .phone-input .phone-country option {
+  background-color: #fff;
+  color: #0f172a;
+  color-scheme: light;
+}

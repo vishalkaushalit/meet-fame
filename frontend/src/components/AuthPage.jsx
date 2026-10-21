@@ -326,7 +326,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       }
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="e.g. Marcus Vance"
+                      placeholder="Enter your full name"
                       className="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                     />
                   </div>
@@ -363,7 +363,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     }
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@example.com"
+                    placeholder="Enter your email address"
                     className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   />
                 </div>
@@ -425,7 +425,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     }
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   />
                   <button type="button" onClick={() => setShowPassword((visible) => !visible)}
@@ -515,6 +515,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                           step="10"
                           id="auth-hourlyRate"
                           name="hourlyRate"
+                          placeholder="Enter your hourly rate"
                           aria-invalid={Boolean(fieldErrors.hourlyRate)}
                           aria-describedby={
                             fieldErrors.hourlyRate
@@ -558,7 +559,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       }
                       value={specialization}
                       onChange={(e) => setSpecialization(e.target.value)}
-                      placeholder="e.g. AI Strategy, Venture Capital, Fitness Coaching"
+                      placeholder="Enter your area of expertise"
                       className="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                     />
                   </div>
@@ -645,7 +646,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       }
                       value={certificateTitle}
                       onChange={(e) => setCertificateTitle(e.target.value)}
-                      placeholder="Certificate Name (e.g. Stanford AI Fellow, NASM Certified)"
+                      placeholder="Enter your certificate name"
                       className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white mb-2 focus:outline-none focus:border-brand-purple"
                     />
                     <div className="flex items-center gap-3">
@@ -764,7 +765,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             </span>
             <a
               href={authPath(role, isRegister ? 'login' : 'register')}
-              className="font-bold text-brand-purple hover:text-brand-pink transition-colors underline"
+              className="font-medium text-brand-purple hover:text-brand-pink transition-colors underline"
             >
               {isRegister ? 'Sign In instead' : 'Create new account'}
             </a>
@@ -837,7 +838,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
               className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-brand-indigo transition-colors"
             >
               <span>Looking for Admin Command Center?</span>
-              <span className="font-bold underline">
+              <span className="font-medium text-brand-purple hover:text-brand-pink transition-colors underline">
                 Open Admin Panel &rarr;
               </span>
             </a>

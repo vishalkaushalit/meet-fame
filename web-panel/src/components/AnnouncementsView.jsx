@@ -55,6 +55,7 @@ export default function AnnouncementsView() {
           required
           maxLength={100}
           disabled={sending}
+          placeholder="Enter your announcement title"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           className={field}
@@ -67,6 +68,7 @@ export default function AnnouncementsView() {
           maxLength={2000}
           rows={6}
           disabled={sending}
+          placeholder="Enter your announcement message"
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           className={field}
