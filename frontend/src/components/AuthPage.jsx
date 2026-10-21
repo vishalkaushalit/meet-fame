@@ -1,3 +1,5 @@
+import AuthSocialBackground from '@shared/AuthSocialBackground';
+import { useFitAuthForm } from '@shared/useFitAuthForm';
 import PhoneInput from '../../../shared/PhoneInput';
 import {
   registrationErrors,
@@ -27,6 +29,7 @@ import ThemeToggle from './ThemeToggle';
 import { authPath, navigate } from '../authRoutes';
 
 export default function AuthPage({ role = 'user', tab = 'login' }) {
+  const { areaRef, cardRef } = useFitAuthForm();
   const { login, registerUser, registerInfluencer, setStatusAlert } = useAuth();
   const isRegister = tab === 'register';
   const heading = useRef(null);
@@ -192,13 +195,14 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   };
 
   return (
-    <div className="auth-page min-h-screen bg-[#0A0F1D] text-slate-100">
+    <div className="auth-page auth-viewport min-h-screen bg-[#0A0F1D] text-slate-100">
       <header className="auth-page-header">
         <Logo size="header" />
         <ThemeToggle />
       </header>
-      <main className="auth-page-main">
-        <div className="auth-page-card auth-form-compact relative w-full max-w-2xl p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100">
+      <main ref={areaRef} className="auth-page-main auth-fit-area">
+        <AuthSocialBackground />
+        <div ref={cardRef} className="auth-fit-card auth-page-card auth-form-compact relative w-full max-w-2xl p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100">
           {/* Page heading */}
           <div className="text-center mb-6">
             <h1
@@ -275,7 +279,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 ))}
               </ol>
               <h2
-                className="signup-step-heading"
+                className="sr-only"
                 ref={stepHeading}
                 tabIndex={-1}
               >
@@ -613,8 +617,8 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     <p id="auth-introVideoFile-error" className="auth-field-error" role="alert">{fieldErrors.introVideoFile}</p>
                   </div>
                   {/* Certification Upload for Verified Badge */}
-                  <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <div className="flex items-center justify-between mb-2">
+                  <details open={fieldErrors.certificateTitle || fieldErrors.certificateFile ? true : undefined} className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
+                    <summary className="cursor-pointer flex items-center justify-between gap-2">
                       <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                         <FileCheck className="w-4 h-4 text-[#0095F6]" />
                         <span>
@@ -622,9 +626,10 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         </span>
                       </label>
                       <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 font-semibold border border-blue-500/20">
-                        Instagram Style Badge
+                        Optional · Expand ▾
                       </span>
-                    </div>
+                    </summary>
+                    <div className="mt-3">
                     {fieldErrors.certificateTitle && (
                       <p
                         id="auth-certificateTitle-error"
@@ -703,7 +708,8 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       Uploaded certificates will be reviewed to grant
                       your profile the official Blue Verified badge.
                     </p>
-                  </div>
+                    </div>
+                  </details>
                 </fieldset>
               </div>
             )}
@@ -772,14 +778,11 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
           </div>
 
           {/* 1-Click Demo Accounts for testing */}
-          <div className="mt-5 p-3 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs">
-            <div className="font-semibold text-slate-400 mb-2 flex items-center justify-between">
+          <details className="mt-5 p-3 rounded-2xl bg-slate-950/70 border border-slate-800 text-xs">
+            <summary className="cursor-pointer font-medium text-slate-400">
               <span>Quick Test Demo Accounts:</span>
-              <span className="text-[10px] text-slate-500">
-                Auto-fill & Login
-              </span>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            </summary>
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => handleDemoLogin('alex@example.com', 'user')}
@@ -824,7 +827,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 </div>
               </button>
             </div>
-          </div>
+          </details>
 
           {/* Link to Admin Command Center on port 5174 */}
           <div className="mt-3 text-center">

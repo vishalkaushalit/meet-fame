@@ -1,3 +1,5 @@
+import AuthSocialBackground from '@shared/AuthSocialBackground';
+import { useFitAuthForm } from '@shared/useFitAuthForm';
 import './admin-login.css';
 import ThemeToggle from './ThemeToggle';
 import React, { useState } from 'react';
@@ -6,6 +8,7 @@ import { adminApi } from '../api';
 import { Shield, Lock, Eye, EyeOff, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function AdminLogin({ onLoginSuccess }) {
+  const { areaRef, cardRef } = useFitAuthForm();
   const [email, setEmail] = useState('admin@meetfame.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -45,13 +48,14 @@ export default function AdminLogin({ onLoginSuccess }) {
   };
 
   return (
-    <div className="admin-login-page min-h-screen bg-[#0B0F19]">
+    <div className="admin-login-page auth-viewport min-h-screen bg-[#0B0F19]">
       <header className="admin-login-toolbar">
         <a href={import.meta.env.VITE_FRONTEND_URL || '/'}>← Back to website</a>
         <ThemeToggle />
       </header>
-      <main className="admin-login-main">
-        <div className="w-full max-w-md p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative overflow-hidden">
+      <main ref={areaRef} className="admin-login-main auth-fit-area">
+        <AuthSocialBackground />
+        <div ref={cardRef} className="auth-fit-card w-full max-w-md p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative overflow-hidden">
           {/* Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
 
