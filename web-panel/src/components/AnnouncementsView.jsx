@@ -86,7 +86,7 @@ export default function AnnouncementsView() {
       )}
       <button
         disabled={sending || !title.trim() || !message.trim()}
-        className="dashboard-button disabled:opacity-50"
+        className="dashboard-button button-primary disabled:opacity-50"
       >
         <Send size={15} />
         {sending ? <span>Sending…</span> : 'Send announcement'}

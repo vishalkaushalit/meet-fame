@@ -1,8 +1,7 @@
 import LogoLoader from './LogoLoader';
 import { dayRanges } from '../../../shared/availability';
 import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { X, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { adminApi } from '../api';
 
 const text = (value) =>
@@ -24,12 +23,11 @@ const safeLink = (value) => {
   }
 };
 
-export default function AccountDetailsDialog({ account, onClose }) {
+export default function AccountDetailsPage({ account, onBack }) {
   const [details, setDetails] = useState(null);
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
-  const dialog = useRef(null);
-  const close = useRef(null);
+  const heading = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -51,38 +49,7 @@ export default function AccountDetailsDialog({ account, onClose }) {
     };
   }, [account.role, account.id, retry]);
 
-  useEffect(() => {
-    const previousFocus = document.activeElement;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    close.current?.focus();
-    const handleKey = (event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onClose();
-      }
-      if (event.key === 'Tab') {
-        const elements = [
-          ...dialog.current.querySelectorAll('button:not(:disabled), a[href]'),
-        ];
-        const first = elements[0];
-        const last = elements[elements.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.body.style.overflow = overflow;
-      document.removeEventListener('keydown', handleKey);
-      previousFocus?.focus();
-    };
-  }, [onClose]);
+  useEffect(() => { heading.current?.focus(); }, [account.role, account.id]);
 
   const fields = details
     ? [
@@ -109,34 +76,21 @@ export default function AccountDetailsDialog({ account, onClose }) {
       ]
     : [];
   const certificateUrl = safeLink(details?.certification?.fileUrl);
-  return createPortal(
-    <div
-      className="account-details-overlay"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <section
-        ref={dialog}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="account-details-title"
-        className="account-details-dialog"
-      >
+  return (
+      <section aria-labelledby="account-details-title" className="account-details-dialog account-details-page">
         <header>
           <div>
             <p>ACCOUNT DETAILS</p>
-            <h2 id="account-details-title">
+            <h2 ref={heading} tabIndex={-1} id="account-details-title">
               {details?.name || account.name || 'Account details'}
             </h2>
           </div>
           <button
-            ref={close}
             type="button"
-            aria-label="Close account details"
-            onClick={onClose}
+            aria-label="Back to previous page"
+            onClick={onBack}
           >
-            <X size={20} />
+            <ArrowLeft size={16} /> Back
           </button>
         </header>
         <div className="account-details-body">
@@ -211,12 +165,14 @@ export default function AccountDetailsDialog({ account, onClose }) {
                       ].map((day) => (
                         <div key={day}>
                           <dt className="capitalize">{day}</dt>
-                          <dd>
+                          <dd className="account-availability-badges">
                             {dayRanges(details.availability?.[day]).length
-                              ? dayRanges(details.availability?.[day])
-                                  .map((range) => `${range.start}–${range.end}`)
-                                  .join(', ')
-                              : 'Unavailable'}
+                              ? dayRanges(details.availability?.[day]).map((range, index) => (
+                                  <span key={`${range.start}-${range.end}-${index}`} className="account-time-badge">
+                                    {range.start}–{range.end}
+                                  </span>
+                                ))
+                              : <span className="account-time-unavailable">Unavailable</span>}
                           </dd>
                         </div>
                       ))}
@@ -228,12 +184,10 @@ export default function AccountDetailsDialog({ account, onClose }) {
           )}
         </div>
         <footer>
-          <button type="button" onClick={onClose}>
-            Close
+          <button type="button" onClick={onBack}>
+            Back to list
           </button>
         </footer>
       </section>
-    </div>,
-    document.body,
   );
 }

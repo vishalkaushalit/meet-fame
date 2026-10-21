@@ -19,10 +19,15 @@ export default function App() {
   useEffect(() => {
     if (loading) return;
     if (!admin && page !== 'login') {
-      if (page) requestedPage.current = page;
+      if (page) requestedPage.current = { path: window.location.pathname, search: window.location.search };
       navigateAdmin(null, { replace: true });
     } else if (admin && (!page || page === 'login')) {
-      navigateAdmin(requestedPage.current || 'overview', { replace: true });
+      const destination = requestedPage.current;
+      if (destination) {
+        window.history.replaceState({}, '', destination.path + destination.search);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        window.scrollTo(0, 0);
+      } else navigateAdmin('overview', { replace: true });
       requestedPage.current = null;
     }
   }, [admin, loading, page]);

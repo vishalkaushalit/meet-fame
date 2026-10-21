@@ -100,7 +100,7 @@
   top: 0;
   background: #a855f7;
   color: #fff;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 16px;
   min-width: 16px;
   border-radius: 10px;
@@ -132,7 +132,7 @@
 .notification-panel small {
   display: block;
   color: #94a3b8;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 4px;
 }
 .notification-panel header button {
@@ -144,7 +144,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 18px;
-  font-size: 10px;
+  font-size: 12px;
   color: #94a3b8;
 }
 .notification-tools button {
@@ -170,12 +170,12 @@
   padding-left: 15px;
 }
 .notification-feed h3 {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #e2e8f0;
 }
 .notification-feed p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   color: #a7b2c6;
   margin-top: 5px;
@@ -187,7 +187,7 @@
   justify-content: space-between;
   gap: 10px;
   margin-top: 10px;
-  font-size: 9px;
+  font-size: 12px;
   color: #8190a7;
 }
 .notification-feed footer button {
@@ -196,13 +196,13 @@
 .notification-empty {
   padding: 28px 18px !important;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   color: #94a3b8;
 }
 .notification-error {
   padding: 12px 18px;
   color: #fda4af;
-  font-size: 11px;
+  font-size: 12px;
 }
 .notification-error button {
   text-decoration: underline;
@@ -254,7 +254,7 @@
   font-weight: 600;
 }
 .video-call-dialog header p {
-  font-size: 11px;
+  font-size: 12px;
   color: #94a3b8;
   margin-top: 5px;
 }
@@ -297,14 +297,14 @@
   position: absolute;
   bottom: 5px;
   left: 8px;
-  font-size: 10px;
+  font-size: 12px;
   background: #0009;
   padding: 2px 5px;
   border-radius: 4px;
 }
 .video-call-status {
   padding: 14px 20px 0;
-  font-size: 12px;
+  font-size: 14px;
   color: #c4b5fd;
   text-align: center;
 }
@@ -313,7 +313,7 @@
   padding: 12px;
   background: #3a242b;
   color: #fda4af;
-  font-size: 12px;
+  font-size: 14px;
   border-radius: 8px;
 }
 .video-call-dialog > footer {
@@ -332,7 +332,7 @@
   background: #1e293b;
   border-radius: 10px;
   padding: 12px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .video-call-dialog footer .video-call-join {
   background: #7c3aed;
@@ -375,7 +375,7 @@
   border-radius: 8px;
   background: #1c160bf2;
   color: #fcd34d;
-  font-size: 12px;
+  font-size: 14px;
   box-shadow: 0 4px 16px #0005;
   pointer-events: none;
 }
@@ -389,7 +389,7 @@
     left: 10px;
     gap: 5px;
     padding: 7px 8px;
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
@@ -442,7 +442,7 @@
   top: 0;
   background: #a855f7;
   color: #fff;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 16px;
   min-width: 16px;
   border-radius: 10px;
@@ -474,7 +474,7 @@
 .notification-panel small {
   display: block;
   color: #94a3b8;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 4px;
 }
 .notification-panel header button {
@@ -486,7 +486,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 12px 18px;
-  font-size: 10px;
+  font-size: 12px;
   color: #94a3b8;
 }
 .notification-tools button {
@@ -512,12 +512,12 @@
   padding-left: 15px;
 }
 .notification-feed h3 {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #e2e8f0;
 }
 .notification-feed p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   color: #a7b2c6;
   margin-top: 5px;
@@ -527,26 +527,26 @@
 .notification-feed time {
   display: block;
   margin-top: 10px;
-  font-size: 9px;
+  font-size: 12px;
   color: #8190a7;
 }
 .notification-actions {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
-  font-size: 10px;
+  font-size: 12px;
   color: #c4b5fd;
 }
 .notification-empty {
   padding: 28px 18px !important;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
   color: #94a3b8;
 }
 .notification-error {
   padding: 12px 18px;
   color: #fda4af;
-  font-size: 11px;
+  font-size: 12px;
 }
 .notification-error button {
   text-decoration: underline;
@@ -577,15 +577,15 @@
   color: #c4b5fd;
 }
 .meeting-reminder-banner strong {
-  font-size: 13px;
+  font-size: 14px;
 }
 .meeting-reminder-banner p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   margin: 6px 0;
 }
 .meeting-reminder-banner button {
-  font-size: 11px;
+  font-size: 12px;
   color: #c4b5fd;
 }
 .meeting-reminder-banner .reminder-dismiss {
@@ -650,7 +650,7 @@
   animation: logo-loader-progress 1.4s ease-in-out infinite;
 }
 .logo-loader-label {
-  font-size: 11px;
+  font-size: 12px;
   color: #94a3b8;
   margin: 0;
 }
@@ -703,7 +703,7 @@
   width: 80px;
 }
 .logo-loader-button .logo-loader-label {
-  font-size: 10px;
+  font-size: 12px;
   color: inherit;
 }
 .logo-loader-button .logo-loader-track {
@@ -728,7 +728,7 @@
   color: #e2e8f0;
 }
 .video-call-placeholder span {
-  font-size: 12px;
+  font-size: 14px;
 }
 .video-call-preview .video-call-local {
   inset: 0;
@@ -749,7 +749,7 @@
   color: #e2e8f0;
   border-radius: 8px;
   padding: 6px 10px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .video-call-dialog > footer {
   flex-wrap: wrap;

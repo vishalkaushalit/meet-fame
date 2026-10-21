@@ -49,3 +49,8 @@ body:has(.auth-viewport) {
 .auth-fit-card[data-compact='true'] > .mt-3 { display: none; }
 .auth-fit-card[data-compact='true'] > .pt-4 { padding-top: 8px; margin-top: 8px; }
 .auth-fit-card[data-compact='true'] [data-signup-step='2'] > p:first-of-type { display: none; }
+.auth-fit-card[data-compact='true'] input:is([type='text'], [type='email'], [type='password'], [type='tel'], [type='number']),
+.auth-fit-card[data-compact='true'] select:not([aria-label='Phone country']) {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}

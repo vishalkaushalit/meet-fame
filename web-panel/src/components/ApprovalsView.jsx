@@ -2,7 +2,7 @@ import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
-import AccountDetailsDialog from './AccountDetailsDialog';
+import { navigateAccountDetails } from '../routes';
 import VerifiedBadge from './VerifiedBadge';
 import {
   Eye,
@@ -21,12 +21,11 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export default function ApprovalsView() {
-  const [activeTab, setActiveTab] = useState('influencers'); // 'influencers' | 'users'
+export default function ApprovalsView({ onChange }) {
   const [statusFilter, setStatusFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('influencers'); // 'influencers' | 'users'
   const [influencers, setInfluencers] = useState([]);
   const [users, setUsers] = useState([]);
-  const [viewingAccount, setViewingAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionMessage, setActionMessage] = useState('');
   const [actionError, setActionError] = useState('');
@@ -63,6 +62,10 @@ export default function ApprovalsView() {
     loadData();
   }, [statusFilter]);
 
+  const refreshAfterAction = async () => {
+    await Promise.all([loadData(), onChange?.()]);
+  };
+
   // Handle Influencer Approval
   const handleApproveInfluencer = async (id, name) => {
     try {
@@ -70,7 +73,7 @@ export default function ApprovalsView() {
       setActionMessage(
         `Approved ${name}! They can now log in to their Influencer Dashboard.`,
       );
-      loadData();
+      await refreshAfterAction();
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err) {
       console.error('Approval failed:', err);
@@ -88,7 +91,7 @@ export default function ApprovalsView() {
       );
       setActionMessage(`Declined ${rejectingItem.name}.`);
       setRejectingItem(null);
-      loadData();
+      await refreshAfterAction();
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err) {
       console.error('Rejection failed:', err);
@@ -108,7 +111,7 @@ export default function ApprovalsView() {
           ? `Verified ${name}'s certificate! Instagram-style Blue Badge awarded.`
           : `Revoked certificate verification for ${name}.`,
       );
-      loadData();
+      await refreshAfterAction();
       setTimeout(() => setActionMessage(''), 4000);
     } catch (err) {
       console.error('Certificate verification failed:', err);
@@ -126,7 +129,7 @@ export default function ApprovalsView() {
           ? `${user.name} has been blocked from logging in.`
           : `${user.name} can now log in.`,
       );
-      await loadData();
+      await refreshAfterAction();
     } catch (err) {
       setActionError(
         err.error || 'Unable to update this user. Please try again.',
@@ -157,7 +160,7 @@ export default function ApprovalsView() {
         `${blockingItem.name} has been blocked. They will see your remark when logging in.`,
       );
       setBlockingItem(null);
-      await loadData();
+      await refreshAfterAction();
     } catch (err) {
       setBlockError(
         err.error || 'Unable to block this account. Please try again.',
@@ -172,39 +175,6 @@ export default function ApprovalsView() {
 
   return (
     <div className="space-y-6">
-      {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
-            <Shield className="w-6 h-6 text-brand-purple" />
-            <span>Registration & Certificate Approvals</span>
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Review applicant credentials. Influencers can only log in once
-            approved by admin.
-          </p>
-        </div>
-
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2">
-          {['all', 'pending_review', 'approved', 'rejected', 'blocked'].map(
-            (s) => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition-all ${
-                  statusFilter === s
-                    ? 'bg-brand-purple text-white shadow-md'
-                    : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                {s.replace('_', ' ')}
-              </button>
-            ),
-          )}
-        </div>
-      </div>
-
       {actionError && (
         <div
           role="alert"
@@ -221,7 +191,8 @@ export default function ApprovalsView() {
       )}
 
       {/* Tabs: Influencer Queue vs User Queue */}
-      <div className="flex items-center gap-3 border-b border-slate-800 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+        <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={() => {
             setActiveTab('influencers');
@@ -248,6 +219,18 @@ export default function ApprovalsView() {
           <UserCheck className="w-4 h-4 text-brand-indigo" />
           <span>Users ({users.length})</span>
         </button>
+        </div>
+        <label className="approval-status-filter ml-auto flex shrink-0 items-center gap-3 text-sm text-slate-300">
+          Status:
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}
+            className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white">
+            <option value="all">All statuses</option>
+            <option value="pending_review">Pending review</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="blocked">Blocked</option>
+          </select>
+        </label>
       </div>
 
       {/* QUEUE CONTENT */}
@@ -266,7 +249,7 @@ export default function ApprovalsView() {
                 <thead>
                   <tr>
                     {[
-                      'Sr. No.',
+                      'S.No.',
                       'Influencer',
                       'Contact',
                       'Category',
@@ -408,7 +391,7 @@ export default function ApprovalsView() {
                               title="View details"
                               aria-label={`View details for ${inf.name}`}
                               onClick={() =>
-                                setViewingAccount({
+                                navigateAccountDetails({
                                   ...inf,
                                   role: 'influencer',
                                 })
@@ -503,7 +486,7 @@ export default function ApprovalsView() {
               </caption>
               <thead>
                 <tr>
-                  <th scope="col">Sr. No.</th>
+                  <th scope="col">S.No.</th>
                   <th scope="col">User</th>
                   <th scope="col">Email</th>
                   <th scope="col">Phone</th>
@@ -559,7 +542,7 @@ export default function ApprovalsView() {
                           title="View details"
                           aria-label={`View details for ${u.name}`}
                           onClick={() =>
-                            setViewingAccount({ ...u, role: 'user' })
+                            navigateAccountDetails({ ...u, role: 'user' })
                           }
                         >
                           <Eye size={16} aria-hidden="true" />
@@ -603,12 +586,6 @@ export default function ApprovalsView() {
         </div>
       )}
 
-      {viewingAccount && (
-        <AccountDetailsDialog
-          account={viewingAccount}
-          onClose={() => setViewingAccount(null)}
-        />
-      )}
       {blockingItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
           <form

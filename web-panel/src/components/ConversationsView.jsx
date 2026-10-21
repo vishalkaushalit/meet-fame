@@ -3,12 +3,9 @@ import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
 import {
-  MessageSquare,
   User,
   Sparkles,
-  Clock,
-  ArrowRight,
-  Shield,
+  Eye,
   Search,
 } from 'lucide-react';
 
@@ -24,9 +21,6 @@ export default function ConversationsView() {
       try {
         const res = await adminApi.conversations.getAll();
         setConversations(res.conversations || []);
-        if (res.conversations?.length > 0 && !selectedConv) {
-          setSelectedConv(res.conversations[0]);
-        }
       } catch (err) {
         console.error('Failed to load conversations:', err);
       } finally {
@@ -50,18 +44,6 @@ export default function ConversationsView() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
-          <MessageSquare className="w-6 h-6 text-brand-purple" />
-          <span>User & Influencer Conversations Monitor</span>
-        </h2>
-        <p className="text-xs text-slate-400 mt-1">
-          Inspect message threads, review attendee briefings, and monitor
-          community interactions.
-        </p>
-      </div>
-
       {loading ? (
         <LogoLoader variant="inline" label="Loading conversation threads..." />
       ) : conversations.length === 0 ? (
@@ -69,10 +51,10 @@ export default function ConversationsView() {
           No conversations recorded on platform yet.
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[550px]">
-          {/* Threads List (5 cols) */}
-          <div className="lg:col-span-5 bg-slate-900 rounded-3xl border border-slate-800 p-4 flex flex-col">
-            <div className="relative mb-3">
+        <div className="space-y-4">
+          {!selectedConv ? (
+          <div className="bg-slate-900 rounded-3xl border border-slate-800 p-4">
+            <div className="conversation-search relative mb-3">
               <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-slate-500" />
               <input
                 type="text"
@@ -83,57 +65,38 @@ export default function ConversationsView() {
               />
             </div>
 
-            <div className="space-y-2 flex-1 overflow-y-auto max-h-[500px]">
-              {threadPagination.items.map((conv) => {
-                const isSelected =
-                  selectedConv?.conversationId === conv.conversationId;
-                return (
-                  <button
-                    key={conv.conversationId}
-                    type="button"
-                    onClick={() => setSelectedConv(conv)}
-                    className={`w-full p-3.5 rounded-2xl text-left border transition-all ${
-                      isSelected
-                        ? 'bg-slate-800 border-brand-purple shadow-md'
-                        : 'bg-slate-950/60 border-slate-800/80 hover:bg-slate-800/40 text-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-1.5 font-semibold text-xs text-white">
-                        <span>{conv.userName}</span>
-                        <span className="text-slate-500 font-normal">↔</span>
-                        <span className="text-brand-purple">
-                          {conv.influencerName}
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        {conv.messageCount} msgs
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] text-slate-400 line-clamp-1 italic">
-                      "{conv.lastMessage}"
-                    </p>
-
-                    <div className="text-[10px] text-slate-500 mt-1">
-                      {new Date(conv.lastTimestamp).toLocaleString()}
-                    </div>
-                  </button>
-                );
-              })}
+            <div className="dashboard-table-wrap">
+              <table className="dashboard-table conversation-table">
+                <thead><tr><th>S.No.</th><th>User</th><th>Creator</th><th>Messages</th><th>Latest message</th><th>Last activity</th><th>Action</th></tr></thead>
+                <tbody>
+                  {threadPagination.items.map((conv, index) => (
+                    <tr key={conv.conversationId}>
+                      <td>{threadPagination.start + index}</td>
+                      <td>{conv.userName}</td>
+                      <td>{conv.influencerName}</td>
+                      <td>{conv.messageCount}</td>
+                      <td><span className="conversation-preview">{conv.lastMessage || '—'}</span></td>
+                      <td>{new Date(conv.lastTimestamp).toLocaleString()}</td>
+                      <td><div className="account-icon-actions"><button type="button" className="user-view-button" aria-label={`View conversation between ${conv.userName} and ${conv.influencerName}`} title="View conversation" onClick={() => setSelectedConv(conv)}><Eye size={18} aria-hidden="true" /></button></div></td>
+                    </tr>
+                  ))}
+                  {!filtered.length && <tr><td colSpan={7}>No conversations match your search.</td></tr>}
+                </tbody>
+              </table>
             </div>
             <Pagination pagination={threadPagination} label="conversations" />
           </div>
 
-          {/* Active Thread Inspector (7 cols) */}
-          <div className="lg:col-span-7 bg-slate-900 rounded-3xl border border-slate-800 flex flex-col overflow-hidden">
+          ) : (
+          <div className=" bg-slate-900 rounded-3xl border border-slate-800 flex flex-col overflow-hidden">
             {selectedConv ? (
               <>
+                <div className="p-4 border-b border-slate-800"><button type="button" className="dashboard-button" onClick={() => setSelectedConv(null)}>Back to conversations</button></div>
                 <div className="conversation-header p-4 px-6 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold text-white text-sm">
-                        Client: {selectedConv.userName}
+                        {selectedConv.userName}
                       </span>
                       <span className="text-slate-500">•</span>
                       <span className="font-semibold text-brand-purple text-sm">
@@ -157,9 +120,9 @@ export default function ConversationsView() {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex flex-col ${isInfluencer ? 'items-end' : 'items-start'}`}
+                        className={`flex flex-col ${isInfluencer ? 'items-end' : 'conversation-client-message items-start'}`}
                       >
-                        <span className="text-[10px] font-semibold text-slate-400 mb-1 flex items-center gap-1">
+                        <span className="conversation-message-sender text-[10px] font-semibold text-slate-400 mb-1 flex items-center gap-1">
                           {isInfluencer ? (
                             <>
                               <Sparkles className="w-3 h-3 text-brand-purple" />
@@ -171,7 +134,7 @@ export default function ConversationsView() {
                             <>
                               <User className="w-3 h-3 text-indigo-400" />
                               <span className="text-indigo-300">
-                                {msg.userName} (Client)
+                                {msg.userName}
                               </span>
                             </>
                           )}
@@ -181,7 +144,7 @@ export default function ConversationsView() {
                           className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed break-words ${
                             isInfluencer
                               ? 'conversation-message-creator bg-gradient-to-r from-brand-indigo to-brand-purple text-white rounded-tr-none'
-                              : 'bg-slate-800 text-slate-200 border border-slate-700/70 rounded-tl-none'
+                              : 'conversation-message-client bg-slate-800 text-slate-200 border border-slate-700/70 rounded-tl-none'
                           }`}
                         >
                           {msg.text}
@@ -200,6 +163,7 @@ export default function ConversationsView() {
               </div>
             )}
           </div>
+          )}
         </div>
       )}
     </div>

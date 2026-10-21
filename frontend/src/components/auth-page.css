@@ -18,7 +18,7 @@
   align-items: center;
   gap: 8px;
   color: #a78bfa;
-  font-size: 12px;
+  font-size: 14px;
   margin-bottom: 24px;
 }
 .auth-back-link:hover {
@@ -37,7 +37,7 @@ html[data-theme='light'] .auth-back-link {
   border-radius: 12px;
   background: #f59e0b14;
   color: #fcd34d;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.7;
 }
 html[data-theme='light'] .auth-page-header {
@@ -89,11 +89,11 @@ html[data-theme='light'] .auth-page-notice {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 .signup-steps li > strong {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
 }
 .signup-steps li.is-active {
@@ -129,7 +129,7 @@ html[data-theme='light'] .auth-page-notice {
   border-radius: 16px;
   padding: 12px 18px;
   color: #cbd5e1;
-  font-size: 12px;
+  font-size: 14px;
 }
 .signup-back:focus-visible {
   outline: 2px solid #a78bfa;
@@ -224,7 +224,7 @@ html[data-theme='light'] .signup-steps li:has(+ .is-active)::after {
 }
 
 .auth-field-error {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
   color: #fda4af;
   margin: 4px 0 6px;

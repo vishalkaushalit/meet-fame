@@ -56,32 +56,17 @@ export default function BookingsView() {
 
   return (
     <div className="space-y-6">
-      {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-white flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-brand-purple" />
-            <span>All Platform Bookings</span>
-          </h2>
-          <p className="text-xs text-slate-400 mt-1">
-            Global record of all 1-hour sessions, consultations, and attendee
-            bookings.
-          </p>
-        </div>
-
-        {/* Stats Pill */}
-        <div className="flex items-center gap-3">
-          <div className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-            <span className="text-slate-400">Total Bookings: </span>
-            <strong className="text-white font-mono">{bookings.length}</strong>
+      <div className="booking-summary-cards">
+          <div className="metric-card">
+            <div className="metric-top"><span>Total Bookings</span><span className="metric-icon violet"><Calendar size={18} /></span></div>
+            <strong className="metric-value text-white">{bookings.length}</strong>
           </div>
-          <div className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs">
-            <span className="text-slate-400">Total Volume: </span>
-            <strong className="text-emerald-400 font-mono">
+          <div className="metric-card">
+            <div className="metric-top"><span>Total Volume</span><span className="metric-icon green"><DollarSign size={18} /></span></div>
+            <strong className="metric-value text-emerald-400">
               ${totalRevenue}
             </strong>
           </div>
-        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -129,7 +114,7 @@ export default function BookingsView() {
               <thead>
                 <tr>
                   {[
-                    'Sr. No.',
+                    'S.No.',
                     'Booking',
                     'Client',
                     'Creator',

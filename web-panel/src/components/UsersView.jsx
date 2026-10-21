@@ -13,7 +13,7 @@ import {
   LoaderCircle,
 } from 'lucide-react';
 import { adminApi } from '../api';
-import AccountDetailsDialog from './AccountDetailsDialog';
+import { navigateAccountDetails } from '../routes';
 
 const statuses = [
   'all',
@@ -27,7 +27,6 @@ const label = (status) => (status || 'unknown').replaceAll('_', ' ');
 
 export default function UsersView({ refreshKey = 0 }) {
   const [users, setUsers] = useState([]);
-  const [viewingAccount, setViewingAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
@@ -188,7 +187,7 @@ export default function UsersView({ refreshKey = 0 }) {
             <table className="dashboard-table">
               <thead>
                 <tr>
-                  <th scope="col">Sr. No.</th>
+                  <th scope="col">S.No.</th>
                   <th scope="col">User</th>
                   <th scope="col">Role</th>
                   <th scope="col">Contact</th>
@@ -249,7 +248,7 @@ export default function UsersView({ refreshKey = 0 }) {
                           className="user-view-button"
                           title="View details"
                           aria-label={`View details for ${user.name || 'account'}`}
-                          onClick={() => setViewingAccount(user)}
+                          onClick={() => navigateAccountDetails(user)}
                         >
                           <Eye size={16} aria-hidden="true" />
                         </button>
@@ -326,12 +325,6 @@ export default function UsersView({ refreshKey = 0 }) {
             label="accounts"
           />
         </>
-      )}
-      {viewingAccount && (
-        <AccountDetailsDialog
-          account={viewingAccount}
-          onClose={() => setViewingAccount(null)}
-        />
       )}
       {blockingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">

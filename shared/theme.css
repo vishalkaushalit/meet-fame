@@ -1030,7 +1030,7 @@ html[data-theme='light'] .website-sign-in:focus-visible {
   margin-top: 12px;
   border-top: 1px solid #334155;
   color: #cbd5e1;
-  font-size: 11px;
+  font-size: 12px;
   flex-wrap: wrap;
 }
 .record-pagination > div {
@@ -1051,7 +1051,7 @@ html[data-theme='light'] .website-sign-in:focus-visible {
   color: #e2e8f0;
   min-height: 36px;
   padding: 7px 10px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .record-pagination button:disabled {
   opacity: 0.4;
@@ -1080,7 +1080,7 @@ html[data-theme='light'] .record-pagination button {
 }
 
 .dashboard-table th {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 }
 .record-serial-cell {
@@ -1090,7 +1090,7 @@ html[data-theme='light'] .record-pagination button {
 }
 .record-serial {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: #a5b4fc;
   margin-bottom: 8px;
@@ -1265,4 +1265,148 @@ b, strong { font-weight: 600; }
 /* Keep creator names readable over the dark video poster gradient. */
 html[data-theme='light'] .intro-video-name {
   color: #fff;
+}
+
+/* Inset dropdown chevrons and reserve room so labels cannot overlap them. */
+html select:not([aria-label='Phone country']) {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+}
+html[data-theme='light'] select:not([aria-label='Phone country']) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+}
+
+/* Consistent primary, secondary, and disabled action colors in both apps. */
+:root {
+  --button-primary-background: linear-gradient(110deg, #6366f1, #8b5cf6 55%, #e94c78);
+  --button-secondary-background: #1e293b;
+  --button-secondary-text: #e2e8f0;
+  --button-secondary-border: #64748b;
+  --button-disabled-background: #1e293b;
+  --button-disabled-text: #94a3b8;
+  --button-disabled-border: #475569;
+}
+html[data-theme='light'] {
+  --button-primary-background: linear-gradient(110deg, #4f46e5, #7c3aed 55%, #be185d);
+  --button-secondary-background: #fff;
+  --button-secondary-text: #334155;
+  --button-secondary-border: #94a3b8;
+  --button-disabled-background: #e2e8f0;
+  --button-disabled-text: #64748b;
+  --button-disabled-border: #cbd5e1;
+}
+html button.dashboard-button:not(.button-primary) {
+  background: var(--button-secondary-background);
+  color: var(--button-secondary-text);
+  border-color: var(--button-secondary-border);
+}
+html button.dashboard-button:not(.button-primary):hover:not(:disabled) {
+  border-color: var(--focus-border-color);
+  color: var(--interactive-hover-text);
+}
+html :is(button, a):is(.button-primary, .primary-dashboard-button, [class*='bg-gradient-to-']),
+html button[type='submit'] {
+  background: var(--button-primary-background) !important;
+  color: #fff !important;
+  border-color: transparent;
+}
+html :is(button, a):is(.button-primary, .primary-dashboard-button, [class*='bg-gradient-to-']):hover:not(:disabled),
+html button[type='submit']:hover:not(:disabled) {
+  filter: brightness(1.08);
+  opacity: 1;
+}
+html button:disabled {
+  background: var(--button-disabled-background) !important;
+  color: var(--button-disabled-text) !important;
+  border-color: var(--button-disabled-border) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+html button:disabled svg { color: inherit; }
+
+/* Readable typography across public, creator, and administration pages. */
+html .text-xs { font-size: 14px; line-height: 1.5; }
+html .text-sm { font-size: 15px; line-height: 1.5; }
+html [class~='text-[9px]'],
+html [class~='text-[10px]'],
+html [class~='text-[11px]'] { font-size: 12px; line-height: 1.5; }
+html label,
+html dt,
+html th { font-weight: 600; }
+html .dashboard-table th,
+html .dashboard-table td { padding: 14px 16px; font-size: 14px; line-height: 1.6; }
+html .account-details-page .account-details-body { font-size: 16px; line-height: 1.7; }
+html .account-details-page .account-details-fields dt { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+html .account-details-page .account-details-fields dd { font-size: 16px; line-height: 1.6; }
+html .account-details-page .account-details-body h3 { font-size: 18px; font-weight: 600; }
+html .account-details-page .account-details-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px 32px;
+  align-items: start;
+}
+html .account-details-page .account-details-body > section > p { max-width: 85ch; }
+@media (max-width: 1100px) {
+  html .account-details-page .account-details-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  html .account-details-page .account-details-fields { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  html .account-details-page .account-details-body { padding: 20px 16px; }
+}
+
+.account-availability-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.account-time-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid #6d4cac;
+  border-radius: 8px;
+  background: #8b5cf61a;
+  color: #ddd6fe;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+html[data-theme='light'] .account-time-badge {
+  background: #ede9fe;
+  border-color: #ddd6fe;
+  color: #5b21b6;
+}
+.account-time-unavailable { color: #94a3b8; font-size: 14px; }
+html[data-theme='light'] .account-time-unavailable { color: #64748b; }
+
+html button.profile-cancel-button:not(:disabled),
+html[data-theme='light'] button.profile-cancel-button:not(:disabled) {
+  background: #991b1b;
+  color: #fff;
+  border-color: #991b1b;
+}
+html button.profile-cancel-button:hover:not(:disabled),
+html[data-theme='light'] button.profile-cancel-button:hover:not(:disabled) {
+  background: #7f1d1d;
+  color: #fff;
+  border-color: #7f1d1d;
+}
+
+html label.approval-status-filter {
+  font-weight: 500;
+}
+html .approval-status-filter select,
+html .approval-status-filter option {
+  font-weight: 400;
 }

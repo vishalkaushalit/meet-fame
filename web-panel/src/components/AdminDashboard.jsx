@@ -1,11 +1,11 @@
 import AuthSocialBackground from '@shared/AuthSocialBackground';
-import { adminPath, navigateAdmin } from '../routes';
+import { adminPath, navigateAdmin, navigateAccountDetails, matchAccountDetails, accountDetailsParent, navigateAdminAction } from '../routes';
 import ThemeToggle from './ThemeToggle';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
 import ApprovalsView from './ApprovalsView';
 import AnnouncementsView from './AnnouncementsView';
-import AccountDetailsDialog from './AccountDetailsDialog';
+import AccountDetailsPage from './AccountDetailsPage';
 import AdminEditProfile from './AdminEditProfile';
 import SlotsInspectorView from './SlotsInspectorView';
 import BookingsView from './BookingsView';
@@ -24,6 +24,7 @@ import {
   ExternalLink,
   ArrowUpRight,
   ArrowRight,
+  ArrowLeft,
   RefreshCw,
   Menu,
   X,
@@ -95,8 +96,6 @@ export default function AdminDashboard({
   activeTab = 'overview',
 }) {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [profileNotice, setProfileNotice] = useState('');
   const profileMenu = useRef(null);
   const profileTrigger = useRef(null);
@@ -126,32 +125,39 @@ export default function AdminDashboard({
   const [refreshing, setRefreshing] = useState(false);
   const [updated, setUpdated] = useState(null);
   const [days, setDays] = useState(7);
+  const refreshRequest = useRef(0);
   const load = useCallback(async () => {
+    const request = ++refreshRequest.current;
     setRefreshing(true);
     try {
-      const [overview, result] = await Promise.all([
+      const [overview, result] = await Promise.allSettled([
         adminApi.stats.getOverview(),
         adminApi.bookings.getAll(),
       ]);
-      setStats(overview);
-      setBookings(result.bookings || []);
-      setUpdated(new Date());
-      setError('');
+      if (request !== refreshRequest.current) return;
+      if (overview.status === 'fulfilled') setStats(overview.value);
+      if (result.status === 'fulfilled') setBookings(result.value.bookings || []);
+      if (overview.status === 'fulfilled' && result.status === 'fulfilled') {
+        setUpdated(new Date());
+        setError('');
+      } else {
+        setError('Some dashboard data could not be refreshed. Please try again.');
+      }
     } catch {
       setError(
         'Unable to refresh dashboard data. Check your connection and try again.',
       );
     } finally {
-      setRefreshing(false);
+      if (request === refreshRequest.current) setRefreshing(false);
     }
   }, []);
   useEffect(() => {
     const timer = setInterval(load, 30000);
     return () => clearInterval(timer);
   }, [load]);
-  // Refresh summary counts after approval actions in a different view.
+  // Load live counts immediately on every page, including direct links.
   useEffect(() => {
-    if (activeTab === 'overview') load();
+    load();
   }, [activeTab, load]);
 
   const navigate = (id) => {
@@ -159,7 +165,13 @@ export default function AdminDashboard({
     setProfileMenuOpen(false);
     setMobileOpen(false);
   };
-  const current = navigation.find((item) => item.id === activeTab);
+  const navigationTab = activeTab === 'add-announcement' ? 'announcements' : activeTab === 'edit-profile' ? 'overview' : activeTab;
+  const actionPages = {
+    'edit-profile': { label: 'Edit profile', description: 'Update your account information.' },
+    'add-announcement': { label: 'Add announcement', description: 'Create a notification for your community.' },
+  };
+  const current = actionPages[activeTab] || navigation.find((item) => item.id === navigationTab) || { label: 'Account details', description: 'Profile, credentials, and availability.' };
+  const detailsAccount = matchAccountDetails(window.location.pathname);
   const pending = stats
     ? (stats.pendingInfluencers || 0) +
       (stats.pendingCertificates || 0) +
@@ -214,7 +226,7 @@ export default function AdminDashboard({
       count: bookings.filter((booking) => booking.date === key).length,
     };
   });
-  const maximum = Math.max(1, ...activity.map((day) => day.count));
+  const maximum = Math.max(4, Math.ceil(Math.max(0, ...activity.map((day) => day.count)) / 4) * 4);
   const statuses = ['confirmed', 'completed', 'cancelled'];
 
   return (
@@ -240,8 +252,9 @@ export default function AdminDashboard({
         <div className="sidebar-scroll">
           <div className="workspace-label">
             <span className="workspace-mark">M</span>
-            <div>
-              MeetFame workspace<small>Administration</small>
+            <div className="workspace-copy">
+              <span className="workspace-title">MeetFame workspace</span>
+              <small>Administration</small>
             </div>
             <ShieldCheck size={15} />
           </div>
@@ -263,12 +276,14 @@ export default function AdminDashboard({
                   event.preventDefault();
                   navigate(item.id);
                 }}
-                className={`nav-item ${activeTab === item.id ? 'selected' : ''}`}
-                aria-current={activeTab === item.id ? 'page' : undefined}
+                className={`nav-item ${navigationTab === item.id ? 'selected' : ''}`}
+                aria-current={navigationTab === item.id ? 'page' : undefined}
               >
                 <item.icon size={19} />
                 <span>{item.label}</span>
-                {item.id === 'approvals' && pending > 0 && <b>{pending}</b>}
+
+
+
               </a>
             ))}
           </nav>
@@ -293,26 +308,6 @@ export default function AdminDashboard({
           </button>
         </div>
       </aside>
-      {editProfileOpen && (
-        <AdminEditProfile
-          admin={admin}
-          onClose={() => setEditProfileOpen(false)}
-          onSaved={(user) => {
-            onProfileUpdated(user);
-            setEditProfileOpen(false);
-            setProfileNotice('Profile updated successfully.');
-          }}
-        />
-      )}
-      {profileOpen && (
-        <AccountDetailsDialog
-          account={{ ...admin, role: 'admin' }}
-          onClose={() => {
-            setProfileOpen(false);
-            profileTrigger.current?.focus();
-          }}
-        />
-      )}
       <div className="dashboard-workspace">
         <header className="dashboard-topbar">
           <div className="breadcrumb">
@@ -363,7 +358,7 @@ export default function AdminDashboard({
                     type="button"
                     onClick={() => {
                       setProfileMenuOpen(false);
-                      setProfileOpen(true);
+                      navigateAccountDetails({ ...admin, role: 'admin' });
                     }}
                   >
                     <UserRound size={16} aria-hidden="true" />
@@ -373,7 +368,7 @@ export default function AdminDashboard({
                     type="button"
                     onClick={() => {
                       setProfileMenuOpen(false);
-                      setEditProfileOpen(true);
+                      navigateAdminAction('edit-profile');
                     }}
                   >
                     <Pencil size={16} aria-hidden="true" />
@@ -397,11 +392,9 @@ export default function AdminDashboard({
         </header>
         <main className="dashboard-main social-background-host">
           <AuthSocialBackground page />
-          {activeTab !== 'slots' && (
             <div className="dashboard-page-heading">
               <div>
-                <p className="eyebrow">MEETFAME ADMIN</p>
-                <h1>
+                <h1 id="admin-page-title">
                   {activeTab === 'overview'
                     ? 'Platform overview'
                     : current.label}
@@ -420,7 +413,6 @@ export default function AdminDashboard({
                 {refreshing ? 'Refreshing…' : 'Refresh data'}
               </button>
             </div>
-          )}
           {profileNotice && (
             <p role="status" className="mb-4 text-xs text-emerald-400">
               {profileNotice}
@@ -442,7 +434,7 @@ export default function AdminDashboard({
             <>
               <div className="dashboard-metrics">
                 {metrics.map((metric) => (
-                  <article className="metric-card" key={metric.label}>
+                  <article className={`metric-card metric-card-${metric.color}`} key={metric.label}>
                     <div className="metric-top">
                       <span>{metric.label}</span>
                       <span className={`metric-icon ${metric.color}`}>
@@ -492,6 +484,9 @@ export default function AdminDashboard({
                         : 'Booking activity unavailable'
                     }
                   >
+                    <div className="chart-scale" aria-hidden="true">
+                      {[4, 3, 2, 1, 0].map((tick) => <span key={tick}>{maximum * tick / 4}</span>)}
+                    </div>
                     {activity.map((day, index) => (
                       <div className="chart-column" key={day.key}>
                         <div className="chart-track">
@@ -503,7 +498,9 @@ export default function AdminDashboard({
                                 : '0%',
                             }}
                             title={`${day.label}: ${day.count} bookings`}
-                          />
+                          >
+                            <span className="chart-count">{stats ? day.count : '—'}</span>
+                          </div>
                         </div>
                         <span>
                           {days <= 7 || index % Math.ceil(days / 7) === 0
@@ -569,10 +566,10 @@ export default function AdminDashboard({
                     <p>The latest connections on your platform</p>
                   </div>
                   <button
-                    className="text-action"
+                    className="dashboard-button button-primary"
                     onClick={() => navigate('bookings')}
                   >
-                    View all bookings <ArrowRight size={16} />
+                    View All <ArrowRight size={16} />
                   </button>
                 </div>
                 <div className="dashboard-table-wrap">
@@ -643,10 +640,33 @@ export default function AdminDashboard({
             </>
           ) : (
             <div
-              className={`dashboard-detail ${activeTab === 'slots' ? 'dashboard-detail-no-heading' : ''}`}
+              className="dashboard-detail"
             >
-              {activeTab === 'announcements' && <AnnouncementsView />}
-              {activeTab === 'approvals' && <ApprovalsView />}
+              {activeTab === 'account-details' && detailsAccount && (
+                <AccountDetailsPage key={`${detailsAccount.role}:${detailsAccount.id}`} account={detailsAccount} onBack={() => navigateAdmin(accountDetailsParent())} />
+              )}
+              {activeTab === 'edit-profile' && (
+                <AdminEditProfile admin={admin}
+                  onClose={() => navigateAdmin(accountDetailsParent())}
+                  onSaved={(user) => {
+                    onProfileUpdated(user);
+                    setProfileNotice('Profile updated successfully.');
+                    navigateAdmin(accountDetailsParent());
+                  }} />
+              )}
+              {activeTab === 'announcements' && (
+                <section className="dashboard-card p-6 space-y-4">
+                  <p className="text-sm text-slate-400">Send an in-app announcement to users, influencers, or both.</p>
+                  <button type="button" className="dashboard-button button-primary" onClick={() => navigateAdminAction('add-announcement')}>Add announcement</button>
+                </section>
+              )}
+              {activeTab === 'add-announcement' && (
+                <div className="space-y-4">
+                  <button type="button" className="dashboard-button" onClick={() => navigateAdmin(accountDetailsParent())}><ArrowLeft size={16} /> Back</button>
+                  <AnnouncementsView />
+                </div>
+              )}
+              {activeTab === 'approvals' && <ApprovalsView onChange={load} />}
               {activeTab === 'slots' && <SlotsInspectorView />}
               {activeTab === 'bookings' && <BookingsView />}
               {activeTab === 'conversations' && <ConversationsView />}

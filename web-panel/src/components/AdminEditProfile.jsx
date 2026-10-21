@@ -1,26 +1,14 @@
 import PhoneInput from '../../../shared/PhoneInput';
 import { phoneError } from '../../../shared/phoneValidation';
-import React, { useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { X, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { Save } from 'lucide-react';
 import { adminApi } from '../api';
 export default function AdminEditProfile({ admin, onClose, onSaved }) {
-  const dialog = useRef(null);
   const [name, setName] = useState(admin?.name || '');
   const [email, setEmail] = useState(admin?.email || '');
   const [phone, setPhone] = useState(admin?.phone || '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  useEffect(() => {
-    const previous = document.activeElement;
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    dialog.current.showModal();
-    return () => {
-      document.body.style.overflow = overflow;
-      previous?.focus();
-    };
-  }, []);
   const submit = async (event) => {
     event.preventDefault();
     if (saving) return;
@@ -38,30 +26,10 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   };
   const field =
     'w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white mt-2';
-  return createPortal(
-    <dialog
-      ref={dialog}
-      className="admin-edit-profile"
-      aria-labelledby="admin-edit-profile-title"
-      onCancel={(event) => {
-        if (saving) event.preventDefault();
-        else onClose();
-      }}
-    >
+  return (
+    <section className="admin-edit-profile admin-edit-profile-page" aria-labelledby="admin-edit-profile-title">
       <form onSubmit={submit}>
-        <header className="flex items-center justify-between gap-4 mb-5">
-          <h2 id="admin-edit-profile-title" className="text-lg font-semibold">
-            Edit profile
-          </h2>
-          <button
-            type="button"
-            aria-label="Close edit profile"
-            disabled={saving}
-            onClick={onClose}
-          >
-            <X size={20} />
-          </button>
-        </header>
+        <h2 id="admin-edit-profile-title" className="sr-only">Edit profile</h2>
         <label className="block text-xs text-slate-300 mb-4">
           Name
           <input
@@ -107,21 +75,20 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             type="button"
             disabled={saving}
             onClick={onClose}
-            className="px-3 py-2 text-xs text-slate-400"
+            className="dashboard-button profile-cancel-button"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={saving || !name.trim() || !email.trim()}
-            className="dashboard-button"
+            className="dashboard-button button-primary"
           >
             <Save size={15} />
             {saving ? <span>Saving…</span> : 'Save changes'}
           </button>
         </footer>
       </form>
-    </dialog>,
-    document.body,
+    </section>
   );
 }
