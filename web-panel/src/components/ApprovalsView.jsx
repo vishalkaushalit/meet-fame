@@ -1,8 +1,9 @@
+import StatusBadge from './StatusBadge';
 import Pagination, { usePagination } from './Pagination';
 import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../api';
-import { navigateAccountDetails } from '../routes';
+import { navigateAccountDetails, navigateAdminRecord } from '../routes';
 import VerifiedBadge from './VerifiedBadge';
 import AccountDetailsPage from './AccountDetailsPage';
 import {
@@ -24,8 +25,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-export default function ApprovalsView({ onChange }) {
-  const [inspectedId, setInspectedId] = useState(null);
+export default function ApprovalsView({ onChange, detailId }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('influencers'); // 'influencers' | 'users'
@@ -179,7 +179,7 @@ export default function ApprovalsView({ onChange }) {
   const creatorPagination = usePagination(influencers.filter(matchesSearch), `${statusFilter}:${searchTerm}`);
   const userPagination = usePagination(users.filter(matchesSearch), `${statusFilter}:${searchTerm}`);
 
-  const inspected = influencers.find((item) => item.id === inspectedId);
+  const inspected = influencers.find((item) => item.id === detailId);
   const renderInfluencerActions = (inf) => {
     const isPending = inf.status === 'pending_review';
     const isApproved = inf.status === 'approved';
@@ -191,7 +191,7 @@ export default function ApprovalsView({ onChange }) {
                                   onClick={() =>
                                     handleApproveInfluencer(inf.id, inf.name)
                                   }
-                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
+                                  className="px-4 py-2.5 rounded-xl font-normal text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                   <span>Approve Application</span>
@@ -199,7 +199,7 @@ export default function ApprovalsView({ onChange }) {
 
                                 <button
                                   onClick={() => setRejectingItem(inf)}
-                                  className="px-4 py-2.5 rounded-xl font-semibold text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
+                                  className="px-4 py-2.5 rounded-xl font-normal text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
                                 >
                                   <XCircle className="w-4 h-4" />
                                   <span>Decline</span>
@@ -212,7 +212,7 @@ export default function ApprovalsView({ onChange }) {
                                 onClick={() => openBlock(inf, 'influencer')}
                                 title="Block influencer"
                                 aria-label={`Block ${inf.name}`}
-                                className="approval-icon-button rounded-xl bg-rose-500/10 text-rose-400"
+                                className="approval-text-button rounded-xl bg-rose-500/10 text-rose-400"
                               >
                                 <Ban size={16} aria-hidden="true" /><span>Block account</span>
                               </button>
@@ -224,7 +224,7 @@ export default function ApprovalsView({ onChange }) {
                                 }
                                 title="Unblock influencer"
                                 aria-label={`Unblock ${inf.name}`}
-                                className="approval-icon-button rounded-xl bg-emerald-600 text-white"
+                                className="approval-text-button rounded-xl bg-emerald-600 text-white"
                               >
                                 <LockOpen size={16} aria-hidden="true" /><span>Unblock account</span>
                               </button>
@@ -235,7 +235,7 @@ export default function ApprovalsView({ onChange }) {
                                 onClick={() =>
                                   handleApproveInfluencer(inf.id, inf.name)
                                 }
-                                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
+                                className="px-3.5 py-1.5 rounded-xl text-xs font-normal text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
                               >
                                 Re-Approve
                               </button>
@@ -249,7 +249,7 @@ export default function ApprovalsView({ onChange }) {
                                         false,
                                       )
                                     }
-                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-semibold"
+                                    className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-normal"
                                   >
                                     Revoke Blue Badge
                                   </button>
@@ -262,7 +262,7 @@ export default function ApprovalsView({ onChange }) {
                                         true,
                                       )
                                     }
-                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-semibold flex items-center gap-1 shadow-sm"
+                                    className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-normal flex items-center gap-1 shadow-sm"
                                   >
                                     <VerifiedBadge size="sm" />
                                     <span>Verify Certificate</span>
@@ -313,6 +313,10 @@ export default function ApprovalsView({ onChange }) {
 <div className="approval-actions flex flex-wrap items-center gap-2">{renderInfluencerActions(inf)}</div></div>;
   };
 
+  if (detailId && !loading && !inspected) {
+    return <div className="dashboard-card p-6 space-y-4"><p>Influencer not found.</p></div>;
+  }
+
   return (
     <div className="space-y-6">
       {actionError && (
@@ -332,7 +336,7 @@ export default function ApprovalsView({ onChange }) {
 
       {/* Tabs: Influencer Queue vs User Queue */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="approval-type-tabs flex flex-wrap items-center gap-3">
         <button
           onClick={() => {
             setActiveTab('influencers');
@@ -382,7 +386,7 @@ export default function ApprovalsView({ onChange }) {
       {/* QUEUE CONTENT */}
       {inspected ? (
         <div className="space-y-6">
-          <AccountDetailsPage account={{ ...inspected, role: 'influencer' }} onBack={() => setInspectedId(null)} />
+          <AccountDetailsPage account={{ ...inspected, role: 'influencer' }} />
           {renderInfluencerReview(inspected)}
         </div>
       ) : loading ? (
@@ -447,17 +451,7 @@ export default function ApprovalsView({ onChange }) {
                         </td>
                         <td>
                           {' '}
-                          <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
-                              isApproved
-                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                : isPending
-                                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20 animate-pulse'
-                                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                            }`}
-                          >
-                            {inf.status?.replace('_', ' ')}
-                          </span>
+                          <StatusBadge status={inf.status} />
                         </td>
                         <td>
                           {' '}
@@ -467,7 +461,7 @@ export default function ApprovalsView({ onChange }) {
                               className="user-view-button approval-icon-button"
                               title="View details"
                               aria-label={`View details for ${inf.name}`}
-                              onClick={() => setInspectedId(inf.id)}
+                              onClick={() => navigateAdminRecord('approvals', inf.id)}
                             >
                               <Eye size={16} aria-hidden="true" />
                             </button>
@@ -534,17 +528,7 @@ export default function ApprovalsView({ onChange }) {
                     <td>{u.phone || '—'}</td>
                     <td>
                       {' '}
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
-                          u.status === 'approved'
-                            ? 'bg-emerald-500/10 text-emerald-400'
-                            : u.status === 'blocked'
-                              ? 'bg-rose-500/10 text-rose-400'
-                              : 'bg-amber-500/10 text-amber-400'
-                        }`}
-                      >
-                        {u.status.replace(/_/g, ' ')}
-                      </span>
+                      <StatusBadge status={u.status} />
                     </td>
                     <td className="approval-blocking-remark">
                       {u.status === 'blocked'
