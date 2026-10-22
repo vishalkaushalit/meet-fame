@@ -1,4 +1,4 @@
-import { randomInt, createHmac, timingSafeEqual } from 'node:crypto';
+import { randomInt, randomBytes, createHmac, timingSafeEqual } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { db } from './db.js';
 import { databaseContext } from './databaseContext.js';
@@ -36,7 +36,7 @@ export async function forgotPassword(req, res) {
   const previous = data.passwordresets.find((item) => item.id === id);
   if (previous && Date.now() - Date.parse(previous.createdAt) < 60000) return res.json(confirmation);
   const otp = testOtp || String(randomInt(0, 1000000)).padStart(6, '0');
-  const record = { id, accountId: account.id, role, otpHash: digest(id, otp), attempts: 0, createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 10 * 60000).toISOString(), usedAt: null };
+  const record = { id, accountId: account.id, role, otpHash: digest(id, otp), attempts: 0, createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 10 * 60000).toISOString(), usedAt: null, verifiedAt: null, resetTokenHash: null, resetExpiresAt: null };
   if (previous) {
     Object.assign(previous, record);
     delete previous.tokenHash;
@@ -60,15 +60,13 @@ export async function forgotPassword(req, res) {
   return res.json(confirmation);
 }
 
-export async function resetPassword(req, res) {
-  const { email, otp, role, password } = req.body || {};
+export async function verifyOtp(req, res) {
+  const { email, otp, role } = req.body || {};
   if (!Object.hasOwn(collections, role) || !validEmail(email) || typeof otp !== 'string' || !(developmentOtp() ? /^\d{4,6}$/ : /^\d{6}$/).test(otp))
     return res.status(400).json({ error: 'Enter your email address and a valid OTP.' });
-  if (typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password) > 72)
-    return res.status(400).json({ error: 'Use at least 8 characters and no more than 72 bytes for your password.' });
   const data = db.read();
   const account = data[collections[role]].find((item) => item.email.toLowerCase() === email.trim().toLowerCase());
-  const record = account && (data.passwordresets || []).find((item) => item.id === `${role}:${account.id}` && item.otpHash && !item.usedAt && Date.parse(item.expiresAt) > Date.now() && (item.attempts || 0) < 5);
+  const record = account && (data.passwordresets || []).find((item) => item.id === `${role}:${account.id}` && item.otpHash && !item.usedAt && !item.verifiedAt && Date.parse(item.expiresAt) > Date.now() && (item.attempts || 0) < 5);
   if (!record) return res.status(400).json({ error: 'This OTP is invalid or expired. Request a new code.' });
   const expected = digest(record.id, otp);
   if (record.otpHash.length !== expected.length || !timingSafeEqual(Buffer.from(record.otpHash), Buffer.from(expected))) {
@@ -77,9 +75,31 @@ export async function resetPassword(req, res) {
     req.persistDatabaseOnError = true;
     return res.status(400).json({ error: 'This OTP is invalid or expired. Request a new code.' });
   }
+  const resetToken = randomBytes(32).toString('hex');
+  record.verifiedAt = new Date().toISOString();
+  record.resetTokenHash = digest(`${record.id}:reset`, resetToken);
+  record.resetExpiresAt = new Date(Date.now() + 5 * 60000).toISOString();
+  if (!db.write(data)) return res.status(503).json({ error: 'Unable to verify your OTP. Please retry.' });
+  return res.json({ message: 'OTP verified. Choose your new password.', resetToken });
+}
+
+export async function resetPassword(req, res) {
+  const { email, role, resetToken, password } = req.body || {};
+  if (!Object.hasOwn(collections, role) || !validEmail(email) || typeof resetToken !== 'string' || !/^[a-f0-9]{64}$/.test(resetToken))
+    return res.status(400).json({ error: 'Verify your OTP before resetting your password.' });
+  if (typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password) > 72)
+    return res.status(400).json({ error: 'Use at least 8 characters and no more than 72 bytes for your password.' });
+  const data = db.read();
+  const account = data[collections[role]].find((item) => item.email.toLowerCase() === email.trim().toLowerCase());
+  const record = account && (data.passwordresets || []).find((item) => item.id === `${role}:${account.id}` && item.verifiedAt && !item.usedAt && item.resetTokenHash && Date.parse(item.resetExpiresAt) > Date.now());
+  if (!record) return res.status(400).json({ error: 'Your reset session expired. Request and verify a new OTP.' });
+  const expected = digest(`${record.id}:reset`, resetToken);
+  if (record.resetTokenHash.length !== expected.length || !timingSafeEqual(Buffer.from(record.resetTokenHash), Buffer.from(expected)))
+    return res.status(400).json({ error: 'Your reset session is invalid. Request and verify a new OTP.' });
   account.password = await bcrypt.hash(password, 10);
   account.sessionVersion = (account.sessionVersion || 0) + 1;
   record.usedAt = new Date().toISOString();
+  record.resetTokenHash = null;
   if (!db.write(data)) return res.status(503).json({ error: 'Unable to save your new password. Please retry.' });
   return res.json({ message: 'Password updated. You can now sign in with your new password.' });
 }

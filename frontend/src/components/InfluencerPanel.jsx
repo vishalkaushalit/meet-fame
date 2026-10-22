@@ -1,4 +1,5 @@
 import { formatDate } from '../../../shared/dateFormat';
+import { navigate } from '../authRoutes';
 import Pagination, { usePagination } from './Pagination';
 import './creator-dashboard.css';
 import LogoLoader from './LogoLoader';
@@ -373,6 +374,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </span>
           ) : null}
         </button>
+        <button type="button" role="tab" aria-selected={false} onClick={() => navigate('/profile')} className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white whitespace-nowrap">My Profile</button>
       </div>
 
       </div>

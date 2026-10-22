@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
 import { db } from '../src/db.js';
-import { forgotPassword, resetPassword } from '../src/passwordRecovery.js';
+import { forgotPassword, verifyOtp, resetPassword } from '../src/passwordRecovery.js';
 const response = () => ({ code: 200, status(code) { this.code = code; return this; }, json(body) { this.body = body; return this; } });
 
 test('OTP recovery: all roles, expiry, one-time use, guess limits, and explicit production test mode', async () => {
@@ -25,8 +25,11 @@ test('OTP recovery: all roles, expiry, one-time use, guess limits, and explicit 
       const requestCode = async () => {
         const result = response(); await forgotPassword({ body: { role, email } }, result); return result;
       };
-      const verify = async (otp, password = 'newpassword') => {
-        const result = response(); await resetPassword({ body: { role, email, otp, password } }, result); return result;
+      const verify = async (otp) => {
+        const result = response(); await verifyOtp({ body: { role, email, otp } }, result); return result;
+      };
+      const save = async (resetToken, password = 'newpassword', resetRole = role) => {
+        const result = response(); await resetPassword({ body: { role: resetRole, email, resetToken, password } }, result); return result;
       };
       const sent = await requestCode();
       assert.equal(sent.code, 200);
@@ -38,11 +41,25 @@ test('OTP recovery: all roles, expiry, one-time use, guess limits, and explicit 
       assert.deepEqual(unknown.body, sent.body);
       const count = deliveries.length; await requestCode();
       assert.equal(deliveries.length, count);
-      assert.equal((await verify(otp, 'short')).code, 400);
-      assert.equal((await verify(otp)).code, 200);
+      assert.equal((await save(undefined)).code, 400, 'password reset requires a verified session');
+      const verified = await verify(otp);
+      assert.equal(verified.code, 200);
+      assert.equal(await bcrypt.compare('oldpassword', data[collection][0].password), true, 'OTP verification must not change password');
+      const resetToken = verified.body.resetToken;
+      assert.equal(resetToken.length, 64);
+      assert.notEqual(data.passwordresets.at(-1).resetTokenHash, resetToken);
+      assert.equal((await save(resetToken, 'short')).code, 400);
+      assert.equal((await save('0'.repeat(64))).code, 400);
+      assert.equal((await save(resetToken, 'newpassword', role === 'admin' ? 'user' : 'admin')).code, 400);
+      const expiry = data.passwordresets.at(-1).resetExpiresAt;
+      data.passwordresets.at(-1).resetExpiresAt = new Date(Date.now() - 1).toISOString();
+      assert.equal((await save(resetToken)).code, 400);
+      data.passwordresets.at(-1).resetExpiresAt = expiry;
+      assert.equal((await save(resetToken)).code, 200);
       assert.equal(await bcrypt.compare('newpassword', data[collection][0].password), true);
       assert.equal(data[collection][0].sessionVersion, 1);
       assert.equal((await verify(otp)).code, 400);
+      assert.equal((await save(resetToken)).code, 400);
       data.passwordresets.at(-1).createdAt = new Date(Date.now() - 120000).toISOString();
       await requestCode();
       const fresh = deliveries.at(-1).text.match(/\n\n(\d{6})\n\n/)[1];
@@ -58,12 +75,15 @@ test('OTP recovery: all roles, expiry, one-time use, guess limits, and explicit 
     const testing = response();
     await forgotPassword({ body: { role: 'user', email: 'user@example.com' } }, testing);
     assert.equal(testing.body.developmentOtp, '1111');
+    const verification = response();
+    await verifyOtp({ body: { role: 'user', email: 'user@example.com', otp: '1111' } }, verification);
+    assert.equal(verification.code, 200);
     const reset = response();
-    await resetPassword({ body: { role: 'user', email: 'user@example.com', otp: '1111', password: 'testpassword' } }, reset);
+    await resetPassword({ body: { role: 'user', email: 'user@example.com', resetToken: verification.body.resetToken, password: 'testpassword' } }, reset);
     assert.equal(reset.code, 200);
     delete process.env.PASSWORD_RESET_TEST_OTP;
     const production = response();
-    await resetPassword({ body: { role: 'user', email: 'user@example.com', otp: '1111', password: 'testpassword' } }, production);
+    await verifyOtp({ body: { role: 'user', email: 'user@example.com', otp: '1111' } }, production);
     assert.equal(production.code, 400);
   } finally {
     db.read = original.read; db.write = original.write; globalThis.fetch = original.fetch;

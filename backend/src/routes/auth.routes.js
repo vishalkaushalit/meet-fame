@@ -7,7 +7,11 @@ import {
   introVideoError,
 } from '../../../shared/registrationValidation.js';
 import express from 'express';
-import { forgotPassword, resetPassword, recoveryRateLimit } from '../passwordRecovery.js';
+import { requireSession } from '../middleware/session.js';
+import { updateOwnProfile } from '../profile.js';
+import { receiveProfileImage } from '../profileUpload.js';
+import { identityErrors } from '../accountIdentity.js';
+import { forgotPassword, verifyOtp, resetPassword, recoveryRateLimit } from '../passwordRecovery.js';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -16,11 +20,17 @@ import { db } from '../db.js';
 import { uploadToStorage } from '../blobStorage.js';
 
 const router = express.Router();
+router.put('/profile', requireSession, receiveProfileImage, handleProfileUpdate);
+async function handleProfileUpdate(req, res) {
+  try { await updateOwnProfile(req, res); }
+  catch { res.status(503).json({ error: 'Unable to save your profile. Please try again.' }); }
+}
 const recoveryHandler = (handler) => async (req, res) => {
   try { await handler(req, res); }
   catch { res.status(503).json({ error: 'Password recovery is temporarily unavailable. Please try again later.' }); }
 };
 router.post('/forgot-password', recoveryRateLimit, recoveryHandler(forgotPassword));
+router.post('/verify-reset-otp', recoveryRateLimit, recoveryHandler(verifyOtp));
 router.post('/reset-password', recoveryRateLimit, recoveryHandler(resetPassword));
 // Read at request time: server environment configuration loads after route imports.
 const getJwtSecret = () =>
@@ -136,14 +146,8 @@ router.post(
           .json({ error: Object.values(fields)[0], fields });
 
       const data = db.read();
-      const existing = data.influencers.find(
-        (i) => i.email.trim().toLowerCase() === email.trim().toLowerCase(),
-      );
-      if (existing) {
-        return res
-          .status(400)
-          .json({ error: 'An influencer with this email already exists' });
-      }
+      const duplicates = identityErrors(data, { email, phone });
+      if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
 
       let parsedAvailability = {};
       try {
@@ -233,14 +237,8 @@ router.post('/register-user', (req, res) => {
       return res.status(400).json({ error: Object.values(fields)[0], fields });
 
     const data = db.read();
-    const existing = data.users.find(
-      (u) => u.email.trim().toLowerCase() === email.trim().toLowerCase(),
-    );
-    if (existing) {
-      return res
-        .status(400)
-        .json({ error: 'A user with this email already exists' });
-    }
+    const duplicates = identityErrors(data, { email, phone });
+    if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
 
     const salt = bcrypt.genSaltSync(10);
     const newUser = {
@@ -297,12 +295,8 @@ router.post('/register-admin', (req, res) => {
     }
 
     const data = db.read();
-    const existing = data.admins.find(
-      (a) => a.email.trim().toLowerCase() === email.trim().toLowerCase(),
-    );
-    if (existing) {
-      return res.status(400).json({ error: 'Admin already exists' });
-    }
+    const duplicates = identityErrors(data, { email, phone });
+    if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
 
     const salt = bcrypt.genSaltSync(10);
     const newAdmin = {

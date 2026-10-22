@@ -8,6 +8,9 @@ const schema = new mongoose.Schema({
   createdAt: { type: Date, required: true },
   expiresAt: { type: Date, required: true },
   usedAt: Date,
+  verifiedAt: Date,
+  resetTokenHash: String,
+  resetExpiresAt: Date,
 });
 addPersistenceFields(schema);
 export const PasswordReset = mongoose.models.PasswordReset || mongoose.model('PasswordReset', schema);

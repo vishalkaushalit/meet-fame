@@ -147,8 +147,8 @@ export default function Notifications() {
               </button>
             </header>
             <div className="notification-tools">
-              <button disabled={saving || !unread} onClick={() => mark()}>
-                <CheckCheck size={14} />
+              <button type="button" disabled={saving || !unread} onClick={() => mark()}>
+                <CheckCheck size={16} aria-hidden="true" />
                 Mark all read
               </button>
             </div>

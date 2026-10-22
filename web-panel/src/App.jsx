@@ -75,7 +75,7 @@ export default function App() {
   };
 
   if (loading) return <LogoLoader label="Loading admin workspace…" />;
-  if (['forgot-password', 'reset-password'].includes(page)) return <PasswordRecovery header={<><Logo /><ThemeToggle /></>} key={page} role="admin" reset={page === 'reset-password'} requestReset={adminApi.auth.forgotPassword} savePassword={adminApi.auth.resetPassword} loginUrl={adminPath(null)} forgotUrl={adminPath('forgot-password')} />;
+  if (['forgot-password', 'reset-password'].includes(page)) return <PasswordRecovery header={<><Logo /><ThemeToggle /></>} key={page} role="admin" reset={page === 'reset-password'} requestReset={adminApi.auth.forgotPassword} verifyOtp={adminApi.auth.verifyOtp} savePassword={adminApi.auth.resetPassword} loginUrl={adminPath(null)} />;
 
   return (
     <div>

@@ -1,4 +1,5 @@
 import express from 'express';
+import { updateOwnProfile } from '../profile.js';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import { addNotification } from '../notifications.js';
 import { requireSession } from '../middleware/session.js';
@@ -235,29 +236,9 @@ router.post(
 /**
  * Update Profile details
  */
-router.put('/:id/profile', (req, res) => {
-  try {
-    const { name, phone, bio, specialization, category, hourlyRate } = req.body;
-    const data = db.read();
-    const idx = data.influencers.findIndex((i) => i.id === req.params.id);
-    if (idx === -1) {
-      return res.status(404).json({ error: 'Influencer not found' });
-    }
-
-    if (name) data.influencers[idx].name = name;
-    if (phone) data.influencers[idx].phone = phone;
-    if (bio) data.influencers[idx].bio = bio;
-    if (specialization) data.influencers[idx].specialization = specialization;
-    if (category) data.influencers[idx].category = category;
-    if (hourlyRate) data.influencers[idx].hourlyRate = Number(hourlyRate);
-
-    db.write(data);
-
-    const { password: _, ...safeInfluencer } = data.influencers[idx];
-    return res.json({ success: true, influencer: safeInfluencer });
-  } catch (err) {
-    return res.status(500).json({ error: 'Failed to update profile' });
-  }
+router.put('/:id/profile', requireSession, (req, res) => {
+  if (req.session.role !== 'influencer') return res.status(403).json({ error: 'Influencer access required.' });
+  return updateOwnProfile(req, res);
 });
 
 export default router;

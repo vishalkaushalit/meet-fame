@@ -23,6 +23,10 @@ export function createDatabaseMiddleware(store) {
             }
             json(body);
           } catch (error) {
+            if (error.code === 'ACCOUNT_IDENTITY_CONFLICT') {
+              res.status(409);
+              return json({ error: error.message, fields: error.fields });
+            }
             const conflict =
               error.code === 11000 || error.code === 'WRITE_CONFLICT';
             res.status(conflict ? 409 : 503);

@@ -1,0 +1,22 @@
+.header-profile-menu { position: relative; min-width: 0; padding-left: 16px; border-left: 1px solid #334155; }
+.header-profile-trigger { display: flex; align-items: center; gap: 10px; min-width: 0; border-radius: 10px; padding: 4px; color: #f1f5f9; }
+.header-profile-trigger > img { width: 36px; height: 36px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+.header-profile-identity { display: flex; flex-direction: column; gap: 3px; text-align: left; min-width: 0; max-width: 200px; }
+.header-profile-name { display: flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 600; min-width: 0; }
+.header-profile-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.header-profile-role { color: #94a3b8; font-size: 12px; text-transform: capitalize; }
+.header-profile-trigger > svg { color: #94a3b8; flex-shrink: 0; }
+.header-profile-dropdown { position: absolute; top: 100%; right: 0; width: 220px; padding-top: 10px; z-index: 50; }
+.header-profile-options { padding: 6px; border: 1px solid #334155; border-radius: 12px; background: #111827; box-shadow: 0 12px 32px #02061733; }
+.header-profile-options > button { display: flex; align-items: center; gap: 10px; padding: 11px 12px; width: 100%; text-align: left; border-radius: 8px; font: inherit; font-size: 14px; color: #e2e8f0; }
+.header-profile-options > button:hover { background: #8b5cf61a; color: #c4b5fd; }
+.header-profile-options > button.header-profile-logout { color: #fb7185; border-top: 1px solid #334155; margin-top: 4px; border-radius: 0 0 8px 8px; }
+.header-profile-menu button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
+html[data-theme='light'] .header-profile-menu { border-color: #dbe2ed; }
+html[data-theme='light'] .header-profile-trigger { color: #172033; }
+html[data-theme='light'] .header-profile-role { color: #526078; }
+html[data-theme='light'] .header-profile-options { background: #fff; border-color: #dbe2ed; }
+html[data-theme='light'] .header-profile-options > button { color: #334155; }
+html[data-theme='light'] .header-profile-options > button:hover { background: #f5f3ff; color: #7c3aed; }
+html[data-theme='light'] .header-profile-options > button.header-profile-logout { color: #e11d48; border-color: #dbe2ed; }
+@media (max-width: 639px) { .header-profile-identity { display: none; } .header-profile-menu { padding-left: 4px; border-left: 0; } }

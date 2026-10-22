@@ -1,7 +1,11 @@
 # Password recovery with email OTP
 
-All login pages offer Forgot password. Enter the account email, request a code,
-then enter the OTP and a new password on the same page.
+All login pages offer Forgot password. Recovery has three separate steps:
+enter the account email, verify the OTP, then enter and confirm a new password.
+Password inputs appear only after OTP verification succeeds. The verification
+endpoint issues a single-use reset token valid for five minutes, held only in
+page memory. The reset endpoint requires that token; submitting an OTP directly
+cannot change a password. Reloading the page requires starting recovery again.
 
 Backend/Vercel settings for normal email delivery:
 

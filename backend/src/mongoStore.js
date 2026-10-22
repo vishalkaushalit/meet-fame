@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import { createHash } from 'node:crypto';
+import { AccountIdentityLock } from './models/AccountIdentityLock.js';
+import { accountCollections, normalizedIdentity, identityErrors } from './accountIdentity.js';
 import { PasswordReset } from './models/PasswordReset.js';
 import { Transaction } from './models/Transaction.js';
 import { Announcement } from './models/Announcement.js';
@@ -36,6 +39,7 @@ const stored = (name, item, version, id) => {
 };
 async function initialize() {
   await mongoConnection.connect();
+  await AccountIdentityLock.createCollection();
   const local = db.read();
   // Import the retained JSON records once per collection, without overwriting
   // records already maintained in MongoDB.
@@ -115,6 +119,24 @@ export const mongoStore = {
     const session = await mongoose.startSession();
     try {
       await session.withTransaction(async () => {
+        const changed = [];
+        for (const name of accountCollections) {
+          for (const item of state[name] || []) {
+            const previous = snapshot.originals[name]?.get(item.id)?.value;
+            if (!previous || JSON.stringify(normalizedIdentity(previous)) !== JSON.stringify(normalizedIdentity(item))) changed.push({ name, item });
+          }
+        }
+        if (changed.length) {
+          // Serialize claims across roles and instances, including brand-new accounts.
+          const keys = [...new Set(changed.flatMap(({ item }) => Object.entries(normalizedIdentity(item)).filter(([, value]) => value).map(([field, value]) => createHash('sha256').update(`${field}:${value}`).digest('hex'))))].sort();
+          for (const key of keys) await AccountIdentityLock.updateOne({ _id: key }, { $inc: { revision: 1 } }, { session, upsert: true });
+          const current = {};
+          for (const name of accountCollections) current[name] = await persistenceModels[name].find({}, { id: 1, email: 1, phone: 1 }).session(session).lean();
+          for (const { name, item } of changed) {
+            const fields = { ...identityErrors(current, item, { collection: name, id: item.id }), ...identityErrors(state, item, { collection: name, id: item.id }) };
+            if (Object.keys(fields).length) throw Object.assign(new Error(Object.values(fields)[0]), { code: 'ACCOUNT_IDENTITY_CONFLICT', fields });
+          }
+        }
         for (const name of collections) {
           // Announcement removal also removes its delivered notifications.
           if (['announcements', 'notifications'].includes(name) && Array.isArray(state[name])) {

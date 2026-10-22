@@ -1,4 +1,5 @@
 import BillingView from '../../../shared/BillingView';
+import { navigate } from '../authRoutes';
 import { formatDate } from '../../../shared/dateFormat';
 import IntroVideo from './IntroVideo';
 import Pagination, { usePagination } from './Pagination';
@@ -165,6 +166,7 @@ export default function UserPanel({
             <Calendar className="w-4 h-4" />
             <span>My Bookings ({myBookings.length})</span>
           </button>
+          <button type="button" onClick={() => navigate('/profile')} className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white">My Profile</button>
           <button
             onClick={() => setActiveTab('billing')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeTab === 'billing' ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md' : 'text-slate-400 hover:text-white'}`}

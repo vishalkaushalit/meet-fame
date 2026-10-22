@@ -5,6 +5,7 @@ import { dayRanges } from '../../../shared/availability.js';
 import { addNotification } from '../notifications.js';
 import jwt from 'jsonwebtoken';
 import { db } from '../db.js';
+import { identityErrors } from '../accountIdentity.js';
 import { generateDaySlots, getDayNameFromDate } from '../slotUtils.js';
 
 const router = express.Router();
@@ -56,15 +57,8 @@ router.put('/profile', (req, res) => {
   if (!account)
     return res.status(404).json({ error: 'Administrator account not found.' });
   const normalizedEmail = email.trim().toLowerCase();
-  if (
-    data.admins.some(
-      (item) =>
-        item.id !== account.id && item.email.toLowerCase() === normalizedEmail,
-    )
-  )
-    return res
-      .status(409)
-      .json({ error: 'This email is already used by another administrator.' });
+  const duplicates = identityErrors(data, { email: normalizedEmail, phone }, { collection: 'admins', id: account.id });
+  if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
   account.name = name.trim();
   account.email = normalizedEmail;
   account.phone = normalizePhone(phone);

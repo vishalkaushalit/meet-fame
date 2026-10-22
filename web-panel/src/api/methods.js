@@ -33,6 +33,7 @@ export const adminApi = {
   },
   auth: {
     forgotPassword: (payload) => client.post('/auth/forgot-password', payload, { authenticated: false }),
+    verifyOtp: (payload) => client.post('/auth/verify-reset-otp', payload, { authenticated: false }),
     resetPassword: (payload) => client.post('/auth/reset-password', payload, { authenticated: false }),
     login: (email, password) => client.post(ADMIN_LOGIN_API, { email, password, role: 'admin' }, { authenticated: false }),
     getMe: () => client.get(CURRENT_ADMIN_API),

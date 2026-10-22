@@ -8,15 +8,16 @@ import AuthPage from './components/AuthPage';
 import PasswordRecovery from '../../shared/PasswordRecovery';
 import { authPath, matchAuthRoute, navigate } from './authRoutes';
 import BookingPage from './components/BookingPage';
+import ProfilePage from './components/ProfilePage';
 import ChatModal from './components/ChatModal';
 import StatusAlertModal from './components/StatusAlertModal';
 import Logo from './components/Logo';
 import LogoLoader from './components/LogoLoader';
 import Notifications from './components/Notifications';
 import VideoCall from './components/VideoCall';
-import VerifiedBadge from './components/VerifiedBadge';
+import HeaderProfileMenu from './components/HeaderProfileMenu';
 import { api } from './api';
-import { LogOut, User, Sparkles, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 
 function AppContent() {
   const { user, role, logout, loading } = useAuth();
@@ -39,6 +40,10 @@ function AppContent() {
   }, [user, path]);
 
   const bookingRoute = /^\/book\/([^/]+)\/?$/.exec(path);
+  const profileRoute = /^\/profile(?:\/edit)?\/?$/.test(path);
+  useEffect(() => {
+    if (!loading && !user && profileRoute) navigate(authPath('user'));
+  }, [loading, user, profileRoute]);
 
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [chatTarget, setChatTarget] = useState(null);
@@ -85,7 +90,7 @@ function AppContent() {
 
   if (loading) return <LogoLoader />;
   if (authRoute && ['forgot-password', 'reset-password'].includes(authRoute.tab))
-    return <PasswordRecovery header={<><Logo size="header" /><ThemeToggle /></>} key={`${authRoute.role}:${authRoute.tab}`} role={authRoute.role} reset={authRoute.tab === 'reset-password'} requestReset={api.auth.forgotPassword} savePassword={api.auth.resetPassword} loginUrl={authPath(authRoute.role)} forgotUrl={authPath(authRoute.role, 'forgot-password')} />;
+    return <PasswordRecovery header={<><Logo size="header" /><ThemeToggle /></>} key={`${authRoute.role}:${authRoute.tab}`} role={authRoute.role} reset={authRoute.tab === 'reset-password'} requestReset={api.auth.forgotPassword} verifyOtp={api.auth.verifyOtp} savePassword={api.auth.resetPassword} loginUrl={authPath(authRoute.role)} />;
   if (authRoute)
     return (
       <AuthPage
@@ -127,40 +132,7 @@ function AppContent() {
                 <ExternalLink className="w-3 h-3 text-brand-purple" />
               </a>
 
-              <div className="flex min-w-0 items-center gap-2 sm:gap-3 lg:pl-4 lg:border-l border-slate-800">
-                <img
-                  src={
-                    user.avatar ||
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'
-                  }
-                  alt={user.name}
-                  className="w-9 h-9 shrink-0 rounded-xl object-cover ring-1 ring-slate-700"
-                />
-                <div className="hidden sm:block min-w-0 max-w-[160px] xl:max-w-[220px] text-left text-xs">
-                  <div className="font-semibold text-white flex min-w-0 items-center gap-1">
-                    <span className="truncate" title={user.name}>
-                      {user.name}
-                    </span>
-                    {user.isVerified && <VerifiedBadge size="sm" />}
-                  </div>
-                  <div className="mt-1 text-[10px] leading-4 text-slate-400 capitalize">
-                    {user.role}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setCallBooking(null);
-                    logout();
-                  }}
-                  className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors ml-1"
-                  title="Sign Out"
-                  aria-label="Sign out"
-                  type="button"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
+              <HeaderProfileMenu user={user} onLogout={() => { setCallBooking(null); logout(); }} />
             </div>
           </div>
         </header>
@@ -168,7 +140,9 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className={`flex-1 social-background-host${user ? " pt-20" : ""}`}>
-        {bookingRoute ? (
+        {profileRoute && user ? (
+          <ProfilePage edit={/\/edit\/?$/.test(path)} />
+        ) : bookingRoute ? (
           <BookingPage key={bookingRoute[1]} influencerId={bookingRoute[1]} onClose={() => navigate('/')} onLogin={() => {
             sessionStorage.setItem('meetfame-booking-return', path);
             handleOpenAuth('user', 'login');

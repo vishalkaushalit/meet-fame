@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+html .notification-tools button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid #8b5cf633;
+  border-radius: 8px;
+  background: #8b5cf61a;
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+}
+html .notification-tools button svg { flex-shrink: 0; }
+html .notification-tools button:disabled {
+  opacity: 1;
+  color: #94a3b8;
+  background: #1e293b;
+  border-color: transparent;
+  cursor: not-allowed;
+}
+html[data-theme='light'] .notification-tools button:disabled { color: #64748b; background: #e2e8f0; }
+html .notification-tools button:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; }
+
 @layer base {
   * {
     box-sizing: border-box;
