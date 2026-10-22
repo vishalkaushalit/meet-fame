@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { ChevronDown, UserRound, Pencil, LogOut } from 'lucide-react';
+import { ChevronDown, UserRound, LogOut } from 'lucide-react';
 import { navigate } from '../authRoutes';
 import VerifiedBadge from './VerifiedBadge';
 import './header-profile-menu.css';
@@ -25,7 +25,6 @@ export default function HeaderProfileMenu({ user, onLogout }) {
     {open && <div className="header-profile-dropdown" id={id}>
       <div className="header-profile-options" aria-label="Account options">
         <button type="button" onClick={() => go('/profile')}><UserRound size={17} aria-hidden="true" />My Profile</button>
-        <button type="button" onClick={() => go('/profile/edit')}><Pencil size={17} aria-hidden="true" />Edit Profile</button>
         <button type="button" className="header-profile-logout" onClick={() => { setOpen(false); onLogout(); }}><LogOut size={17} aria-hidden="true" />Sign Out</button>
       </div>
     </div>}

@@ -81,18 +81,18 @@ export default function ProfilePage({ edit = false }) {
         <div className="profile-grid">
           {input('name', 'Full name', 'text', true, 100)}
           {input('email', 'Email address', 'email', true, 254)}
-          <div className="profile-field"><label htmlFor="profile-phone">Phone number</label><PhoneInput id="profile-phone" value={profile.phone || ''} onChange={(value) => change('phone', value)} disabled={saving} invalid={Boolean(fields.phone)} describedBy={fields.phone ? 'profile-phone-error' : undefined} />{fields.phone && <small id="profile-phone-error" role="alert">{fields.phone}</small>}</div>
+          <div className="profile-field"><label htmlFor="profile-phone">Phone number</label><PhoneInput id="profile-phone" required value={profile.phone || ''} onChange={(value) => change('phone', value)} disabled={saving} invalid={Boolean(fields.phone)} describedBy={fields.phone ? 'profile-phone-error' : undefined} />{fields.phone && <small id="profile-phone-error" role="alert">{fields.phone}</small>}</div>
           <div className="profile-field">
             <label htmlFor="profile-photo">Profile photo</label>
-            <div className="profile-photo-upload"><Upload size={20} aria-hidden="true" /><input id="profile-photo" type="file" accept="image/jpeg,image/png,image/webp" disabled={saving} onChange={(event) => {
+            <label className="profile-photo-upload" htmlFor="profile-photo"><Upload size={18} aria-hidden="true" /><span>{photo ? photo.name : 'Select Profile Photo'}</span><input id="profile-photo" className="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" disabled={saving} onChange={(event) => {
               const file = event.target.files?.[0];
               if (!file) return;
               if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024 || !file.size) {
                 setFields((current) => ({ ...current, avatar: 'Choose a JPG, PNG, or WebP image up to 2 MB.' })); event.target.value = ''; return;
               }
               setPhoto(file); setFields((current) => ({ ...current, avatar: '' }));
-            }} /></div>
-            <p className="profile-upload-hint">JPG, PNG or WebP · Maximum 2 MB. Saved when you click Save changes.</p>
+            }} /></label>
+            <p className="profile-upload-hint">JPG, PNG or WebP · Maximum 2 MB.</p>
             {photo && <button type="button" disabled={saving} onClick={() => { setPhoto(null); const input = document.getElementById('profile-photo'); if (input) input.value = ''; }}><X size={14} />Clear selection</button>}
             {fields.avatar && <small role="alert">{fields.avatar}</small>}
           </div>

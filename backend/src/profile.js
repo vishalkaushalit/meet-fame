@@ -29,9 +29,10 @@ export async function updateOwnProfile(req, res) {
     else if (collection.some((item) => item.id !== id && item.email.toLowerCase() === changes.email)) fields.email = 'This email address is already in use.';
   }
   if ('phone' in changes) {
-    const error = phoneError(changes.phone);
+    const error = phoneError(changes.phone, true);
     if (error) fields.phone = error; else changes.phone = normalizePhone(changes.phone);
   }
+  if (!('phone' in changes) && !account.phone?.trim()) fields.phone = 'Enter a phone number.';
   if (changes.avatar && changes.avatar !== account.avatar && !req.file) {
     try { if (new URL(changes.avatar).protocol !== 'https:') throw new Error(); }
     catch { fields.avatar = 'Enter a valid HTTPS image URL.'; }

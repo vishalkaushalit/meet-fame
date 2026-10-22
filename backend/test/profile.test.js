@@ -14,8 +14,8 @@ test('account identity checks normalize phones and email across all account type
 test('profile edits are scoped to the signed-in account, validate fields and exclude privileged changes', () => {
   const original = { read: db.read, write: db.write };
   let data = {
-    users: [{ id: 'u', role: 'user', name: 'User', email: 'user@example.com', phone: '+12025550123', password: 'private-hash', status: 'approved' }],
-    influencers: [{ id: 'i', role: 'influencer', name: 'Creator', email: 'creator@example.com', phone: '+919876543210', password: 'private-hash', hourlyRate: 100, status: 'approved' }], admins: [],
+    users: [{ id: 'u', role: 'user', name: 'User', email: 'user@example.com', phone: '+12025550123', avatar: 'https://example.com/user.jpg', password: 'private-hash', status: 'approved' }],
+    influencers: [{ id: 'i', role: 'influencer', name: 'Creator', email: 'creator@example.com', phone: '+919876543210', avatar: 'https://example.com/creator.jpg', password: 'private-hash', hourlyRate: 100, status: 'approved' }], admins: [],
   };
   db.read = () => structuredClone(data);
   db.write = (value) => { data = value; return true; };
@@ -26,6 +26,9 @@ test('profile edits are scoped to the signed-in account, validate fields and exc
     assert.equal(edit({ email: 'CREATOR@example.com' }).code, 409);
     assert.equal(edit({ phone: '+91 98765 43210' }).code, 409);
     assert.equal(edit({ name: '' }).code, 400);
+    assert.equal(edit({ phone: '' }).code, 400);
+    assert.equal(edit({ avatar: '' }).code, 200);
+    assert.equal(edit({ phone: '   ' }, 'influencer').code, 400);
     assert.equal(edit({ avatar: 'javascript:alert(1)' }).code, 400);
     assert.equal(edit({ name: 'Other' }, 'user', { id: 'someone-else' }).code, 403);
     const saved = edit({ name: 'New Name', email: 'new@example.com', phone: '+1 202 555 0123', role: 'admin', status: 'blocked', password: 'overwrite', isVerified: true });
