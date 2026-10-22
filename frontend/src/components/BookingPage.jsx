@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { api } from '../api';
 import { useAuth } from '../context/AuthContext';
 import BookingModal from './BookingModal';
@@ -35,9 +34,6 @@ export default function BookingPage({ influencerId, onClose, onLogin }) {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <button type="button" onClick={onClose} className="flex items-center gap-2 text-slate-300 hover:text-white mb-6">
-        <ArrowLeft className="w-4 h-4" /> Back to portal
-      </button>
       <h1 className="text-3xl font-semibold text-white">Book a slot</h1>
       {loading ? <LogoLoader label="Loading booking…" /> : error ? (
         <p role="alert" className="mt-6 text-rose-400">{error}</p>
