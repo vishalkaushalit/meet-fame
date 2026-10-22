@@ -21,7 +21,10 @@ export function requireSession(req, res, next) {
       : [];
     const account = records.find((item) => item.id === decoded.id);
     if (!account) return res.status(401).json({ error: 'Account not found.' });
-    if (decoded.role !== 'admin' && account.status !== 'approved')
+    if ((decoded.sessionVersion || 0) !== (account.sessionVersion || 0))
+      return res.status(401).json({ error: 'Your password changed. Please sign in again.' });
+    if ((decoded.role === 'influencer' && account.status !== 'approved') ||
+        (decoded.role === 'user' && ['blocked', 'rejected'].includes(account.status)))
       return res.status(403).json({ error: 'Account access is restricted.' });
     req.session = { id: account.id, role: decoded.role };
     next();

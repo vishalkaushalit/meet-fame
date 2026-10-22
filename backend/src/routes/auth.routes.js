@@ -7,6 +7,7 @@ import {
   introVideoError,
 } from '../../../shared/registrationValidation.js';
 import express from 'express';
+import { forgotPassword, resetPassword, recoveryRateLimit } from '../passwordRecovery.js';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -15,6 +16,12 @@ import { db } from '../db.js';
 import { uploadToStorage } from '../blobStorage.js';
 
 const router = express.Router();
+const recoveryHandler = (handler) => async (req, res) => {
+  try { await handler(req, res); }
+  catch { res.status(503).json({ error: 'Password recovery is temporarily unavailable. Please try again later.' }); }
+};
+router.post('/forgot-password', recoveryRateLimit, recoveryHandler(forgotPassword));
+router.post('/reset-password', recoveryRateLimit, recoveryHandler(resetPassword));
 // Read at request time: server environment configuration loads after route imports.
 const getJwtSecret = () =>
   process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
@@ -32,7 +39,9 @@ const upload = multer({
 
 // Helper to sign JWT
 function generateToken(payload) {
-  return jwt.sign(payload, getJwtSecret(), { expiresIn: '7d' });
+  const collection = { user: 'users', influencer: 'influencers', admin: 'admins' }[payload.role];
+  const account = collection && db.read()[collection]?.find((item) => item.id === payload.id);
+  return jwt.sign({ ...payload, sessionVersion: account?.sessionVersion || 0 }, getJwtSecret(), { expiresIn: '7d' });
 }
 
 // Videos upload directly to Blob to avoid the serverless request body limit.
@@ -439,12 +448,9 @@ router.post('/login', (req, res) => {
       }
 
       if (user.status === 'pending_review') {
-        return res.status(403).json({
-          success: false,
-          status: 'pending_review',
-          role: 'user',
-          message: 'Your user account is currently under review.',
-        });
+        user.status = 'approved';
+        user.statusReason = '';
+        if (!db.write(data)) return res.status(503).json({ error: 'Unable to activate your account. Please try again.' });
       }
 
       const token = generateToken({
@@ -523,9 +529,12 @@ router.get('/me', (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
+    if ((decoded.sessionVersion || 0) !== (account.sessionVersion || 0))
+      return res.status(401).json({ error: 'Your password changed. Please sign in again.' });
+
     if (
       ['user', 'influencer'].includes(decoded.role) &&
-      ['blocked', 'rejected', 'pending_review'].includes(account.status)
+      (['blocked', 'rejected'].includes(account.status) || (decoded.role === 'influencer' && account.status === 'pending_review'))
     ) {
       return res.status(403).json({
         error: 'Account access is restricted.',

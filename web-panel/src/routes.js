@@ -1,4 +1,6 @@
 export const adminPages = {
+  'forgot-password': 'forgot-password',
+  'reset-password': 'reset-password',
   overview: 'overview',
   approvals: 'approvals',
   bookings: 'bookings',

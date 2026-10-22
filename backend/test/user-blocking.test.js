@@ -38,7 +38,7 @@ test('admin blocking denies login and session verification; unblocking restores 
     admins: [{ id: 'test-admin' }],
   };
   db.read = () => data;
-  db.write = () => {};
+  db.write = () => true;
   try {
     const login = () => {
       const res = response();
@@ -92,8 +92,11 @@ test('admin blocking denies login and session verification; unblocking restores 
     assert.equal(update('approved').code, 200);
     assert.equal(login().code, 200);
     assert.equal(data.users[0].statusReason, '');
-    assert.equal(update('rejected').code, 200);
-    assert.equal(login().code, 403);
+    assert.equal(update('rejected').code, 400);
+    assert.equal(update('pending_review').code, 400);
+    data.users[0].status = 'pending_review';
+    assert.equal(login().code, 200);
+    assert.equal(data.users[0].status, 'approved');
     const missing = response();
     handler(
       adminRoutes,

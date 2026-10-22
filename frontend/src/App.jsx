@@ -1,4 +1,3 @@
-import AuthSocialBackground from '@shared/AuthSocialBackground';
 import ThemeToggle from './components/ThemeToggle';
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -6,6 +5,7 @@ import LandingPage from './components/LandingPage';
 import InfluencerPanel from './components/InfluencerPanel';
 import UserPanel from './components/UserPanel';
 import AuthPage from './components/AuthPage';
+import PasswordRecovery from '../../shared/PasswordRecovery';
 import { authPath, matchAuthRoute, navigate } from './authRoutes';
 import BookingPage from './components/BookingPage';
 import ChatModal from './components/ChatModal';
@@ -31,7 +31,7 @@ function AppContent() {
     return () => window.removeEventListener('popstate', updatePath);
   }, []);
   useEffect(() => {
-    if (user && authRoute) {
+    if (user && authRoute && !['forgot-password', 'reset-password'].includes(authRoute.tab)) {
       const destination = sessionStorage.getItem('meetfame-booking-return');
       sessionStorage.removeItem('meetfame-booking-return');
       navigate(destination && /^\/book\/[^/]+$/.test(destination) ? destination : '/', { replace: true });
@@ -84,6 +84,8 @@ function AppContent() {
   };
 
   if (loading) return <LogoLoader />;
+  if (authRoute && ['forgot-password', 'reset-password'].includes(authRoute.tab))
+    return <PasswordRecovery header={<><Logo size="header" /><ThemeToggle /></>} key={`${authRoute.role}:${authRoute.tab}`} role={authRoute.role} reset={authRoute.tab === 'reset-password'} requestReset={api.auth.forgotPassword} savePassword={api.auth.resetPassword} loginUrl={authPath(authRoute.role)} forgotUrl={authPath(authRoute.role, 'forgot-password')} />;
   if (authRoute)
     return (
       <AuthPage
@@ -166,7 +168,6 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className={`flex-1 social-background-host${user ? " pt-20" : ""}`}>
-        {user && <AuthSocialBackground page />}
         {bookingRoute ? (
           <BookingPage key={bookingRoute[1]} influencerId={bookingRoute[1]} onClose={() => navigate('/')} onLogin={() => {
             sessionStorage.setItem('meetfame-booking-return', path);

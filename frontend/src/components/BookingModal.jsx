@@ -11,8 +11,6 @@ import {
   X,
   Calendar,
   Clock,
-  Video,
-  Users,
   CheckCircle,
   AlertCircle,
   DollarSign,
@@ -58,8 +56,6 @@ export default function BookingModal({
   });
 
   const [selectedSlot, setSelectedSlot] = useState('');
-  const [topic, setTopic] = useState('1-on-1 Strategy & Mentorship Session');
-  const [meetingType, setMeetingType] = useState('video');
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -159,8 +155,8 @@ export default function BookingModal({
         date,
         slot: selectedSlot,
         slotLabel: chosen?.label || selectedSlot,
-        topic,
-        meetingType,
+        topic: '1-on-1 Strategy & Mentorship Session',
+        meetingType: 'video',
         currency: 'USD',
       };
       const order = await api.bookings.createPaymentOrder(bookingData);
@@ -384,54 +380,6 @@ export default function BookingModal({
                   </div>
                 </>
               )}
-            </div>
-
-            {/* Meeting Type */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Meeting Preference
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setMeetingType('video')}
-                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all ${
-                    meetingType === 'video'
-                      ? 'bg-brand-indigo/20 border-brand-indigo text-brand-indigo'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Video className="w-4 h-4" />
-                  <span>1-on-1 Video Session</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setMeetingType('in-person')}
-                  className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-semibold transition-all ${
-                    meetingType === 'in-person'
-                      ? 'bg-brand-coral/20 border-brand-coral text-brand-coral'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Users className="w-4 h-4" />
-                  <span>In-Person Meeting</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Consultation Topic */}
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
-                Session Objective / Topic
-              </label>
-              <textarea
-                rows={2}
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                placeholder="Enter what you would like to discuss"
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-purple"
-              />
             </div>
 
             <p className="text-xs text-slate-400">Secure payment via Razorpay. All payments are charged in USD.</p>

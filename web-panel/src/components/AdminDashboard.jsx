@@ -1,5 +1,4 @@
 import { formatDate } from '../../../shared/dateFormat';
-import AuthSocialBackground from '@shared/AuthSocialBackground';
 import { adminPath, matchAdminRecord, navigateAdmin, navigateAccountDetails, matchAccountDetails, accountDetailsParent, navigateAdminAction } from '../routes';
 import ThemeToggle from './ThemeToggle';
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
@@ -399,7 +398,6 @@ export default function AdminDashboard({
           </div>
         </header>
         <main className="dashboard-main social-background-host">
-          <AuthSocialBackground page />
             <div className="dashboard-page-heading">
               <div className="admin-heading-leading">
                 <button type="button" className="dashboard-button admin-back-button admin-back-icon" aria-label="Go back" title="Back" onClick={() => {

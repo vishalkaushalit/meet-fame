@@ -39,6 +39,8 @@ export const api = {
     ),
   },
   auth: {
+    forgotPassword: (payload) => client.post('/auth/forgot-password', payload, publicRequest),
+    resetPassword: (payload) => client.post('/auth/reset-password', payload, publicRequest),
     login: (email, password, role) => client.post(LOGIN_API, { email, password, role }, publicRequest),
     registerUser: (payload) => client.post(REGISTER_USER_API, payload, publicRequest),
     registerInfluencer: async (formData) => {

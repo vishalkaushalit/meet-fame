@@ -317,7 +317,7 @@ export default function ApprovalsView({ onChange, detailId }) {
         </button>
 
         <button
-          onClick={() => setActiveTab('users')}
+          onClick={() => { setActiveTab('users'); setStatusFilter('all'); }}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'users'
               ? 'bg-slate-800 text-white border border-slate-700 shadow-sm'
@@ -339,9 +339,9 @@ export default function ApprovalsView({ onChange, detailId }) {
           <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}
             className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white">
             <option value="all">All statuses</option>
-            <option value="pending_review">Pending review</option>
+            {activeTab === 'influencers' && <option value="pending_review">Pending review</option>}
             <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
+            {activeTab === 'influencers' && <option value="rejected">Rejected</option>}
             <option value="blocked">Blocked</option>
           </select>
         </label>
@@ -526,7 +526,7 @@ export default function ApprovalsView({ onChange, detailId }) {
                             )}
                           </button>
                         )}
-                        {u.status !== 'approved' && (
+                        {u.status === 'blocked' && (
                           <button
                             onClick={() => handleUserStatus(u, 'approved')}
                             disabled={updatingUser === u.id}
@@ -534,11 +534,7 @@ export default function ApprovalsView({ onChange, detailId }) {
                           >
                             {updatingUser === u.id ? (
                               <span>Saving…</span>
-                            ) : u.status === 'blocked' ? (
-                              'Unblock User'
-                            ) : (
-                              'Approve User'
-                            )}
+                            ) : 'Unblock User'}
                           </button>
                         )}
                       </div>

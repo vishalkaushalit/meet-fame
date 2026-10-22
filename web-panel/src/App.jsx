@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AdminLogin from './components/AdminLogin';
+import PasswordRecovery from '../../shared/PasswordRecovery';
+import Logo from './components/Logo';
+import ThemeToggle from './components/ThemeToggle';
 import LogoLoader from './components/LogoLoader';
 import AdminDashboard from './components/AdminDashboard';
 import { adminApi } from './api';
-import { matchAdminPage, navigateAdmin, cleanAdminReturnUrl } from './routes';
+import { adminPath, matchAdminPage, navigateAdmin, cleanAdminReturnUrl } from './routes';
 
 export default function App() {
   const [admin, setAdmin] = useState(null);
@@ -19,6 +22,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (loading) return;
+    if (['forgot-password', 'reset-password'].includes(page)) return;
     if (!admin && page !== 'login') {
       if (page) requestedPage.current = { path: window.location.pathname, search: window.location.search, state: window.history.state };
       navigateAdmin(null, { replace: true });
@@ -71,6 +75,7 @@ export default function App() {
   };
 
   if (loading) return <LogoLoader label="Loading admin workspace…" />;
+  if (['forgot-password', 'reset-password'].includes(page)) return <PasswordRecovery header={<><Logo /><ThemeToggle /></>} key={page} role="admin" reset={page === 'reset-password'} requestReset={adminApi.auth.forgotPassword} savePassword={adminApi.auth.resetPassword} loginUrl={adminPath(null)} forgotUrl={adminPath('forgot-password')} />;
 
   return (
     <div>

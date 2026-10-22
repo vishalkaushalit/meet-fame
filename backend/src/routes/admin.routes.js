@@ -22,7 +22,7 @@ router.use((req, res, next) => {
     );
     if (
       decoded.role !== 'admin' ||
-      !db.read().admins.some((admin) => admin.id === decoded.id)
+      !db.read().admins.some((admin) => admin.id === decoded.id && (admin.sessionVersion || 0) === (decoded.sessionVersion || 0))
     ) {
       return res.status(403).json({ error: 'Administrator access required' });
     }
@@ -355,13 +355,13 @@ router.put('/influencers/:id/status', (req, res) => {
 });
 
 /**
- * APPROVE OR REJECT USER REGISTRATION
+ * BLOCK OR UNBLOCK USER ACCOUNTS (registration is automatic)
  */
 router.put('/users/:id/status', (req, res) => {
   try {
     const { status, reason } = req.body;
     if (
-      !['approved', 'rejected', 'pending_review', 'blocked'].includes(status)
+      !['approved', 'blocked'].includes(status)
     ) {
       return res.status(400).json({ error: 'Invalid status' });
     }

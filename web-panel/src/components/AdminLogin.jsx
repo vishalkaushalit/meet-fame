@@ -5,6 +5,7 @@ import ThemeToggle from './ThemeToggle';
 import React, { useState } from 'react';
 import Logo from './Logo';
 import { adminApi } from '../api';
+import { adminPath } from '../routes';
 import { Shield, Lock, Eye, EyeOff, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function AdminLogin({ onLoginSuccess }) {
@@ -120,6 +121,7 @@ export default function AdminLogin({ onLoginSuccess }) {
               </div>
             </div>
 
+            <div className="text-right"><a className="text-sm text-brand-purple hover:underline" href={adminPath('forgot-password')}>Forgot password?</a></div>
             <button
               type="submit"
               disabled={loading}

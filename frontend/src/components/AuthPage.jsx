@@ -441,6 +441,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 </div>
               </div>
             </fieldset>
+            {!isRegister && <div className="text-right"><a className="text-sm text-brand-purple hover:underline" href={authPath(role, 'forgot-password')}>Forgot password?</a></div>}
             {/* INFLUENCER REGISTRATION SPECIFIC DETAILS */}
             {isRegister && role === 'influencer' && (
               <div>

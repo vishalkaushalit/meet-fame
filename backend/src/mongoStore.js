@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { PasswordReset } from './models/PasswordReset.js';
 import { Transaction } from './models/Transaction.js';
 import { Announcement } from './models/Announcement.js';
 import { mongoConnection } from './mongoConnection.js';
@@ -11,6 +12,7 @@ import { Booking } from './models/Booking.js';
 import { Message } from './models/Message.js';
 import { Notification } from './models/Notification.js';
 export const persistenceModels = {
+  passwordresets: PasswordReset,
   transactions: Transaction,
   announcements: Announcement,
   users: User,
