@@ -1,18 +1,9 @@
-import BillingView from '../../../shared/BillingView';
-import AnnouncementsIndex from './AnnouncementsIndex';
 import { formatDate } from '../../../shared/dateFormat';
 import AuthSocialBackground from '@shared/AuthSocialBackground';
 import { adminPath, matchAdminRecord, navigateAdmin, navigateAccountDetails, matchAccountDetails, accountDetailsParent, navigateAdminAction } from '../routes';
 import ThemeToggle from './ThemeToggle';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Logo from './Logo';
-import ApprovalsView from './ApprovalsView';
-import AnnouncementsView from './AnnouncementsView';
-import AccountDetailsPage from './AccountDetailsPage';
-import AdminEditProfile from './AdminEditProfile';
-import SlotsInspectorView from './SlotsInspectorView';
-import BookingsView from './BookingsView';
-import ConversationsView from './ConversationsView';
 import { adminApi } from '../api';
 import {
   LayoutDashboard,
@@ -39,6 +30,16 @@ import {
   Pencil,
 } from 'lucide-react';
 import './dashboard.css';
+
+const BillingView = lazy(() => import('../../../shared/BillingView'));
+const AnnouncementsIndex = lazy(() => import('./AnnouncementsIndex'));
+const ApprovalsView = lazy(() => import('./ApprovalsView'));
+const AnnouncementsView = lazy(() => import('./AnnouncementsView'));
+const AccountDetailsPage = lazy(() => import('./AccountDetailsPage'));
+const AdminEditProfile = lazy(() => import('./AdminEditProfile'));
+const SlotsInspectorView = lazy(() => import('./SlotsInspectorView'));
+const BookingsView = lazy(() => import('./BookingsView'));
+const ConversationsView = lazy(() => import('./ConversationsView'));
 
 const navigation = [
   {
@@ -663,6 +664,7 @@ export default function AdminDashboard({
             <div
               className="dashboard-detail"
             >
+              <Suspense fallback={<p role="status" className="p-6 text-sm">Loading page…</p>}>
               {activeTab === 'account-details' && detailsAccount && (
                 <AccountDetailsPage key={`${detailsAccount.role}:${detailsAccount.id}`} account={detailsAccount} />
               )}
@@ -686,6 +688,7 @@ export default function AdminDashboard({
               {activeTab === 'slots' && <SlotsInspectorView />}
               {activeTab === 'bookings' && <BookingsView detailId={recordDetails?.id} />}
               {activeTab === 'conversations' && <ConversationsView detailId={recordDetails?.id} />}
+              </Suspense>
             </div>
           )}
         </main>

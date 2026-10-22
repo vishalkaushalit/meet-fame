@@ -476,3 +476,14 @@ html[data-theme='light'] .user-bookings .creator-appointment {
   background: #fff;
   border-color: var(--creator-line);
 }
+
+.creator-sticky-overview {
+  position: sticky;
+  top: 80px;
+  z-index: 30;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background: #0a0f1d;
+}
+.creator-sticky-overview .creator-tabs { margin-bottom: 0; }
+html[data-theme='light'] .creator-sticky-overview { background: #f8fafc; }

@@ -98,7 +98,7 @@ function AppContent() {
       {/* If logged in, show app top bar */}
       {user && (
         <header
-          className={`${role === 'influencer' ? 'creator-site-header ' : ''}sticky top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800`}
+          className={`${role === 'influencer' ? 'creator-site-header ' : ''}fixed inset-x-0 top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800`}
         >
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 h-20 py-4 flex items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-3 sm:gap-4">
@@ -165,7 +165,7 @@ function AppContent() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 social-background-host">
+      <main className={`flex-1 social-background-host${user ? " pt-20" : ""}`}>
         {user && <AuthSocialBackground page />}
         {bookingRoute ? (
           <BookingPage key={bookingRoute[1]} influencerId={bookingRoute[1]} onClose={() => navigate('/')} onLogin={() => {

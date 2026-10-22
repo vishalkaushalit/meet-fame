@@ -223,6 +223,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
   return (
     <div className="creator-dashboard max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="creator-sticky-overview">
       {/* Influencer Profile Top Card */}
       <div className="creator-summary p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl mb-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-brand-purple/10 rounded-full blur-3xl pointer-events-none" />
@@ -372,6 +373,8 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             </span>
           ) : null}
         </button>
+      </div>
+
       </div>
 
       {/* TAB 1: SLOTS & AVAILABILITY MANAGER */}
