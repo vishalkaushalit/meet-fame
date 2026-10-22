@@ -43,7 +43,7 @@ const reviews = [
 const panelClass =
   "min-w-0 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5";
 
-function Reviews() {
+const Reviews = () => {
   const [ratingFilter, setRatingFilter] = useState("All ratings");
   const filteredReviews = useMemo(
     () =>
@@ -181,6 +181,6 @@ function Reviews() {
       </section>
     </div>
   );
-}
+};
 
 export default Reviews;

@@ -1,1 +1,103 @@
 @import "tailwindcss";
+
+.app-shell {
+  color-scheme: light;
+}
+
+.app-shell[data-theme="dark"] {
+  color-scheme: dark;
+  background-color: #0b1120;
+  color: #e2e8f0;
+}
+
+.app-shell[data-theme="dark"] aside {
+  border-right: 1px solid #1e293b;
+  background-color: #080e1b;
+}
+
+.app-shell[data-theme="dark"] aside .bg-slate-50,
+.app-shell[data-theme="dark"] aside .bg-slate-100 {
+  background-color: rgb(255 255 255 / 6%);
+}
+
+.app-shell[data-theme="dark"] aside .border-slate-200 {
+  border-color: #334155;
+}
+
+.app-shell[data-theme="dark"] aside .text-slate-600 {
+  color: #cbd5e1;
+}
+
+.app-shell[data-theme="dark"] aside .text-slate-500 {
+  color: #94a3b8;
+}
+
+.app-shell[data-theme="dark"] main .bg-white,
+.app-shell[data-theme="dark"] [role="dialog"].bg-white,
+.app-shell[data-theme="dark"] [role="status"].bg-white {
+  background-color: #111c30;
+}
+
+.app-shell[data-theme="dark"] main [class~="bg-white/95"] {
+  background-color: rgb(17 28 48 / 95%);
+}
+
+.app-shell[data-theme="dark"] main .bg-slate-50 {
+  background-color: #0b1220;
+}
+
+.app-shell[data-theme="dark"] main .bg-slate-100 {
+  background-color: #1e293b;
+}
+
+.app-shell[data-theme="dark"] main .border-slate-100,
+.app-shell[data-theme="dark"] main .border-slate-200,
+.app-shell[data-theme="dark"] main [class~="border-slate-200/80"],
+.app-shell[data-theme="dark"] [role="dialog"] .border-slate-100,
+.app-shell[data-theme="dark"] [role="dialog"] .border-slate-200,
+.app-shell[data-theme="dark"] [role="dialog"].border-slate-200,
+.app-shell[data-theme="dark"] [role="status"].border-slate-200 {
+  border-color: #334155;
+}
+
+.app-shell[data-theme="dark"] main .text-slate-800,
+.app-shell[data-theme="dark"] main .text-slate-700,
+.app-shell[data-theme="dark"] main [class~="text-[#18213e]"],
+.app-shell[data-theme="dark"] main [class~="text-[#19213e]"],
+.app-shell[data-theme="dark"] [role="dialog"] .text-slate-800,
+.app-shell[data-theme="dark"] [role="dialog"] .text-slate-700,
+.app-shell[data-theme="dark"] [role="status"].text-slate-700 {
+  color: #e2e8f0;
+}
+
+.app-shell[data-theme="dark"] main .text-slate-600,
+.app-shell[data-theme="dark"] main .text-slate-500,
+.app-shell[data-theme="dark"] main .text-slate-400,
+.app-shell[data-theme="dark"] main [class~="text-[#1b2340]"],
+.app-shell[data-theme="dark"] [role="dialog"] .text-slate-600,
+.app-shell[data-theme="dark"] [role="dialog"] .text-slate-500,
+.app-shell[data-theme="dark"] [role="dialog"] .text-slate-400,
+.app-shell[data-theme="dark"] [role="status"] .text-slate-400 {
+  color: #94a3b8;
+}
+
+.app-shell[data-theme="dark"] main input:not([type="checkbox"]),
+.app-shell[data-theme="dark"] main select,
+.app-shell[data-theme="dark"] [role="dialog"] input:not([type="checkbox"]),
+.app-shell[data-theme="dark"] [role="dialog"] select {
+  border-color: #334155;
+  background-color: #0b1220;
+  color: #e2e8f0;
+}
+
+.app-shell[data-theme="dark"] main .bg-violet-50,
+.app-shell[data-theme="dark"] main .bg-emerald-50,
+.app-shell[data-theme="dark"] main .bg-amber-50,
+.app-shell[data-theme="dark"] main .bg-rose-50,
+.app-shell[data-theme="dark"] main .bg-blue-50,
+.app-shell[data-theme="dark"] main .bg-orange-50,
+.app-shell[data-theme="dark"] main .bg-indigo-50,
+.app-shell[data-theme="dark"] main .bg-purple-50,
+.app-shell[data-theme="dark"] main .bg-pink-50 {
+  background-color: rgb(148 163 184 / 10%);
+}

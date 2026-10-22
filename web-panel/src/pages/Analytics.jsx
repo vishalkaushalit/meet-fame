@@ -25,7 +25,7 @@ const analytics = {
 const panelClass =
   "min-w-0 rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5";
 
-function Analytics() {
+const Analytics = () => {
   const [period, setPeriod] = useState("7 days");
   const current = analytics[period];
 
@@ -143,6 +143,6 @@ function Analytics() {
       </section>
     </div>
   );
-}
+};
 
 export default Analytics;

@@ -13,7 +13,7 @@ const defaultSettings = {
   productEmails: false,
 };
 
-function readSettings() {
+const readSettings = () => {
   try {
     const saved = window.localStorage.getItem("meetfame-settings");
     return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
@@ -21,14 +21,14 @@ function readSettings() {
     console.error("Unable to load saved settings.", error);
     return defaultSettings;
   }
-}
+};
 
-function Settings() {
+const Settings = () => {
   const [settings, setSettings] = useState(readSettings);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
 
-  function updateSetting(event) {
+  const updateSetting = (event) => {
     const { checked, name, type, value } = event.target;
     setSettings((current) => ({
       ...current,
@@ -36,9 +36,9 @@ function Settings() {
     }));
     setSaved(false);
     setSaveError("");
-  }
+  };
 
-  function saveSettings(event) {
+  const saveSettings = (event) => {
     event.preventDefault();
     try {
       window.localStorage.setItem("meetfame-settings", JSON.stringify(settings));
@@ -48,8 +48,8 @@ function Settings() {
       console.error("Unable to save settings.", error);
       setSaved(false);
       setSaveError("Settings could not be saved in this browser.");
-    }
-  }
+    };
+  };
 
   return (
     <div className="mx-auto max-w-[1000px] px-3 pb-5 pt-6 sm:px-5 sm:pt-[30px] lg:px-[38px]">

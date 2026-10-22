@@ -1,0 +1,39 @@
+.admin-bookings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.admin-bookings-card {
+  min-width: 0;
+}
+
+.admin-bookings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.admin-bookings-table-viewport {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.admin-bookings-table {
+  width: 100%;
+  min-width: 640px;
+}
+
+@media (max-width: 480px) {
+  .admin-bookings-header {
+    align-items: flex-start;
+  }
+
+  .admin-bookings-card {
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+  }
+}

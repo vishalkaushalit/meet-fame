@@ -26,7 +26,7 @@ const faqs = [
 const panelClass =
   "rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm shadow-slate-900/[0.02] sm:p-5";
 
-function HelpSupport() {
+const HelpSupport = () => {
   return (
     <div className="mx-auto max-w-[1000px] px-3 pb-5 pt-6 sm:px-5 sm:pt-[30px] lg:px-[38px]">
       <section className="mb-5">
@@ -97,6 +97,6 @@ function HelpSupport() {
       </section>
     </div>
   );
-}
+};
 
 export default HelpSupport;
