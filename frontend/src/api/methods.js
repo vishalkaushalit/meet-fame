@@ -24,6 +24,7 @@ import {
 const publicRequest = { authenticated: false };
 
 export const api = {
+  billing: { getTransactions: () => client.get('/bookings/transactions') },
   notifications: {
     request: (path = '', method = 'GET') => client.request({ url: NOTIFICATIONS_API(path), method }),
   },
@@ -65,6 +66,7 @@ export const api = {
     updateProfile: (id, profile) => client.put(INFLUENCER_PROFILE_API(id), profile),
   },
   bookings: {
+    createPaymentOrder: (data) => client.post(`${CREATE_BOOKING_API}/payment-order`, data),
     getSlots: (influencerId, date) => client.get(BOOKING_SLOTS_API, { ...publicRequest, params: { influencerId, date } }),
     create: (bookingData) => client.post(CREATE_BOOKING_API, bookingData),
     getMyBookings: (params = {}) => client.get(MY_BOOKINGS_API, { params }),

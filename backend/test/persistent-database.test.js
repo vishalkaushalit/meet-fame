@@ -88,3 +88,28 @@ test('request snapshots are isolated and database outages do not fall back to se
   );
   assert.equal(unavailable.status, 503);
 });
+
+test('refund ledger can explicitly commit alongside a booking conflict response', async () => {
+  let committed = false;
+  const request = {};
+  const result = await new Promise((resolve) => {
+    const res = {
+      statusCode: 200,
+      status(code) { this.statusCode = code; return this; },
+      json(body) { resolve({ status: this.statusCode, body }); return this; },
+    };
+    createDatabaseMiddleware({
+      load: async () => ({ state: { transactions: [], influencers: [] } }),
+      commit: async (_, state) => {
+        assert.equal(state.transactions[0].status, 'refund_pending');
+        committed = true;
+      },
+    })(request, res, () => {
+      db.write({ transactions: [{ id: 't1', status: 'refund_pending' }], influencers: [] });
+      request.persistDatabaseOnError = true;
+      res.status(409).json({ error: 'Slot unavailable; refund requested.' });
+    });
+  });
+  assert.equal(result.status, 409);
+  assert.equal(committed, true);
+});

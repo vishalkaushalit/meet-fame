@@ -12,7 +12,7 @@ export function createDatabaseMiddleware(store) {
       res.json = (body) => {
         const finish = async () => {
           try {
-            if (context.dirty && res.statusCode < 400)
+            if (context.dirty && (res.statusCode < 400 || req.persistDatabaseOnError === true))
               await store.commit(snapshot, context.state);
             json(body);
           } catch (error) {

@@ -19,6 +19,7 @@ import {
 } from './endpoints';
 
 export const adminApi = {
+  billing: { getTransactions: () => client.get('/bookings/transactions') },
   profile: { update: (profile) => client.put(ADMIN_PROFILE_API, profile) },
   announcements: {
     getAll: () => client.get(ANNOUNCEMENTS_API),

@@ -7,7 +7,7 @@ import InfluencerPanel from './components/InfluencerPanel';
 import UserPanel from './components/UserPanel';
 import AuthPage from './components/AuthPage';
 import { authPath, matchAuthRoute, navigate } from './authRoutes';
-import BookingModal from './components/BookingModal';
+import BookingPage from './components/BookingPage';
 import ChatModal from './components/ChatModal';
 import StatusAlertModal from './components/StatusAlertModal';
 import Logo from './components/Logo';
@@ -31,11 +31,14 @@ function AppContent() {
     return () => window.removeEventListener('popstate', updatePath);
   }, []);
   useEffect(() => {
-    if (user && authRoute) navigate('/', { replace: true });
+    if (user && authRoute) {
+      const destination = sessionStorage.getItem('meetfame-booking-return');
+      sessionStorage.removeItem('meetfame-booking-return');
+      navigate(destination && /^\/book\/[^/]+$/.test(destination) ? destination : '/', { replace: true });
+    }
   }, [user, path]);
 
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const [selectedInfluencer, setSelectedInfluencer] = useState(null);
+  const bookingRoute = /^\/book\/([^/]+)\/?$/.exec(path);
 
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [chatTarget, setChatTarget] = useState(null);
@@ -61,12 +64,13 @@ function AppContent() {
   };
 
   const handleBookInfluencer = (influencer) => {
+    const destination = `/book/${encodeURIComponent(influencer.id)}`;
     if (!user) {
+      sessionStorage.setItem('meetfame-booking-return', destination);
       handleOpenAuth('user', 'login');
       return;
     }
-    setSelectedInfluencer(influencer);
-    setBookingModalOpen(true);
+    navigate(destination);
   };
 
   const handleOpenChat = (target, targetR) => {
@@ -163,7 +167,12 @@ function AppContent() {
       {/* Main Content Area */}
       <main className="flex-1 social-background-host">
         {user && <AuthSocialBackground page />}
-        {!user ? (
+        {bookingRoute ? (
+          <BookingPage key={bookingRoute[1]} influencerId={bookingRoute[1]} onClose={() => navigate('/')} onLogin={() => {
+            sessionStorage.setItem('meetfame-booking-return', path);
+            handleOpenAuth('user', 'login');
+          }} />
+        ) : !user ? (
           <LandingPage
             onBookInfluencer={handleBookInfluencer}
             onOpenChat={handleOpenChat}
@@ -192,15 +201,6 @@ function AppContent() {
         />
       )}
       {/* Modals & Dialogs */}
-
-      <BookingModal
-        onBookingSuccess={() =>
-          window.dispatchEvent(new Event('meetfame-bookings-updated'))
-        }
-        isOpen={bookingModalOpen}
-        influencer={selectedInfluencer}
-        onClose={() => setBookingModalOpen(false)}
-      />
 
       <ChatModal
         isOpen={chatModalOpen}

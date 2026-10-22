@@ -1,3 +1,4 @@
+import BillingView from '../../../shared/BillingView';
 import AnnouncementsIndex from './AnnouncementsIndex';
 import { formatDate } from '../../../shared/dateFormat';
 import AuthSocialBackground from '@shared/AuthSocialBackground';
@@ -76,6 +77,7 @@ const navigation = [
     icon: MessageSquare,
     description: 'Review conversations between users and influencers.',
   },
+  { id: 'billing', label: 'Billing', icon: DollarSign, description: 'Review customer payments and transaction history.' },
 ];
 const money = (value) =>
   new Intl.NumberFormat('en-US', {
@@ -127,10 +129,12 @@ export default function AdminDashboard({
   const [refreshing, setRefreshing] = useState(false);
   const [updated, setUpdated] = useState(null);
   const [days, setDays] = useState(7);
+  const [billingRevision, setBillingRevision] = useState(0);
   const refreshRequest = useRef(0);
   const load = useCallback(async () => {
     const request = ++refreshRequest.current;
     setRefreshing(true);
+    setBillingRevision((value) => value + 1);
     try {
       const [overview, result] = await Promise.allSettled([
         adminApi.stats.getOverview(),
@@ -678,6 +682,7 @@ export default function AdminDashboard({
                 </div>
               )}
               {activeTab === 'approvals' && <ApprovalsView onChange={load} detailId={recordDetails?.id} />}
+              {activeTab === 'billing' && <BillingView admin refreshKey={billingRevision} loadTransactions={adminApi.billing.getTransactions} />}
               {activeTab === 'slots' && <SlotsInspectorView />}
               {activeTab === 'bookings' && <BookingsView detailId={recordDetails?.id} />}
               {activeTab === 'conversations' && <ConversationsView detailId={recordDetails?.id} />}

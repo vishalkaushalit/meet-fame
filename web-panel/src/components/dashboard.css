@@ -277,7 +277,7 @@ html[data-theme='light'] button.dashboard-button.admin-back-button:hover { backg
 }
 .booking-summary-cards {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 260px));
   gap: 18px;
 }
 .booking-summary-cards .metric-top { font-size: 14px; font-weight: 600; }

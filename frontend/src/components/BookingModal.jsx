@@ -1,3 +1,4 @@
+import { openRazorpay } from '../razorpay';
 import DatePicker from '../../../shared/DatePicker.jsx';
 import IntroVideo from './IntroVideo';
 import LogoLoader from './LogoLoader';
@@ -21,6 +22,7 @@ import {
 export default function BookingModal({
   influencer,
   isOpen,
+  page = false,
   onClose,
   onBookingSuccess,
 }) {
@@ -62,6 +64,24 @@ export default function BookingModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [pendingPayment, setPendingPayment] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('meetfame-pending-payment') || 'null'); }
+    catch { return null; }
+  });
+  const retryPayment = async () => {
+    if (!pendingPayment || pendingPayment.userId !== user?.id) return;
+    setSubmitting(true);
+    setError('');
+    try {
+      await api.bookings.create(pendingPayment);
+      sessionStorage.removeItem('meetfame-pending-payment');
+      setPendingPayment(null);
+      onBookingSuccess?.();
+      onClose();
+    } catch (err) {
+      setError(err.error || err.message || 'Unable to verify payment. Please contact support before paying again.');
+    } finally { setSubmitting(false); }
+  };
 
   // Fetch slots whenever influencer or date changes
   useEffect(() => {
@@ -133,7 +153,7 @@ export default function BookingModal({
     const chosen = slotsData?.slots?.find((s) => s.slot === selectedSlot);
 
     try {
-      await api.bookings.create({
+      const bookingData = {
         influencerId: influencer.id,
         userId: user.id,
         date,
@@ -141,7 +161,24 @@ export default function BookingModal({
         slotLabel: chosen?.label || selectedSlot,
         topic,
         meetingType,
+        currency: 'USD',
+      };
+      const order = await api.bookings.createPaymentOrder(bookingData);
+      const payment = await openRazorpay({
+        key: order.key,
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'MeetFame',
+        description: `1-hour session with ${influencer.name}`,
+        prefill: { name: user.name, email: user.email, contact: user.phone || '' },
+        theme: { color: '#7c3aed' },
       });
+      sessionStorage.setItem('meetfame-pending-payment', JSON.stringify({ ...bookingData, payment }));
+      setPendingPayment({ ...bookingData, payment });
+      await api.bookings.create({ ...bookingData, payment });
+      sessionStorage.removeItem('meetfame-pending-payment');
+      setPendingPayment(null);
 
       setSuccess(true);
       if (onBookingSuccess) onBookingSuccess();
@@ -157,14 +194,15 @@ export default function BookingModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-xl my-8 p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100">
-        <button
+    <div className={page ? "mt-8" : "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto"}>
+      <div className={page ? "w-full text-slate-100" : "relative w-full max-w-xl my-8 p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100"}>
+        {!page && <button
           onClick={onClose}
+          aria-label="Close booking"
           className="absolute top-5 right-5 text-slate-400 hover:text-white p-2 rounded-full hover:bg-slate-800 transition-colors"
         >
           <X className="w-5 h-5" />
-        </button>
+        </button>}
 
         {/* Influencer Header */}
         <div className="flex items-center gap-4 pb-6 border-b border-slate-800">
@@ -197,7 +235,11 @@ export default function BookingModal({
           </div>
         </div>
 
-        <IntroVideo influencer={influencer} />
+        <div className={page ? "grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-start mt-6" : ""}>
+        <div className="min-w-0">
+          <IntroVideo influencer={influencer} />
+        </div>
+        <div className="min-w-0">
         {success ? (
           <div className="py-12 text-center">
             <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-500/30">
@@ -213,7 +255,13 @@ export default function BookingModal({
             </p>
           </div>
         ) : (
-          <form onSubmit={handleBook} className="mt-6 space-y-5">
+          <form onSubmit={handleBook} className={page ? "space-y-5" : "mt-6 space-y-5"}>
+            {pendingPayment?.userId === user?.id && (
+              <div className="p-4 rounded-xl border border-amber-500/30 text-sm text-amber-500">
+                A payment is awaiting booking confirmation. Verify it before making another payment.
+                <button type="button" disabled={submitting} onClick={retryPayment} className="block mt-2 underline">Retry payment verification</button>
+              </div>
+            )}
             {error && (
               <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -318,17 +366,11 @@ export default function BookingModal({
                           type="button"
                           disabled={s.isBooked || s.isPast}
                           onClick={() => setSelectedSlot(s.slot)}
-                          className={`p-2.5 rounded-xl text-xs font-semibold text-center border transition-all ${
-                            s.isBooked || s.isPast
-                              ? 'bg-slate-950/60 border-slate-800 text-slate-600 cursor-not-allowed line-through'
-                              : isSelected
-                                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple border-brand-purple text-white shadow-lg shadow-indigo-500/30'
-                                : 'bg-slate-950/80 border-slate-700/80 text-slate-300 hover:border-brand-purple/60 hover:text-white'
-                          }`}
+                          aria-pressed={isSelected}
+                          className={`booking-time-slot ${s.isBooked ? 'is-booked' : s.isPast ? 'is-past' : 'is-available'}`}
                         >
-                          <div className="font-mono">{s.slot}</div>
-                          <div
-                            className={`text-[10px] mt-0.5 ${s.isBooked ? 'text-rose-500/80' : isSelected ? 'text-white/90' : 'text-slate-400'}`}
+                          <div className="booking-time-slot-label">{s.slot}</div>
+                          <div className="booking-time-slot-status"
                           >
                             {s.isBooked
                               ? 'Booked'
@@ -392,11 +434,12 @@ export default function BookingModal({
               />
             </div>
 
+            <p className="text-xs text-slate-400">Secure payment via Razorpay. All payments are charged in USD.</p>
             {/* Summary & Submit */}
             <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
               <div>
                 <span className="text-xs text-slate-400">
-                  Total Investment:
+                  Session price (USD):
                 </span>
                 <div className="text-xl font-semibold text-white">
                   ${influencer.hourlyRate || 150}
@@ -408,19 +451,21 @@ export default function BookingModal({
 
               <button
                 type="submit"
-                disabled={submitting || !selectedSlot || loadingSlots}
+                disabled={submitting || !selectedSlot || loadingSlots || pendingPayment?.userId === user?.id}
                 className="py-3 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.99] disabled:opacity-50 flex items-center gap-2 text-sm"
               >
                 {submitting ? (
                   <span>Confirming...</span>
                 ) : (
-                  'Confirm & Book Slot'
+                  'Pay & Book Slot'
                 )}
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </form>
         )}
+        </div>
+        </div>
       </div>
     </div>
   );

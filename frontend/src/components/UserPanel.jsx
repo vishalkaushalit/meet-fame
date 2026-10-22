@@ -1,3 +1,4 @@
+import BillingView from '../../../shared/BillingView';
 import { formatDate } from '../../../shared/dateFormat';
 import IntroVideo from './IntroVideo';
 import Pagination, { usePagination } from './Pagination';
@@ -140,7 +141,7 @@ export default function UserPanel({
         </div>
 
         {/* Tab Controls */}
-        <div className="flex items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 relative z-10">
+        <div className="flex flex-wrap items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 relative z-10">
           <button
             onClick={() => setActiveTab('browse')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
@@ -164,8 +165,16 @@ export default function UserPanel({
             <Calendar className="w-4 h-4" />
             <span>My Bookings ({myBookings.length})</span>
           </button>
+          <button
+            onClick={() => setActiveTab('billing')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeTab === 'billing' ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+          >
+            <DollarSign className="w-4 h-4" /><span>Billing</span>
+          </button>
         </div>
       </div>
+
+      {activeTab === 'billing' && <BillingView key={user.id} loadTransactions={api.billing.getTransactions} />}
 
       {/* TAB 1: BROWSE INFLUENCERS */}
       {activeTab === 'browse' && (
@@ -343,8 +352,7 @@ export default function UserPanel({
           ) : bookingsError &&
             myBookings.length === 0 ? null : myBookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              You haven't booked any sessions yet. Browse influencers to schedule
-              your first 1-hour slot!
+              No paid bookings yet. Complete payment for a session to see it here.
             </div>
           ) : (
             <div className="space-y-3">

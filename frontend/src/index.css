@@ -754,3 +754,63 @@
 .video-call-dialog > footer {
   flex-wrap: wrap;
 }
+
+/* Match the admin availability calendar's slot cards in both themes. */
+html .booking-time-slot {
+  --slot-open-bg: #153f34;
+  --slot-open-text: #8aebc5;
+  --slot-booked-bg: #3d2b5c;
+  --slot-booked-text: #d3b7ff;
+  --slot-accent: #bd9bff;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.5;
+  transition: background-color 150ms, border-color 150ms;
+}
+html[data-theme='light'] .booking-time-slot {
+  --slot-open-bg: #dff7ec;
+  --slot-open-text: #065f46;
+  --slot-booked-bg: #ede5ff;
+  --slot-booked-text: #5b21b6;
+  --slot-accent: #7c3aed;
+}
+html .booking-time-slot.is-available {
+  background: var(--slot-open-bg);
+  color: var(--slot-open-text);
+}
+html .booking-time-slot.is-booked {
+  background: var(--slot-booked-bg);
+  color: var(--slot-booked-text);
+  cursor: not-allowed;
+}
+html .booking-time-slot.is-past {
+  background: #24242f;
+  color: #b1b1c4;
+  cursor: not-allowed;
+}
+html[data-theme='light'] .booking-time-slot.is-past {
+  background: #e2e8f0;
+  color: #64748b;
+}
+html .booking-time-slot[aria-pressed='true'] {
+  border-color: var(--slot-accent);
+  box-shadow: inset 0 0 0 1px var(--slot-accent);
+}
+html .booking-time-slot.is-available:hover {
+  background: #205644;
+  color: #bbf7d0;
+}
+html[data-theme='light'] .booking-time-slot.is-available:hover {
+  background: #bbf0d7;
+  color: #064e3b;
+}
+html .booking-time-slot:focus-visible {
+  outline: 2px solid var(--slot-accent);
+  outline-offset: 3px;
+}
+.booking-time-slot-label { font-weight: 600; }
+.booking-time-slot-status { margin-top: 2px; font-size: 10px; }

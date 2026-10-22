@@ -9,6 +9,7 @@ import { mongoConnection } from './mongoConnection.js';
 import { createHealthHandler } from './health.js';
 
 // Load environment variables
+dotenv.config({ path: fileURLToPath(new URL('../.env', import.meta.url)) });
 dotenv.config();
 
 import authRoutes from './routes/auth.routes.js';

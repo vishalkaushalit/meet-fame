@@ -2,6 +2,7 @@ export const adminPages = {
   overview: 'overview',
   approvals: 'approvals',
   bookings: 'bookings',
+  billing: 'billing',
   slots: 'availability',
   announcements: 'announcements',
   conversations: 'conversations',

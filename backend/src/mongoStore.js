@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { Transaction } from './models/Transaction.js';
 import { Announcement } from './models/Announcement.js';
 import { mongoConnection } from './mongoConnection.js';
 import { db } from './db.js';
@@ -10,6 +11,7 @@ import { Booking } from './models/Booking.js';
 import { Message } from './models/Message.js';
 import { Notification } from './models/Notification.js';
 export const persistenceModels = {
+  transactions: Transaction,
   announcements: Announcement,
   users: User,
   influencers: Influencer,

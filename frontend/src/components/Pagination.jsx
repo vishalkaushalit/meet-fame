@@ -7,8 +7,8 @@ export function usePagination(items, resetKey = '', pageSize = 10) {
   return { ...result, setPage: (page) => setState({ key: resetKey, page }) };
 }
 export default function Pagination({ pagination, label = 'records' }) {
-  const { page, pages, total, setPage } = pagination;
-  if (total === 0) return null;
+  const { page, pages, setPage } = pagination;
+  if (pages <= 1) return null;
   return (
     <nav className="record-pagination" aria-label={`${label} pagination`}>
       <div>

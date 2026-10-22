@@ -600,8 +600,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           ) : bookingsError &&
             bookings.length === 0 ? null : bookings.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              No sessions booked yet. Once users book your slots, they will
-              appear here!
+              No paid bookings yet. Sessions appear here after payment is confirmed.
             </div>
           ) : (
             <div className="space-y-3">
