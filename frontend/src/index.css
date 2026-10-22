@@ -123,7 +123,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px;
+  padding: 8px 18px;
   border-bottom: 1px solid #293448;
 }
 .notification-panel strong {
@@ -465,7 +465,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px;
+  padding: 8px 18px;
   border-bottom: 1px solid #293448;
 }
 .notification-panel strong {

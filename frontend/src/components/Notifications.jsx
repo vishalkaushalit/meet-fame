@@ -136,8 +136,7 @@ export default function Notifications() {
           >
             <header>
               <div>
-                <strong>Notifications</strong>
-                <small>Bookings & 15-minute reminders</small>
+                <strong>Notifications ({unread})</strong>
               </div>
               <button
                 type="button"
@@ -148,7 +147,6 @@ export default function Notifications() {
               </button>
             </header>
             <div className="notification-tools">
-              <span>{unread} unread</span>
               <button disabled={saving || !unread} onClick={() => mark()}>
                 <CheckCheck size={14} />
                 Mark all read

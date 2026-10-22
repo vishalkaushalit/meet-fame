@@ -70,13 +70,17 @@ export function notificationFeed(data, session, now = Date.now()) {
       ['booking', 'reminder', 'update'].includes(item.kind),
   );
   for (const announcement of activeAnnouncements(data, session, now)) {
-    if (own.some(item => item.announcementId === announcement.id)) continue;
+    const existing = own.find(item => item.announcementId === announcement.id);
+    if (existing) {
+      existing.createdAt = announcement.createdAt || existing.createdAt || announcement.activeFrom;
+      continue;
+    }
     own.push({
       id: `announcement:${announcement.id}:${session.role}:${session.id}`,
       announcementId: announcement.id,
       kind: 'update', recipientId: session.id, recipientRole: session.role,
       title: announcement.title, message: announcement.message,
-      createdAt: announcement.activeFrom || announcement.createdAt,
+      createdAt: announcement.createdAt || announcement.activeFrom,
       expiresAt: announcement.expiresAt ? Date.parse(announcement.expiresAt) : null,
       readAt: null,
     });
