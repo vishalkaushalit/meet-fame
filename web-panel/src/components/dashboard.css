@@ -1889,3 +1889,32 @@ html[data-theme='light'] .dashboard-sidebar .signout-button { color: #991b1b; ba
   .admin-record-pagination > span { width: 100%; text-align: center; }
   .admin-record-pagination > div { margin-inline: auto; }
 }
+
+html .user-view-button.announcement-delete-button svg { color: #fb7185; }
+html[data-theme='light'] .user-view-button.announcement-delete-button svg { color: #e11d48; }
+
+html .account-icon-actions.announcement-actions { display: inline-flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+
+html .account-icon-actions .announcement-delete-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: #3a242b;
+  color: #fda4af;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+html[data-theme='light'] .account-icon-actions .announcement-delete-action { background: #fff0f3; color: #e11d48; }
+html .announcement-delete-action svg { color: inherit; flex-shrink: 0; }
+html .announcement-delete-action:hover:not(:disabled) { filter: brightness(.96); }
+html .announcement-delete-action:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+html .announcement-delete-action:disabled { opacity: .45; cursor: not-allowed; }
