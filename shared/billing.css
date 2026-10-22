@@ -58,3 +58,12 @@ html[data-theme='light'] .billing-search input, html[data-theme='light'] .billin
 .billing-timezone { font-size: 12px; opacity: .75; margin-left: 2px; }
 .billing-created-date { white-space: nowrap; }
 .billing-booking-id { min-width: 170px; font-family: Poppins, sans-serif; overflow-wrap: anywhere; }
+
+.billing-view { min-width: 0; max-width: 100%; }
+.billing-table-scroll { width: 100%; max-width: 100%; }
+.billing-table { table-layout: fixed; }
+.billing-table :is(th, td) { overflow-wrap: anywhere; }
+.billing-session { min-width: 0; }
+.billing-amount { white-space: normal; }
+.billing-amount > small { font-weight: 400; }
+.billing-table .billing-booking-id, .billing-table .billing-reference { min-width: 0; }

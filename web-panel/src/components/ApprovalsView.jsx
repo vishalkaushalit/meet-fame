@@ -363,7 +363,7 @@ export default function ApprovalsView({ onChange, detailId }) {
         ) : (
           <div className="record-list">
             <div className="admin-records-table-wrap">
-              <table className="dashboard-table admin-records-table approval-creators-table">
+              <table className="dashboard-table admin-records-table approval-creators-table column-sized-table" style={{ minWidth: 874 }}><colgroup><col style={{ width: 64 }} /><col style={{ width: 240 }} /><col style={{ width: 180 }} /><col style={{ width: 100 }} /><col style={{ width: 130 }} /><col style={{ width: 160 }} /></colgroup>
                 <caption className="sr-only">Influencer applications</caption>
                 <thead>
                   <tr>
@@ -456,7 +456,7 @@ export default function ApprovalsView({ onChange, detailId }) {
       ) : (
         <div className="record-list">
           <div className="approval-users-table-wrap">
-            <table className="dashboard-table approval-users-table">
+            <table className="dashboard-table approval-users-table column-sized-table" style={{ minWidth: 1124 }}><colgroup><col style={{ width: 64 }} /><col style={{ width: 190 }} /><col style={{ width: 230 }} /><col style={{ width: 170 }} /><col style={{ width: 120 }} /><col style={{ width: 200 }} /><col style={{ width: 150 }} /></colgroup>
               <caption className="sr-only">
                 Registered users and account access
               </caption>

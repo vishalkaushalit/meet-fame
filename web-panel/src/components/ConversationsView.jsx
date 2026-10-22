@@ -74,7 +74,7 @@ export default function ConversationsView({ detailId }) {
 
             </div>
             <div className="admin-records-table-wrap">
-              <table className="dashboard-table conversation-table">
+              <table className="dashboard-table conversation-table column-sized-table" style={{ minWidth: 1074 }}><colgroup><col style={{ width: 64 }} /><col style={{ width: 180 }} /><col style={{ width: 180 }} /><col style={{ width: 100 }} /><col style={{ width: 260 }} /><col style={{ width: 210 }} /><col style={{ width: 80 }} /></colgroup>
                 <thead><tr><th>S.No.</th><th>User</th><th>Influencer</th><th>Messages</th><th>Latest message</th><th>Last activity</th><th>Action</th></tr></thead>
                 <tbody>
                   {threadPagination.items.map((conv, index) => (

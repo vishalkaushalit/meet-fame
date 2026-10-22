@@ -592,7 +592,7 @@ export default function AdminDashboard({
                   </button>
                 </div>
                 <div className="dashboard-table-wrap">
-                  <table className="dashboard-table">
+                  <table className="dashboard-table column-sized-table" style={{ minWidth: 904 }}><colgroup><col style={{ width: 64 }} /><col style={{ width: 240 }} /><col style={{ width: 230 }} /><col style={{ width: 140 }} /><col style={{ width: 110 }} /><col style={{ width: 120 }} /></colgroup>
                     <thead>
                       <tr>
                         <th>S.No.</th>

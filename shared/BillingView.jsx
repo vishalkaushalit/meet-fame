@@ -88,7 +88,13 @@ export default function BillingView({ loadTransactions, admin = false, refreshKe
         </div>
         {filtered.length ? <>
           <div className="billing-table-scroll">
-            <table className="billing-table">
+            <table className="billing-table" style={{ minWidth: admin ? 1380 : 1200 }}>
+              <colgroup>
+                <col style={{ width: 60 }} /><col style={{ width: 140 }} />
+                {admin && <col style={{ width: 180 }} />}
+                <col style={{ width: 240 }} /><col style={{ width: 200 }} />
+                <col style={{ width: 200 }} /><col style={{ width: 130 }} /><col style={{ width: 230 }} />
+              </colgroup>
               <thead><tr><th scope="col">S.No.</th><th scope="col">Date</th>{admin && <th scope="col">Customer</th>}<th scope="col">Session</th><th scope="col">Booking ID</th><th scope="col">Amount</th><th scope="col">Status</th><th scope="col">Transaction ID</th></tr></thead>
               <tbody>{filtered.slice((currentPage - 1) * 10, currentPage * 10).map((item, index) => <tr key={item.id}>
                 <td>{(currentPage - 1) * 10 + index + 1}</td>

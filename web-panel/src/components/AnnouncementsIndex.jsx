@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Eye, Pencil, Trash2, Search } from 'lucide-react';
+import { Eye, Pencil, Trash2, Search, TriangleAlert } from 'lucide-react';
 import { adminApi } from '../api';
 import { navigateAdmin, navigateAdminAction, navigateAdminRecord } from '../routes';
 import { formatDate, formatDateTime } from '../../../shared/dateFormat';
@@ -33,12 +33,15 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
     finally { setDeleting(null); }
   };
   const deleteConfirmation = deleteTarget && (
-    <div className="dashboard-card p-4 space-y-3" role="alertdialog" aria-label="Delete announcement" aria-describedby="delete-announcement-message">
-      <p id="delete-announcement-message">Delete “{deleteTarget.title}” and its notifications? This cannot be undone.</p>
+    <div className="announcement-delete-confirmation" role="alertdialog" aria-label="Delete announcement" aria-describedby="delete-announcement-message">
+      <div className="announcement-delete-warning">
+        <span className="announcement-warning-icon"><TriangleAlert size={22} aria-hidden="true" /></span>
+        <div><h3>Delete announcement?</h3><p id="delete-announcement-message">“{deleteTarget.title}” and its notifications will be permanently removed.</p></div>
+      </div>
       {error && <p role="alert">{error}</p>}
-      <div className="flex gap-2">
+      <div className="announcement-confirm-actions">
         <button type="button" className="dashboard-button" disabled={Boolean(deleting)} onClick={() => { setDeleteTarget(null); setError(''); }}>Cancel</button>
-        <button type="button" className="dashboard-button text-rose-500" disabled={Boolean(deleting)} onClick={() => remove(deleteTarget)}>{deleting ? 'Deleting…' : 'Confirm delete'}</button>
+        <button type="button" className="dashboard-button announcement-confirm-delete" disabled={Boolean(deleting)} onClick={() => remove(deleteTarget)}><Trash2 size={16} aria-hidden="true" />{deleting ? 'Deleting…' : 'Confirm delete'}</button>
       </div>
     </div>
   );
@@ -56,7 +59,7 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
     {deleteConfirmation}
     <div className="admin-list-toolbar"><div className="users-search"><Search size={16} /><input aria-label="Search announcements" placeholder="Search announcements..." value={search} onChange={event => setSearch(event.target.value)} /></div><button className="dashboard-button button-primary" onClick={() => navigateAdminAction('add-announcement')}>Add announcement</button></div>
     {error && <p role="alert">{error}</p>}
-    <div className="admin-records-table-wrap"><table className="dashboard-table"><thead><tr>{['S.No.', 'Title', 'Audience', 'Created', 'Activation', 'Expiry', 'Status', 'Actions'].map(label => <th key={label}>{label}</th>)}</tr></thead><tbody>{pagination.items.map((item, index) => <tr key={item.id}><td>{pagination.start + index}</td><td>{item.title}</td><td>{audience(item.audience)}</td><td>{formatDate(item.createdAt)}</td><td>{formatDate(item.activeFrom || item.createdAt)}</td><td>{item.expiresAt ? formatDate(item.expiresAt) : 'No expiry'}</td><td><StatusBadge status={status(item)} /></td><td><div className="account-icon-actions announcement-actions"><button className="user-view-button" aria-label={`View ${item.title}`} onClick={() => navigateAdminRecord('announcements', item.id)}><Eye size={16} /></button><button className="user-view-button" aria-label={`Edit ${item.title}`} onClick={() => navigateAdminRecord('announcements', item.id, { edit: true })}><Pencil size={16} /></button><button className="announcement-delete-action" disabled={deleting === item.id} aria-label={`Delete ${item.title}`} onClick={() => setDeleteTarget(item)}><Trash2 size={16} /></button></div></td></tr>)}{!pagination.total && <tr><td colSpan={8}>No announcements found.</td></tr>}</tbody></table></div>
+    <div className="admin-records-table-wrap"><table className="dashboard-table column-sized-table" style={{ minWidth: 1174 }}><colgroup><col style={{ width: 64 }} /><col style={{ width: 240 }} /><col style={{ width: 180 }} /><col style={{ width: 140 }} /><col style={{ width: 140 }} /><col style={{ width: 140 }} /><col style={{ width: 120 }} /><col style={{ width: 150 }} /></colgroup><thead><tr>{['S.No.', 'Title', 'Audience', 'Created', 'Activation', 'Expiry', 'Status', 'Actions'].map(label => <th key={label}>{label}</th>)}</tr></thead><tbody>{pagination.items.map((item, index) => <tr key={item.id}><td>{pagination.start + index}</td><td>{item.title}</td><td>{audience(item.audience)}</td><td>{formatDate(item.createdAt)}</td><td>{formatDate(item.activeFrom || item.createdAt)}</td><td>{item.expiresAt ? formatDate(item.expiresAt) : 'No expiry'}</td><td><StatusBadge status={status(item)} /></td><td><div className="account-icon-actions announcement-actions"><button className="user-view-button" aria-label={`View ${item.title}`} onClick={() => navigateAdminRecord('announcements', item.id)}><Eye size={16} /></button><button className="user-view-button" aria-label={`Edit ${item.title}`} onClick={() => navigateAdminRecord('announcements', item.id, { edit: true })}><Pencil size={16} /></button><button className="announcement-delete-action" disabled={deleting === item.id} aria-label={`Delete ${item.title}`} onClick={() => setDeleteTarget(item)}><Trash2 size={16} /></button></div></td></tr>)}{!pagination.total && <tr><td colSpan={8}>No announcements found.</td></tr>}</tbody></table></div>
     <Pagination pagination={pagination} label="announcements" />
   </div>;
 }

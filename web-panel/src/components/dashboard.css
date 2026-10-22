@@ -1918,3 +1918,46 @@ html .announcement-delete-action svg { color: inherit; flex-shrink: 0; }
 html .announcement-delete-action:hover:not(:disabled) { filter: brightness(.96); }
 html .announcement-delete-action:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 html .announcement-delete-action:disabled { opacity: .45; cursor: not-allowed; }
+
+.announcement-delete-confirmation { padding: 22px; border: 1px solid #fb71854d; border-radius: 14px; background: #2d2028; color: var(--text); }
+.announcement-delete-warning { display: flex; align-items: flex-start; gap: 14px; }
+.announcement-warning-icon { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: #fb71851a; color: #fb7185; }
+.announcement-delete-warning h3 { margin: 0 0 6px; font-size: 16px; font-weight: 600; }
+.announcement-delete-warning p { margin: 0; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.announcement-delete-warning .announcement-delete-note { margin-top: 4px; font-size: 12px; color: #fda4af; }
+.announcement-confirm-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+html .dashboard-button.announcement-confirm-delete { background: #e11d48; border-color: #e11d48; color: #fff; }
+html .dashboard-button.announcement-confirm-delete svg { color: inherit; }
+html .dashboard-button.announcement-confirm-delete:hover:not(:disabled) { background: #be123c; border-color: #be123c; }
+html[data-theme='light'] .announcement-delete-confirmation { background: #fff7f8; border-color: #fecdd3; }
+html[data-theme='light'] .announcement-warning-icon { background: #ffe4e6; color: #e11d48; }
+html[data-theme='light'] .announcement-delete-note { color: #be123c; }
+.announcement-delete-confirmation > [role='alert'] { margin-top: 12px; font-size: 14px; color: #e11d48; }
+
+html .announcement-confirm-actions .dashboard-button {
+  min-height: 36px;
+  height: 36px;
+  padding: 7px 14px;
+  font-size: 14px;
+  line-height: 20px;
+  border-radius: 8px;
+}
+html .announcement-confirm-actions .dashboard-button.announcement-confirm-delete {
+  color: #fff;
+  background: #e11d48;
+  border: 1px solid #e11d48;
+}
+html .announcement-confirm-actions .dashboard-button.announcement-confirm-delete svg { color: #fff; }
+html .announcement-confirm-actions .dashboard-button.announcement-confirm-delete:hover:not(:disabled) {
+  color: #fff;
+  background: #be123c;
+  border-color: #be123c;
+}
+html .announcement-delete-confirmation { padding: 16px; }
+html .announcement-confirm-actions { margin-top: 14px; }
+
+/* Keep table columns predictable while allowing horizontal scrolling on small screens. */
+html .dashboard-table.column-sized-table { table-layout: fixed; width: 100%; }
+html .column-sized-table :is(th, td) { overflow-wrap: anywhere; }
+html .column-sized-table td { white-space: normal; }
+html .admin-records-table-wrap, html .dashboard-table-wrap { max-width: 100%; min-width: 0; overflow-x: auto; }
