@@ -393,14 +393,15 @@ export default function UserPanel({
                     </div>
                   </div>
                   <div className="creator-session-meta">
+                    <div className="creator-status-field">
                     <span
                       className={`creator-status creator-status-${b.status}`}
                     >
                       <CheckCircle size={13} aria-hidden="true" />
                       {b.status}
                     </span>
+                    </div>
                     <div className="creator-fee">
-                      <DollarSign size={16} aria-hidden="true" />
                       <div>
                         <span>Fee</span>
                         <strong>${b.price ?? 0}</strong>
