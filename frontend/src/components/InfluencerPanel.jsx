@@ -240,7 +240,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 className="creator-avatar w-20 h-20 rounded-2xl object-cover ring-2 ring-brand-purple/50 shadow-md"
               />
               {user?.isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-slate-900 p-0.5 rounded-full">
+                <div className="absolute -bottom-1 -right-1 bg-slate-900 p-0.5 rounded-full w-[24px] h-[24px] flex items-center justify-center border border-blue-500/30">
                   <VerifiedBadge size="md" />
                 </div>
               )}
@@ -685,10 +685,10 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       {/* TAB 3: VERIFICATION & CERTIFICATE */}
       {activeTab === 'certificate' && (
         <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl max-w-3xl">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-[#0095F6] flex items-center justify-center border border-blue-500/30">
+          <div className="flex items-center justify-start gap-3 mb-6">
+            {/* <div className="w-10 h-8 rounded-2xl bg-blue-500/10 text-[#0095F6] flex items-center justify-center border border-blue-500/30"> */}
               <VerifiedBadge size="lg" />
-            </div>
+            {/* </div> */}
             <div>
               <h3 className="text-xl font-semibold text-white">
                 Instagram-Style Verified Badge
