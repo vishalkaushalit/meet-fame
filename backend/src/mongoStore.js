@@ -114,6 +114,19 @@ export const mongoStore = {
     try {
       await session.withTransaction(async () => {
         for (const name of collections) {
+          // Announcement removal also removes its delivered notifications.
+          if (['announcements', 'notifications'].includes(name) && Array.isArray(state[name])) {
+            const retained = new Set(state[name].map((item) => item.id));
+            for (const [id, original] of snapshot.originals[name]) {
+              if (retained.has(id)) continue;
+              const result = await persistenceModels[name].deleteOne({
+                _id: original._id,
+                _version: original.version ?? { $exists: false },
+              }, { session });
+              if (!result.deletedCount)
+                throw Object.assign(new Error('Concurrent record deletion'), { code: 'WRITE_CONFLICT' });
+            }
+          }
           for (const item of state[name] || []) {
             const original = snapshot.originals[name].get(item.id);
             if (
