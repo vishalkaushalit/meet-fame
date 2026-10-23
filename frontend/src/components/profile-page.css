@@ -3,8 +3,9 @@
 .profile-page-influencer .profile-identity { position: sticky; top: 80px; z-index: 30; flex-wrap: wrap; }
 .profile-section-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
 @media (max-width: 600px) { .profile-section-tabs { width: 100%; justify-content: flex-end; } }
-.profile-section-tabs button { white-space: nowrap; background: var(--profile-surface); color: var(--profile-muted); }
-.profile-section-tabs button[aria-pressed='true'] { background: #7c3aed; border-color: #7c3aed; color: #fff; }
+.profile-section-tabs button { white-space: nowrap; background: var(--button-secondary-background); color: var(--button-secondary-text); border-color: var(--button-secondary-border); }
+.profile-section-tabs button[aria-pressed='true'] { background: var(--button-primary-background); border-color: transparent; color: #fff; }
+.profile-section-tabs button:hover:not(:disabled) { filter: brightness(1.08); }
 #profile-bank-panel .bank-details { margin-top: 0; }
 @media (min-width: 640px) { .profile-page { padding-inline: 24px; } }
 html[data-theme='light'] .profile-page { --profile-surface: #fff; --profile-line: #dbe2ed; --profile-text: #172033; --profile-muted: #526078; }

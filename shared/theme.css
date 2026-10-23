@@ -1327,13 +1327,13 @@ html button.dashboard-button:not(.button-primary):hover:not(:disabled) {
   border-color: var(--focus-border-color);
   color: var(--interactive-hover-text);
 }
-html :is(button, a):is(.button-primary, .primary-dashboard-button, [class*='bg-gradient-to-']),
+html :is(button, a):is(.button-primary, .primary-dashboard-button, .profile-primary, .bank-save, [class*='bg-gradient-to-']),
 html button[type='submit'] {
   background: var(--button-primary-background) !important;
   color: #fff !important;
   border-color: transparent;
 }
-html :is(button, a):is(.button-primary, .primary-dashboard-button, [class*='bg-gradient-to-']):hover:not(:disabled),
+html :is(button, a):is(.button-primary, .primary-dashboard-button, .profile-primary, .bank-save, [class*='bg-gradient-to-']):hover:not(:disabled),
 html button[type='submit']:hover:not(:disabled) {
   filter: brightness(1.08);
   opacity: 1;
@@ -1406,16 +1406,17 @@ html[data-theme='light'] .account-time-badge {
 html[data-theme='light'] .account-time-unavailable { color: #64748b; }
 
 html button.profile-cancel-button:not(:disabled),
-html[data-theme='light'] button.profile-cancel-button:not(:disabled) {
-  background: #991b1b;
-  color: #fff;
-  border-color: #991b1b;
+html .profile-form-actions button[type='button']:not(:disabled),
+html .bank-actions button:not(.bank-save):not(:disabled) {
+  background: var(--button-secondary-background);
+  color: var(--button-secondary-text);
+  border-color: var(--button-secondary-border);
 }
 html button.profile-cancel-button:hover:not(:disabled),
-html[data-theme='light'] button.profile-cancel-button:hover:not(:disabled) {
-  background: #7f1d1d;
-  color: #fff;
-  border-color: #7f1d1d;
+html .profile-form-actions button[type='button']:hover:not(:disabled),
+html .bank-actions button:not(.bank-save):hover:not(:disabled) {
+  border-color: var(--focus-border-color);
+  color: var(--interactive-hover-text);
 }
 
 html label.approval-status-filter {
