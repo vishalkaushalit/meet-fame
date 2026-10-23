@@ -7,6 +7,7 @@ import {
   introVideoError,
 } from '../../../shared/registrationValidation.js';
 import express from 'express';
+import { getBankDetails, saveBankDetails } from '../bankDetails.js';
 import { requireSession } from '../middleware/session.js';
 import { updateOwnProfile } from '../profile.js';
 import { receiveProfileImage } from '../profileUpload.js';
@@ -20,6 +21,8 @@ import { db } from '../db.js';
 import { uploadToStorage } from '../blobStorage.js';
 
 const router = express.Router();
+router.get('/bank-details', requireSession, getBankDetails);
+router.put('/bank-details', requireSession, saveBankDetails);
 router.put('/profile', requireSession, receiveProfileImage, handleProfileUpdate);
 async function handleProfileUpdate(req, res) {
   try { await updateOwnProfile(req, res); }

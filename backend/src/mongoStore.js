@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { BankDetails } from './models/BankDetails.js';
 import { createHash } from 'node:crypto';
 import { AccountIdentityLock } from './models/AccountIdentityLock.js';
 import { accountCollections, normalizedIdentity, identityErrors } from './accountIdentity.js';
@@ -15,6 +16,7 @@ import { Booking } from './models/Booking.js';
 import { Message } from './models/Message.js';
 import { Notification } from './models/Notification.js';
 export const persistenceModels = {
+  bankdetails: BankDetails,
   passwordresets: PasswordReset,
   transactions: Transaction,
   announcements: Announcement,

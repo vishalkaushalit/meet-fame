@@ -379,6 +379,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
       </div>
 
+
       {/* TAB 1: SLOTS & AVAILABILITY MANAGER */}
       {activeTab === 'slots' && (
         <div className="space-y-6">
@@ -406,7 +407,7 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                   {savingSlots ? (
                     <span>Saving...</span>
                   ) : (
-                    'Save Availability & Generate Slots'
+                    'Save changes'
                   )}
                 </span>
               </button>

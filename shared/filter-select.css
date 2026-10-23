@@ -1,0 +1,9 @@
+.filter-select { position: relative; display: block; width: 256px; max-width: 100%; }
+.filter-select > select, .billing-view .filter-select > select { appearance: none; width: 100%; min-height: 44px; padding: 10px 40px 10px 44px; border: 1px solid #334155; border-radius: 16px; background: #0f172a; color: #cbd5e1; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.filter-select-icon, .filter-select-chevron { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: none; }
+.filter-select-icon { left: 16px; color: #64748b; }
+.filter-select-chevron { right: 16px; color: #cbd5e1; }
+.filter-select > select:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
+html[data-theme='light'] .filter-select > select { background: #f8fafc; border-color: #cbd5e1; color: #172033; }
+html[data-theme='light'] .filter-select-chevron { color: #526078; }
+@media (max-width: 639px) { .filter-select { width: 100%; } }

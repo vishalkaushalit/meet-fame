@@ -1,0 +1,4 @@
+.secure-input { position: relative; }
+.secure-input > input, .bank-field .secure-input > input, .password-recovery-card .secure-input > input { padding-right: 48px; }
+.secure-input .secure-input-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; justify-content: center; width: 36px; min-height: 36px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: #94a3b8; cursor: pointer; }
+.secure-input .secure-input-toggle:focus-visible { outline: 2px solid #a78bfa; outline-offset: 1px; }

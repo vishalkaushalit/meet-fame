@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import BankDetailsForm from '../../../shared/BankDetailsForm';
 import { ArrowLeft, Pencil, Save, UserRound, Mail, Phone, Briefcase, Upload, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
@@ -10,9 +11,18 @@ import VerifiedBadge from './VerifiedBadge';
 import LogoLoader from './LogoLoader';
 import './profile-page.css';
 
+const marcusDemoBankDetails = {
+  accountHolder: 'Marcus Vance (Demo)',
+  bankName: 'Demo Bank — Sample Only',
+  country: 'IN',
+  accountNumber: '000000123456',
+  routingCode: 'DEMO0000001',
+};
+
 export default function ProfilePage({ edit = false }) {
   const { user, updateUserProfile } = useAuth();
   const [profile, setProfile] = useState(user);
+  const [activeSection, setActiveSection] = useState('profile');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -64,7 +74,7 @@ export default function ProfilePage({ edit = false }) {
     {fields[key] && <small id={`profile-${key}-error`} role="alert">{fields[key]}</small>}
   </div>;
   const detail = (label, value) => <div className="profile-detail" key={label}><dt>{label}</dt><dd>{value || 'Not provided'}</dd></div>;
-  return <section className="profile-page">
+  return <section className={`profile-page${influencer ? ' profile-page-influencer' : ''}`}>
     <div className="profile-page-heading">
       <div><button type="button" className="profile-back" onClick={() => navigate(edit ? '/profile' : '/')} aria-label={edit ? 'Back to profile' : 'Back to dashboard'}><ArrowLeft size={18} /></button><h1>{edit ? 'Edit Profile' : 'My Profile'}</h1></div>
       {!edit && <button className="profile-primary" type="button" onClick={() => { setSaved(false); navigate('/profile/edit'); }}><Pencil size={16} />Edit Profile</button>}
@@ -75,7 +85,12 @@ export default function ProfilePage({ edit = false }) {
       <div className="profile-identity">
         {photoPreview || profile.avatar ? <img src={photoPreview || profile.avatar} alt={profile.name} /> : <span className="profile-avatar-placeholder"><UserRound size={32} /></span>}
         <div><h2>{profile.name}{profile.isVerified && <VerifiedBadge size="md" />}</h2>{influencer && <p>{profile.specialization}</p>}<span className="profile-role">{influencer ? 'Influencer' : 'User'}</span></div>
+      {influencer && <nav className="profile-section-tabs" aria-label="Profile sections">
+        <button type="button" aria-pressed={activeSection === 'profile'} aria-controls="profile-details-panel" disabled={saving} onClick={() => setActiveSection('profile')}><UserRound size={18} />Profile details</button>
+        <button type="button" aria-pressed={activeSection === 'bank'} aria-controls="profile-bank-panel" disabled={saving} onClick={() => setActiveSection('bank')}><Briefcase size={18} />Bank details</button>
+      </nav>}
       </div>
+      <div id="profile-details-panel" hidden={influencer && activeSection !== 'profile'}>
       {edit ? <form onSubmit={submit} className="profile-card">
         <h2><UserRound size={18} />Personal details</h2>
         <div className="profile-grid">
@@ -106,12 +121,14 @@ export default function ProfilePage({ edit = false }) {
             <div className="profile-field profile-full"><label htmlFor="profile-bio">Bio</label><textarea id="profile-bio" rows={4} maxLength={2000} value={profile.bio || ''} disabled={saving} onChange={(event) => change('bio', event.target.value)} />{fields.bio && <small role="alert">{fields.bio}</small>}</div>
           </div>
         </>}
-        <div className="profile-form-actions"><button type="button" onClick={() => navigate('/profile')} disabled={saving}>Cancel</button><button className="profile-primary" type="submit" disabled={saving}><Save size={16} />{saving ? 'Saving…' : 'Save changes'}</button></div>
+        <div className="profile-form-actions"><button className="profile-primary" type="submit" disabled={saving}><Save size={16} />{saving ? 'Saving…' : 'Save changes'}</button><button type="button" onClick={() => navigate('/profile')} disabled={saving}>Cancel</button></div>
       </form> : <div className="profile-card">
         <h2><UserRound size={18} />Personal details</h2>
         <dl className="profile-grid">{detail('Full name', profile.name)}{detail('Email address', <span className="profile-detail-inline"><Mail size={16} />{profile.email}</span>)}{detail('Phone number', profile.phone ? <span className="profile-detail-inline"><Phone size={16} />{profile.phone}</span> : null)}{detail('Member since', formatDate(profile.createdAt))}</dl>
         {influencer && <><h2><Briefcase size={18} />Professional details</h2><dl className="profile-grid">{detail('Specialization', profile.specialization)}{detail('Category', profile.category)}{detail('Hourly rate', `$${profile.hourlyRate ?? 0} / hour`)}{detail('Account status', profile.status?.replaceAll('_', ' '))}{detail('Verification', profile.isVerified ? 'Verified' : 'Not verified')}{detail('Bio', profile.bio)}</dl></>}
       </div>}
+      </div>
+      {influencer && <div id="profile-bank-panel" hidden={activeSection !== 'bank'}><BankDetailsForm api={api.bankDetails} demoDetails={user.email?.toLowerCase() === 'marcus@techcreator.io' ? marcusDemoBankDetails : null} /></div>}
     </>}
   </section>;
 }

@@ -24,6 +24,7 @@ import {
 const publicRequest = { authenticated: false };
 
 export const api = {
+  bankDetails: { get: () => client.get('/auth/bank-details'), save: (details) => client.put('/auth/bank-details', details) },
   billing: { getTransactions: () => client.get('/bookings/transactions') },
   notifications: {
     request: (path = '', method = 'GET') => client.request({ url: NOTIFICATIONS_API(path), method }),

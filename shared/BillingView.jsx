@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import './billing.css';
+import FilterSelect from './FilterSelect';
+import { createPortal } from 'react-dom';
 import { CalendarDays, Clock, ReceiptText, Wallet, CheckCircle2, Search } from 'lucide-react';
 import { formatDate } from './dateFormat';
 
@@ -8,7 +10,7 @@ const reportingAmount = (item) => Number.isSafeInteger(item.usdAmount)
   ? { amount: item.usdAmount, currency: 'USD' }
   : { amount: item.amount, currency: item.currency };
 const statusLabel = { pending: 'Awaiting payment', paid: 'Paid', refund_pending: 'Refund requested', refunded: 'Refunded' };
-export default function BillingView({ loadTransactions, admin = false, refreshKey = 0 }) {
+export default function BillingView({ loadTransactions, admin = false, refreshKey = 0, headerTarget = null, showRefresh = true, showSummary = true }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -48,27 +50,7 @@ export default function BillingView({ loadTransactions, admin = false, refreshKe
     if (item.status === 'paid') result[currency] = (result[currency] || 0) + amount;
     return result;
   }, {});
-  return (
-    <section className="billing-view" aria-label="Billing">
-      {!admin && <div className="billing-heading">
-        <div><h2>Billing & transactions</h2><p>{admin ? 'Payment history across the platform.' : 'Your session payments and refunds.'}</p></div>
-        <button type="button" onClick={refresh} disabled={loading}>Refresh</button>
-      </div>}
-      {error && <p role="alert" className="billing-error">{error}</p>}
-      {loading ? <p role="status">Loading transactions…</p> : !error && <>
-        <div className="billing-totals">
-          <div className="billing-summary-card">
-            <div className="billing-summary-top"><span className="billing-summary-label">Transactions</span><span className="billing-summary-icon"><ReceiptText size={20} aria-hidden="true" /></span></div>
-            <strong>{transactions.length.toLocaleString()}</strong>
-            <p className="billing-summary-caption">All payment records</p>
-          </div>
-          {Object.entries(totals).map(([currency, amount]) => <div key={currency} className="billing-summary-card billing-summary-collected">
-            <div className="billing-summary-top"><span className="billing-summary-label">{admin ? 'Collected' : 'Paid'} <span className="billing-summary-currency">{currency}</span></span><span className="billing-summary-icon"><Wallet size={20} aria-hidden="true" /></span></div>
-            <strong>{money(amount, currency)}</strong>
-            <p className="billing-summary-caption"><CheckCircle2 size={13} aria-hidden="true" />{currency === 'USD' && transactions.some((item) => item.currency !== 'USD' && Number.isSafeInteger(item.usdAmount)) ? 'Includes USD equivalents' : 'Confirmed payments'}</p>
-          </div>)}
-        </div>
-        <div className="billing-toolbar">
+  const billingToolbar = <div className="billing-toolbar">
           <div className="billing-search">
             <Search size={18} aria-hidden="true" />
             <input
@@ -79,13 +61,33 @@ export default function BillingView({ loadTransactions, admin = false, refreshKe
               onChange={(event) => { setSearch(event.target.value); setPage(1); }}
             />
           </div>
-          <label className="billing-filter">Status:
-            <select value={status} onChange={(event) => { setStatus(event.target.value); setPage(1); }}>
+          <FilterSelect label="Filter by payment status" value={status} onChange={(event) => { setStatus(event.target.value); setPage(1); }}>
               <option value="all">All statuses</option>
               {Object.entries(statusLabel).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-            </select>
-          </label>
-        </div>
+          </FilterSelect>
+        </div>;
+  const billingHeading = <div className="billing-heading">
+        <div><h2>Billing & transactions</h2><p>{admin ? 'Payment history across the platform.' : 'Your session payments and refunds.'}</p></div>
+        {showRefresh && <button type="button" onClick={refresh} disabled={loading}>Refresh</button>}
+      </div>;
+  return (
+    <section className="billing-view" aria-label="Billing">
+      {!admin && (headerTarget ? createPortal(<div className="billing-pinned-controls">{billingHeading}{billingToolbar}</div>, headerTarget) : billingHeading)}
+      {error && <p role="alert" className="billing-error">{error}</p>}
+      {loading ? <p role="status">Loading transactions…</p> : !error && <>
+        {showSummary && <div className="billing-totals">
+          <div className="billing-summary-card">
+            <div className="billing-summary-top"><span className="billing-summary-label">Transactions</span><span className="billing-summary-icon"><ReceiptText size={20} aria-hidden="true" /></span></div>
+            <strong>{transactions.length.toLocaleString()}</strong>
+            <p className="billing-summary-caption">All payment records</p>
+          </div>
+          {Object.entries(totals).map(([currency, amount]) => <div key={currency} className="billing-summary-card billing-summary-collected">
+            <div className="billing-summary-top"><span className="billing-summary-label">{admin ? 'Collected' : 'Paid'} <span className="billing-summary-currency">{currency}</span></span><span className="billing-summary-icon"><Wallet size={20} aria-hidden="true" /></span></div>
+            <strong>{money(amount, currency)}</strong>
+            <p className="billing-summary-caption"><CheckCircle2 size={13} aria-hidden="true" />{currency === 'USD' && transactions.some((item) => item.currency !== 'USD' && Number.isSafeInteger(item.usdAmount)) ? 'Includes USD equivalents' : 'Confirmed payments'}</p>
+          </div>)}
+        </div>}
+        {!headerTarget && billingToolbar}
         {filtered.length ? <>
           <div className="billing-table-scroll">
             <table className="billing-table" style={{ minWidth: admin ? 1380 : 1200 }}>
@@ -93,7 +95,7 @@ export default function BillingView({ loadTransactions, admin = false, refreshKe
                 <col style={{ width: 60 }} /><col style={{ width: 140 }} />
                 {admin && <col style={{ width: 180 }} />}
                 <col style={{ width: 240 }} /><col style={{ width: 200 }} />
-                <col style={{ width: 200 }} /><col style={{ width: 130 }} /><col style={{ width: 230 }} />
+                <col style={{ width: 140 }} /><col style={{ width: 190 }} /><col style={{ width: 230 }} />
               </colgroup>
               <thead><tr><th scope="col">S.No.</th><th scope="col">Date</th>{admin && <th scope="col">Customer</th>}<th scope="col">Session</th><th scope="col">Booking ID</th><th scope="col">Amount</th><th scope="col">Status</th><th scope="col">Transaction ID</th></tr></thead>
               <tbody>{filtered.slice((currentPage - 1) * 10, currentPage * 10).map((item, index) => <tr key={item.id}>

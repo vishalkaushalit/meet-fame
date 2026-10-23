@@ -19,6 +19,7 @@ import {
 } from './endpoints';
 
 export const adminApi = {
+  bankDetails: { get: () => client.get('/auth/bank-details'), save: (details) => client.put('/auth/bank-details', details) },
   billing: { getTransactions: () => client.get('/bookings/transactions') },
   profile: { update: (profile) => client.put(ADMIN_PROFILE_API, profile) },
   announcements: {

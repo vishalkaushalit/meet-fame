@@ -510,7 +510,8 @@ html[data-theme='light'] .user-bookings .creator-appointment {
   border-color: var(--creator-line);
 }
 
-.creator-sticky-overview {
+.creator-sticky-overview,
+.user-sticky-overview {
   position: sticky;
   top: 80px;
   z-index: 30;
@@ -519,4 +520,5 @@ html[data-theme='light'] .user-bookings .creator-appointment {
   background: #0a0f1d;
 }
 .creator-sticky-overview .creator-tabs { margin-bottom: 0; }
-html[data-theme='light'] .creator-sticky-overview { background: #f8fafc; }
+html[data-theme='light'] .creator-sticky-overview,
+html[data-theme='light'] .user-sticky-overview { background: #f8fafc; }

@@ -1,6 +1,7 @@
 import PhoneInput from '../../../shared/PhoneInput';
 import { phoneError } from '../../../shared/phoneValidation';
 import React, { useState } from 'react';
+import BankDetailsForm from '../../../shared/BankDetailsForm';
 import { Save } from 'lucide-react';
 import { adminApi } from '../api';
 export default function AdminEditProfile({ admin, onClose, onSaved }) {
@@ -72,14 +73,6 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
         )}
         <footer className="flex justify-end gap-3 mt-5">
           <button
-            type="button"
-            disabled={saving}
-            onClick={onClose}
-            className="dashboard-button profile-cancel-button"
-          >
-            Cancel
-          </button>
-          <button
             type="submit"
             disabled={saving || !name.trim() || !email.trim()}
             className="dashboard-button button-primary"
@@ -87,8 +80,17 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             <Save size={15} />
             {saving ? <span>Saving…</span> : 'Save changes'}
           </button>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={onClose}
+            className="dashboard-button profile-cancel-button"
+          >
+            Cancel
+          </button>
         </footer>
       </form>
+      <BankDetailsForm api={adminApi.bankDetails} />
     </section>
   );
 }

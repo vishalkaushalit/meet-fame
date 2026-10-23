@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Eye, EyeOff } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import SecureInput from './SecureInput';
 import AuthSocialBackground from './AuthSocialBackground';
 import './password-recovery.css';
 
@@ -11,7 +12,6 @@ export default function PasswordRecovery({ role, reset = false, requestReset, ve
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
-  const [visible, setVisible] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -82,10 +82,10 @@ export default function PasswordRecovery({ role, reset = false, requestReset, ve
         </>}
         {step === 'password' && <>
           <label htmlFor="recovery-password">New password</label>
-          <div className="recovery-password-field"><input id="recovery-password" autoComplete="new-password" type={visible ? 'text' : 'password'} required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} /><button type="button" aria-label={visible ? 'Hide password' : 'Show password'} onClick={() => setVisible(!visible)}>{visible ? <EyeOff size={18} /> : <Eye size={18} />}</button></div>
+          <SecureInput label="new password" id="recovery-password" autoComplete="new-password" required minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} />
           <small>Use at least 8 characters.</small>
           <label htmlFor="recovery-confirm">Confirm new password</label>
-          <input id="recovery-confirm" autoComplete="new-password" type={visible ? 'text' : 'password'} required minLength={8} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
+          <SecureInput label="confirm new password" id="recovery-confirm" autoComplete="new-password" required minLength={8} value={confirmation} onChange={(event) => setConfirmation(event.target.value)} />
         </>}
         <button className="recovery-submit" type="submit" disabled={busy}>{step === 'email' && <Mail size={17} />}{busy ? 'Please wait…' : step === 'password' ? 'Reset password' : step === 'otp' ? 'Verify OTP' : 'Send OTP'}</button>
         {step === 'otp' && <button className="recovery-resend" type="button" disabled={busy || resendSeconds > 0 || !email.trim()} onClick={resend}>{resendSeconds ? `Resend OTP in ${resendSeconds}s` : 'Resend OTP'}</button>}

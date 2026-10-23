@@ -30,6 +30,18 @@ html[data-theme='light'] .billing-summary-collected .billing-summary-icon { colo
 .billing-search input:focus-visible { outline: 2px solid #a78bfa; outline-offset: 2px; }
 .billing-filter { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; }
 .billing-toolbar select { min-height: 43px; border-radius: 12px; font-weight: 400; background-color: #0f172a; }
+.billing-pinned-controls { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.billing-pinned-controls .billing-heading { margin-bottom: 0; }
+.billing-pinned-controls .billing-toolbar { flex-shrink: 0; padding: 0; margin: 0; border: 0; background: transparent; gap: 12px; }
+.billing-pinned-controls .billing-search { width: 320px; }
+.billing-pinned-controls .billing-filter select { width: 180px; }
+@media (max-width: 1023px) {
+  .billing-pinned-controls { flex-direction: column; align-items: stretch; }
+  .billing-pinned-controls .billing-toolbar { justify-content: flex-start; }
+}
+@media (max-width: 600px) {
+  .billing-pinned-controls .billing-search, .billing-pinned-controls .billing-filter select { width: 100%; }
+}
 html[data-theme='light'] .billing-search input, html[data-theme='light'] .billing-toolbar select { background: #f8fafc; }
 @media (max-width: 600px) {
   .billing-search { width: 100%; }
