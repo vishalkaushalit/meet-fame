@@ -11,70 +11,76 @@ import {
   Clock,
   Sparkles,
   ArrowRight,
-  CheckCircle,
   ExternalLink,
-  Star,
 } from 'lucide-react';
 
 export default function LandingPage({
   onBookInfluencer,
-  onOpenChat,
   featuredInfluencers = [],
+  hideHeader = false,
 }) {
   return (
     <div className="min-h-screen bg-[#0A0F1D] text-slate-100 flex flex-col selection:bg-brand-purple selection:text-white">
       {/* Top Banner / Navbar */}
-      <header className="sticky top-0 z-40 bg-[#0A0F1D]/80 backdrop-blur-xl border-b border-slate-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          <Logo size="header" />
+      {!hideHeader && (
+        <header className="sticky top-0 z-40 bg-[#0A0F1D]/80 backdrop-blur-xl border-b border-slate-800/80">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <Logo size="header" />
 
-          {/* Nav Links */}
-          <div className="hidden lg:flex items-center gap-8 text-xs font-semibold text-slate-300">
-            <a href="#features" className="hover:text-white transition-colors">
-              Features
-            </a>
-            <a href="#creators" className="hover:text-white transition-colors">
-              Top Influencers
-            </a>
-            <a
-              href="#how-it-works"
-              className="hover:text-white transition-colors"
-            >
-              How It Works
-            </a>
-            <a
-              href={
-                import.meta.env.VITE_ADMIN_PANEL_URL ||
-                (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')
-              }
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 text-brand-purple hover:text-brand-pink transition-colors font-semibold"
-            >
-              <span>Admin Command Center</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            {/* Nav Links */}
+            <div className="hidden lg:flex items-center gap-8 text-xs font-semibold text-slate-300">
+              <a
+                href="#features"
+                className="hover:text-white transition-colors"
+              >
+                Features
+              </a>
+              <a
+                href="#creators"
+                className="hover:text-white transition-colors"
+              >
+                Top Influencers
+              </a>
+              <a
+                href="#how-it-works"
+                className="hover:text-white transition-colors"
+              >
+                How It Works
+              </a>
+              <a
+                href={
+                  import.meta.env.VITE_ADMIN_PANEL_URL ||
+                  (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')
+                }
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1.5 text-brand-purple hover:text-brand-pink transition-colors font-semibold"
+              >
+                <span>Admin Command Center</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            {/* Auth Actions */}
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <a
+                href="/login"
+                className="website-sign-in py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"
+              >
+                Sign In
+              </a>
+
+              <a
+                href="/influencer/signup"
+                className="py-2.5 px-5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
+              >
+                Join as Influencer
+              </a>
+            </div>
           </div>
-
-          {/* Auth Actions */}
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <a
-              href="/login"
-              className="website-sign-in py-2.5 px-4 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all border border-slate-800"
-            >
-              Sign In
-            </a>
-
-            <a
-              href="/influencer/signup"
-              className="py-2.5 px-5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
-            >
-              Join as Influencer
-            </a>
-          </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* HERO SECTION */}
       <section className="social-background-host relative pt-16 pb-20 overflow-hidden">
@@ -143,7 +149,9 @@ export default function LandingPage({
               <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto mb-3">
                 <Calendar className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold text-white text-sm">Book Time Slots</h3>
+              <h3 className="font-semibold text-white text-sm">
+                Book Time Slots
+              </h3>
               <p className="text-[11px] text-slate-400 mt-1">
                 Autogenerated 1-hour slots with real-time disabled booked slots
               </p>
@@ -219,7 +227,7 @@ export default function LandingPage({
                         className="w-16 h-16 rounded-2xl object-cover ring-2 ring-brand-purple/30 group-hover:ring-brand-purple transition-all"
                       />
                       {inf.isVerified && (
-                        <div className="absolute -bottom-1 -right-1 bg-slate-900 p-0.5 rounded-full">
+                        <div className="verified-avatar-overlay absolute -bottom-1 -right-1 bg-slate-900 rounded-full">
                           <VerifiedBadge size="sm" />
                         </div>
                       )}
@@ -283,7 +291,10 @@ export default function LandingPage({
       </section>
 
       {/* HOW IT WORKS SECTION */}
-      <section id="how-it-works" className="social-background-host py-20 bg-[#0A0F1D]">
+      <section
+        id="how-it-works"
+        className="social-background-host py-20 bg-[#0A0F1D]"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-semibold text-white">

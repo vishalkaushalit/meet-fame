@@ -1,27 +1,15 @@
+import useBookings from '../hooks/useBookings';
+import useDebouncedValue from '../hooks/useDebouncedValue';
+import UserBookings from './user/UserBookings';
+import InfluencerDirectory from './user/InfluencerDirectory';
 import FilterSelect from '../../../shared/FilterSelect';
 import BillingView from '../../../shared/BillingView';
-import { formatDate } from '../../../shared/dateFormat';
-import IntroVideo from './IntroVideo';
-import Pagination, { usePagination } from './Pagination';
+import { usePagination } from './Pagination';
 import './creator-dashboard.css';
-import LogoLoader from './LogoLoader';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
-import VerifiedBadge from './VerifiedBadge';
-import JoinCallButton from './JoinCallButton';
-import {
-  Search,
-  Calendar,
-  Clock,
-  MessageSquare,
-  Sparkles,
-  DollarSign,
-  ArrowRight,
-  CheckCircle,
-  Video,
-  Info,
-} from 'lucide-react';
+import { Search, Calendar, Sparkles, DollarSign } from 'lucide-react';
 
 export default function UserPanel({
   onBookInfluencer,
@@ -40,11 +28,8 @@ export default function UserPanel({
   const [influencers, setInfluencers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebouncedValue(searchQuery);
   const [loading, setLoading] = useState(true);
-
-  const [myBookings, setMyBookings] = useState([]);
-  const [loadingBookings, setLoadingBookings] = useState(false);
-  const [bookingsError, setBookingsError] = useState('');
 
   const categories = [
     'All',
@@ -54,55 +39,35 @@ export default function UserPanel({
     'Business & Finance',
   ];
 
-  // Fetch approved influencers
+  // Ignore stale responses when the category or search changes.
   useEffect(() => {
+    let active = true;
     async function loadInfluencers() {
       setLoading(true);
       try {
-        const res = await api.influencers.getAll(selectedCategory, searchQuery);
-        setInfluencers(res.influencers || []);
+        const res = await api.influencers.getAll(
+          selectedCategory,
+          debouncedSearchQuery,
+        );
+        if (active) setInfluencers(res.influencers || []);
       } catch (err) {
-        console.error('Failed to fetch influencers:', err);
+        if (active) console.error('Failed to fetch influencers:', err);
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
-
     loadInfluencers();
-  }, [selectedCategory, searchQuery]);
-
-  // Refresh after a successful booking and while the bookings view is open.
-  useEffect(() => {
-    if (!user?.id) return;
-    let active = true;
-    const load = async (showLoading = false) => {
-      if (showLoading) setLoadingBookings(true);
-      try {
-        const result = await api.bookings.getMyBookings({ userId: user.id });
-        if (active) {
-          setMyBookings(result.bookings || []);
-          setBookingsError('');
-        }
-      } catch {
-        if (active)
-          setBookingsError('Unable to load bookings. Please try again.');
-      } finally {
-        if (active && showLoading) setLoadingBookings(false);
-      }
-    };
-    const refresh = () => load();
-    load(true);
-    window.addEventListener('meetfame-bookings-updated', refresh);
-    window.addEventListener('focus', refresh);
-    const timer =
-      activeTab === 'my-bookings' ? setInterval(refresh, 15000) : null;
     return () => {
       active = false;
-      clearInterval(timer);
-      window.removeEventListener('meetfame-bookings-updated', refresh);
-      window.removeEventListener('focus', refresh);
     };
-  }, [user?.id, activeTab]);
+  }, [selectedCategory, debouncedSearchQuery]);
+
+  // Refresh after a successful booking and while the bookings view is open.
+  const {
+    bookings: myBookings,
+    loading: loadingBookings,
+    error: bookingsError,
+  } = useBookings(user?.id, 'user', activeTab === 'my-bookings');
 
   const bookingPagination = usePagination(myBookings);
   const creatorPagination = usePagination(
@@ -114,109 +79,123 @@ export default function UserPanel({
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="user-sticky-overview">
-      {/* User Welcome Banner */}
-      <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-6 relative overflow-hidden">
-        <div className="absolute -top-12 -right-12 w-64 h-64 bg-brand-indigo/10 rounded-full blur-3xl pointer-events-none" />
+        {/* User Welcome Banner */}
+        <div className="p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute -top-12 -right-12 w-64 h-64 bg-brand-indigo/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="flex min-w-0 items-center gap-4 relative z-10">
-          <img
-            src={
-              user?.avatar ||
-              'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
-            }
-            alt={user?.name}
-            className="w-16 h-16 shrink-0 rounded-2xl object-cover ring-2 ring-brand-indigo/40"
-          />
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-semibold leading-snug tracking-tight text-white break-words">
-                Hello, {user?.name || 'Explorer'}
-              </h1>
-              <span className="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                User
-              </span>
-            </div>
-            <p className="text-slate-400 text-xs leading-relaxed mt-1">
-              Connect 1-on-1 with verified influencers, executives, and mentors.
-            </p>
-          </div>
-        </div>
-
-        {/* Tab Controls */}
-        <div className="flex shrink-0 flex-wrap items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 relative z-10">
-          <button
-            data-app-tab="true" data-active={activeTab === 'browse'}
-            onClick={() => setActiveTab('browse')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-              activeTab === 'browse'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Sparkles className="w-4 h-4" />
-            <span>Discover Influencers</span>
-          </button>
-
-          <button
-            data-app-tab="true" data-active={activeTab === 'my-bookings'}
-            onClick={() => setActiveTab('my-bookings')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-              activeTab === 'my-bookings'
-                ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>My Bookings ({myBookings.length})</span>
-          </button>
-          <button
-            data-app-tab="true" data-active={activeTab === 'billing'}
-            onClick={() => setActiveTab('billing')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeTab === 'billing' ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
-          >
-            <DollarSign className="w-4 h-4" /><span>Billing</span>
-          </button>
-        </div>
-      </div>
-
-      {activeTab === 'browse' && (
-        <>
-          {/* Search & Category Filter Bar */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-brand-purple" aria-hidden="true" />
-                <span>Discover Influencers</span>
-              </h2>
-              <p className="text-slate-400 text-xs mt-1">
-                Find experts and book a session with your favorite influencers.
+          <div className="flex min-w-0 items-center gap-4 relative z-10">
+            <img
+              src={
+                user?.avatar ||
+                'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
+              }
+              alt={user?.name}
+              className="w-16 h-16 shrink-0 rounded-2xl object-cover ring-2 ring-brand-indigo/40"
+            />
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-xl font-semibold leading-snug tracking-tight text-white break-words">
+                  Hello, {user?.name || 'Explorer'}
+                </h1>
+                <span className="shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  User
+                </span>
+              </div>
+              <p className="text-slate-400 text-xs leading-relaxed mt-1">
+                Connect 1-on-1 with verified influencers, executives, and
+                mentors.
               </p>
             </div>
-            <div className="flex w-full lg:w-auto flex-col sm:flex-row items-center gap-3 lg:ml-auto">
-            <div className="relative w-full md:w-80">
-              <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
-              <input
-                type="text"
-                aria-label="Search influencers"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name, expertise, or keyword..."
-                className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <FilterSelect label="Filter by category" value={selectedCategory} onChange={(event) => setSelectedCategory(event.target.value)}>
-              {categories.map((category) => (
-                <option key={category} value={category}>{category === 'All' ? 'All categories' : category}</option>
-              ))}
-            </FilterSelect>
-            </div>
           </div>
 
-        </>
-      )}
-      {activeTab === 'my-bookings' && (
+          {/* Tab Controls */}
+          <div className="flex shrink-0 flex-wrap items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 relative z-10">
+            <button
+              data-app-tab="true"
+              data-active={activeTab === 'browse'}
+              onClick={() => setActiveTab('browse')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                activeTab === 'browse'
+                  ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Discover Influencers</span>
+            </button>
+
+            <button
+              data-app-tab="true"
+              data-active={activeTab === 'my-bookings'}
+              onClick={() => setActiveTab('my-bookings')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                activeTab === 'my-bookings'
+                  ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Calendar className="w-4 h-4" />
+              <span>My Bookings ({myBookings.length})</span>
+            </button>
+            <button
+              data-app-tab="true"
+              data-active={activeTab === 'billing'}
+              onClick={() => setActiveTab('billing')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeTab === 'billing' ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+            >
+              <DollarSign className="w-4 h-4" />
+              <span>Billing</span>
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'browse' && (
+          <>
+            {/* Search & Category Filter Bar */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                  <Sparkles
+                    className="w-5 h-5 text-brand-purple"
+                    aria-hidden="true"
+                  />
+                  <span>Discover Influencers</span>
+                </h2>
+                <p className="text-slate-400 text-xs mt-1">
+                  Find experts and book a session with your favorite
+                  influencers.
+                </p>
+              </div>
+              <div className="flex w-full lg:w-auto flex-col sm:flex-row items-center gap-3 lg:ml-auto">
+                <div className="relative w-full md:w-80">
+                  <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-500" />
+                  <input
+                    type="text"
+                    aria-label="Search influencers"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search by name, expertise, or keyword..."
+                    className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
+                  />
+                </div>
+
+                {/* Category Filter */}
+                <FilterSelect
+                  label="Filter by category"
+                  value={selectedCategory}
+                  onChange={(event) => setSelectedCategory(event.target.value)}
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category === 'All' ? 'All categories' : category}
+                    </option>
+                  ))}
+                </FilterSelect>
+              </div>
+            </div>
+          </>
+        )}
+        {activeTab === 'my-bookings' && (
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-xl font-semibold text-white flex items-center gap-2">
@@ -228,232 +207,42 @@ export default function UserPanel({
               </p>
             </div>
           </div>
-      )}
-      {activeTab === 'billing' && <div className="billing-view" ref={setBillingHeaderTarget} />}
+        )}
+        {activeTab === 'billing' && (
+          <div className="billing-view" ref={setBillingHeaderTarget} />
+        )}
       </div>
 
-      {activeTab === 'billing' && <BillingView key={user.id} headerTarget={billingHeaderTarget} showRefresh={false} showSummary={false} loadTransactions={api.billing.getTransactions} />}
+      {activeTab === 'billing' && (
+        <BillingView
+          key={user.id}
+          headerTarget={billingHeaderTarget}
+          showRefresh={false}
+          showSummary={false}
+          loadTransactions={api.billing.getTransactions}
+        />
+      )}
 
       {/* TAB 1: BROWSE INFLUENCERS */}
       {activeTab === 'browse' && (
-        <div>
-          {/* Influencer Grid */}
-          {loading ? (
-            <LogoLoader
-              variant="inline"
-              label="Loading verified influencers..."
-            />
-          ) : influencers.length === 0 ? (
-            <div className="py-16 text-center text-slate-400 bg-slate-900 rounded-3xl border border-slate-800">
-              <p className="text-sm font-semibold">
-                No influencers found matching your criteria.
-              </p>
-              <p className="text-xs text-slate-500 mt-1">
-                Try selecting another category or clearing search.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {creatorPagination.items.map((inf) => (
-                <div
-                  key={inf.id}
-                  className="rounded-3xl bg-slate-900 border border-slate-800 hover:border-brand-purple/40 p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 group"
-                >
-                  <div>
-                    {/* Header: Avatar, Name, Verified Badge, Category */}
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="relative flex-shrink-0">
-                        <img
-                          src={
-                            inf.avatar ||
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
-                          }
-                          alt={inf.name}
-                          className="w-16 h-16 rounded-2xl object-cover ring-2 ring-brand-purple/30 group-hover:ring-brand-purple transition-all"
-                        />
-                        {inf.isVerified && (
-                          <div className="absolute -bottom-1 -right-1 bg-slate-900 p-0.5 rounded-full">
-                            <VerifiedBadge size="sm" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <h3 className="font-semibold text-white text-base truncate">
-                            {inf.name}
-                          </h3>
-                          {inf.isVerified && <VerifiedBadge size="sm" />}
-                        </div>
-                        <p className="text-brand-purple text-xs font-semibold mt-0.5 truncate">
-                          {inf.specialization}
-                        </p>
-                        <span className="inline-block px-2 py-0.5 rounded-full bg-slate-950 text-slate-400 text-[10px] font-semibold mt-1 border border-slate-800">
-                          {inf.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Bio */}
-                    <p className="text-slate-300 text-xs leading-relaxed line-clamp-3 mb-4">
-                      {inf.bio}
-                    </p>
-
-                    <IntroVideo influencer={inf} card />
-
-                    {/* Rate & Slots metadata */}
-                    <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-950/80 border border-slate-800/80 mb-5 text-xs">
-                      <div>
-                        <span className="text-[10px] text-slate-500 uppercase block font-semibold">
-                          1-Hour Session
-                        </span>
-                        <span className="font-semibold text-emerald-400 text-sm">
-                          ${inf.hourlyRate || 150}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[10px] text-slate-500 uppercase block font-semibold">
-                          Availability
-                        </span>
-                        <span className="font-semibold text-slate-300 text-xs">
-                          {inf.totalWeeklySlots || 12} slots/week
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                    {/* Action Buttons */}
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-800/60">
-                    <button
-                      onClick={() => onBookInfluencer(inf)}
-                      className="flex-1 py-2.5 px-4 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-md flex items-center justify-center gap-1.5"
-                    >
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>Book Slot</span>
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          {!loading && (
-            <Pagination pagination={creatorPagination} label="influencers" />
-          )}
-        </div>
+        <InfluencerDirectory
+          loading={loading}
+          influencers={influencers}
+          creatorPagination={creatorPagination}
+          onBookInfluencer={onBookInfluencer}
+        />
       )}
 
       {/* TAB 2: MY BOOKINGS */}
       {activeTab === 'my-bookings' && (
-        <div className="user-bookings creator-appointments p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl">
-
-
-          {bookingsError && (
-            <div
-              role="alert"
-              className="p-3 mb-4 text-xs text-rose-300 border border-rose-500/30 rounded-xl"
-            >
-              {bookingsError}
-              <button
-                className="ml-3 underline"
-                onClick={() =>
-                  window.dispatchEvent(new Event('meetfame-bookings-updated'))
-                }
-              >
-                Retry
-              </button>
-            </div>
-          )}
-          {loadingBookings ? (
-            <LogoLoader variant="inline" label="Loading bookings..." />
-          ) : bookingsError &&
-            myBookings.length === 0 ? null : myBookings.length === 0 ? (
-            <div className="py-12 text-center text-xs text-slate-500 border border-dashed border-slate-800 rounded-2xl">
-              No paid bookings yet. Complete payment for a session to see it here.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {bookingPagination.items.map((b) => (
-                <article key={b.id} className="creator-appointment">
-                  <div className="creator-client">
-                    <span className="creator-client-avatar" aria-hidden="true">
-                      {b.influencerName?.charAt(0) || 'I'}
-                    </span>
-                    <div>
-                      <h4>{b.influencerName}</h4>
-                      <p>
-                        Influencer ·{' '}
-                        {b.meetingType === 'video'
-                          ? 'Video session'
-                          : 'In-person session'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="creator-session-info">
-                    <div className="creator-topic">
-                      <MessageSquare size={17} aria-hidden="true" />
-                      <div>
-                        <span>Topic</span>
-                        <strong>{b.topic || '1-on-1 session'}</strong>
-                      </div>
-                    </div>
-                    <div className="creator-session-time">
-                      <span>
-                        <Calendar size={16} aria-hidden="true" />
-                        {formatDate(b.date)}{' '}
-                        <span className="capitalize">({b.dayOfWeek})</span>
-                      </span>
-                      <span className="time-slot-badge">
-                        <Clock size={16} aria-hidden="true" />
-                        {b.slotLabel || b.slot} <small>IST</small>
-                      </span>
-                    </div>
-                  </div>
-                  <div className="creator-session-meta">
-                    <div className="creator-status-field">
-                    <span
-                      className={`creator-status creator-status-${b.status}`}
-                    >
-                      <CheckCircle size={13} aria-hidden="true" />
-                      {b.status}
-                    </span>
-                    </div>
-                    <div className="creator-fee">
-                      <div>
-                        <span>Fee</span>
-                        <strong>${b.price ?? 0}</strong>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="creator-session-actions">
-                    {b.status === 'confirmed' && b.meetingType === 'video' && (
-                      <JoinCallButton booking={b} onJoinCall={onJoinCall} />
-                    )}
-                    <button
-                      className="creator-chat-button"
-                      onClick={() =>
-                        onOpenChat?.(
-                          { id: b.influencerId, name: b.influencerName },
-                          'influencer',
-                        )
-                      }
-                    >
-                      <MessageSquare size={17} aria-hidden="true" />
-                      Chat with Influencer
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-          {!loadingBookings && (
-            <Pagination pagination={bookingPagination} label="bookings" />
-          )}
-          <p className="creator-session-note">
-            <Info size={18} aria-hidden="true" />
-            You can join the meeting at the scheduled time or chat with the
-            influencer for any updates.
-          </p>
-        </div>
+        <UserBookings
+          bookingsError={bookingsError}
+          loadingBookings={loadingBookings}
+          myBookings={myBookings}
+          bookingPagination={bookingPagination}
+          onJoinCall={onJoinCall}
+          onOpenChat={onOpenChat}
+        />
       )}
     </div>
   );

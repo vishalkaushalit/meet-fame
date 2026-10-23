@@ -11,7 +11,7 @@ export default function Logo({ size = 'md', className = '' }) {
     }[size] || 'w-[200px]';
   return (
     <a
-      href="/"
+      href="/home"
       aria-label="MeetFame homepage"
       className="inline-flex shrink-0 max-w-full rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
     >

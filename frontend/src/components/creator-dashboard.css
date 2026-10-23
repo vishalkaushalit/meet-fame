@@ -470,21 +470,6 @@ html[data-theme='light'] .creator-fee strong {
   .creator-session-info { grid-template-columns: minmax(0, 1fr); }
 }
 
-.creator-site-header > div {
-  max-width: 1500px;
-}
-html[data-theme='light'] .creator-site-header {
-  background: #ffffffed;
-  border-color: #dce3ff;
-}
-html[data-theme='light'] .creator-site-header .uppercase {
-  background: #f1edff;
-  color: #5b21b6;
-  border-color: #e4dcff;
-  font-size: 12px;
-  letter-spacing: 0;
-  padding: 8px 16px;
-}
 
 .user-bookings {
   --creator-line: #334155;

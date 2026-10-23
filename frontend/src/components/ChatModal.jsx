@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api';
 import VerifiedBadge from './VerifiedBadge';
-import { X, Send, MessageSquare, Clock, User, Sparkles } from 'lucide-react';
+import { X, Send, MessageSquare } from 'lucide-react';
 
 export default function ChatModal({
   isOpen,
@@ -13,7 +13,6 @@ export default function ChatModal({
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
-  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Conversation ID format: `${userId}_${influencerId}`

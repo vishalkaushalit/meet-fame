@@ -479,7 +479,10 @@ export default function VideoCall({ booking, role, onClose }) {
           <div>
             <h2 id="video-call-title">Session with {counterpart}</h2>
             <p>
-              {formatDate(booking.date)} · <span className="time-slot-badge">{booking.slotLabel || booking.slot} IST</span>
+              {formatDate(booking.date)} ·{' '}
+              <span className="time-slot-badge">
+                {booking.slotLabel || booking.slot} IST
+              </span>
             </p>
           </div>
           <button

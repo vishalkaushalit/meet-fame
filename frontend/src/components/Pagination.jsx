@@ -3,7 +3,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { paginate, paginationNumbers } from '../../../shared/pagination';
 export function usePagination(items, resetKey = '', pageSize = 10) {
   const [state, setState] = useState({ key: resetKey, page: 1 });
-  const result = paginate(items, state.key === resetKey ? state.page : 1, pageSize);
+  const result = paginate(
+    items,
+    state.key === resetKey ? state.page : 1,
+    pageSize,
+  );
   return { ...result, setPage: (page) => setState({ key: resetKey, page }) };
 }
 export default function Pagination({ pagination, label = 'records' }) {

@@ -13,7 +13,12 @@ export function createApiClient(axios, { baseURL, getToken }) {
       const body = error.response?.data;
       const details = body && typeof body === 'object' ? body : {};
       const normalized = Object.assign(
-        new Error(details.error || details.message || error.message || 'Request failed.'),
+        new Error(
+          details.error ||
+            details.message ||
+            error.message ||
+            'Request failed.',
+        ),
         details,
         { status: details.status ?? error.response?.status },
       );

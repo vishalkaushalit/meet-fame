@@ -147,7 +147,11 @@ export default function Notifications() {
               </button>
             </header>
             <div className="notification-tools">
-              <button type="button" disabled={saving || !unread} onClick={() => mark()}>
+              <button
+                type="button"
+                disabled={saving || !unread}
+                onClick={() => mark()}
+              >
                 <CheckCheck size={16} aria-hidden="true" />
                 Mark all read
               </button>
@@ -183,8 +187,7 @@ export default function Notifications() {
                       )}
                     </div>
                     <time dateTime={item.createdAt}>
-                      {formatDateTime(item.createdAt)}{' '}
-                      IST
+                      {formatDateTime(item.createdAt)} IST
                     </time>
                   </article>
                 ))

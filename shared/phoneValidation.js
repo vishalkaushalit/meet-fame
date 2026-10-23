@@ -12,5 +12,7 @@ export function phoneError(value, required = false) {
 }
 
 export function normalizePhone(value) {
-  return value?.trim() ? parsePhoneNumberFromString(value)?.number || value.trim() : '';
+  return value?.trim()
+    ? parsePhoneNumberFromString(value)?.number || value.trim()
+    : '';
 }

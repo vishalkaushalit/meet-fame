@@ -26,8 +26,10 @@ export function certificateError(file) {
 export function introVideoError(file) {
   if (!file) return 'Upload an introduction video.';
   const name = file.name || file.originalname || '';
-  if (!/\.(mp4|webm)$/i.test(name) ||
-      !['video/mp4', 'video/webm'].includes(file.type || file.mimetype))
+  if (
+    !/\.(mp4|webm)$/i.test(name) ||
+    !['video/mp4', 'video/webm'].includes(file.type || file.mimetype)
+  )
     return 'Upload an MP4 or WebM video.';
   if (!file.size || file.size > 5 * 1024 * 1024)
     return 'Introduction video must be non-empty and 5 MB or smaller.';

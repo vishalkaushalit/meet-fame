@@ -13,7 +13,10 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   const submit = async (event) => {
     event.preventDefault();
     if (saving) return;
-    if (phoneError(phone)) { setError(phoneError(phone)); return; }
+    if (phoneError(phone)) {
+      setError(phoneError(phone));
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -28,9 +31,14 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   const field =
     'w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-white mt-2';
   return (
-    <section className="admin-edit-profile admin-edit-profile-page" aria-labelledby="admin-edit-profile-title">
+    <section
+      className="admin-edit-profile admin-edit-profile-page"
+      aria-labelledby="admin-edit-profile-title"
+    >
       <form onSubmit={submit} className="admin-profile-form">
-        <h2 id="admin-edit-profile-title" className="sr-only">Edit profile</h2>
+        <h2 id="admin-edit-profile-title" className="sr-only">
+          Edit profile
+        </h2>
         <label className="block text-xs text-slate-300 mb-4">
           Name
           <input
@@ -60,8 +68,18 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
           />
         </label>
         <div className="mb-4">
-          <label htmlFor="admin-phone" className="mb-2 block text-xs text-slate-300">Phone</label>
-          <PhoneInput id="admin-phone" value={phone} onChange={setPhone} disabled={saving} />
+          <label
+            htmlFor="admin-phone"
+            className="mb-2 block text-xs text-slate-300"
+          >
+            Phone
+          </label>
+          <PhoneInput
+            id="admin-phone"
+            value={phone}
+            onChange={setPhone}
+            disabled={saving}
+          />
         </div>
         <p className="text-xs text-slate-400 mb-4">
           Use your updated email the next time you sign in.

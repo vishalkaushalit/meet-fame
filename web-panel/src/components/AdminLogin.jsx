@@ -6,7 +6,15 @@ import React, { useState } from 'react';
 import Logo from './Logo';
 import { adminApi } from '../api';
 import { adminPath } from '../routes';
-import { Shield, Lock, Eye, EyeOff, Mail, ArrowRight, CheckCircle2 } from 'lucide-react';
+import {
+  Shield,
+  Lock,
+  Eye,
+  EyeOff,
+  Mail,
+  ArrowRight,
+  CheckCircle2,
+} from 'lucide-react';
 
 export default function AdminLogin({ onLoginSuccess }) {
   const { areaRef, cardRef } = useFitAuthForm();
@@ -56,7 +64,10 @@ export default function AdminLogin({ onLoginSuccess }) {
       </header>
       <main ref={areaRef} className="admin-login-main auth-fit-area">
         <AuthSocialBackground />
-        <div ref={cardRef} className="auth-fit-card w-full max-w-md p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative overflow-hidden">
+        <div
+          ref={cardRef}
+          className="auth-fit-card w-full max-w-md p-8 rounded-3xl bg-slate-900 border border-slate-800 shadow-2xl relative overflow-hidden"
+        >
           {/* Glow */}
           <div className="absolute -top-24 -right-24 w-48 h-48 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -112,16 +123,30 @@ export default function AdminLogin({ onLoginSuccess }) {
                   placeholder="Enter your password"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-12 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
                 />
-                <button type="button" onClick={() => setShowPassword((visible) => !visible)}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((visible) => !visible)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   aria-pressed={showPassword}
-                  className="absolute right-2 bottom-1.5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-purple">
-                  {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                  className="absolute right-2 bottom-1.5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-purple"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-4 w-4" aria-hidden="true" />
+                  )}
                 </button>
               </div>
             </div>
 
-            <div className="text-right"><a className="text-sm text-brand-purple hover:underline" href={adminPath('forgot-password')}>Forgot password?</a></div>
+            <div className="text-right">
+              <a
+                className="text-sm text-brand-purple hover:underline"
+                href={adminPath('forgot-password')}
+              >
+                Forgot password?
+              </a>
+            </div>
             <button
               type="submit"
               disabled={loading}

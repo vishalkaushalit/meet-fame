@@ -1,4 +1,3 @@
-import { upload } from '@vercel/blob/client';
 import { client } from './client';
 import {
   API_BASE,
@@ -24,36 +23,58 @@ import {
 const publicRequest = { authenticated: false };
 
 export const api = {
-  bankDetails: { get: () => client.get('/auth/bank-details'), save: (details) => client.put('/auth/bank-details', details) },
+  bankDetails: {
+    get: () => client.get('/auth/bank-details'),
+    save: (details) => client.put('/auth/bank-details', details),
+  },
   billing: { getTransactions: () => client.get('/bookings/transactions') },
   notifications: {
-    request: (path = '', method = 'GET') => client.request({ url: NOTIFICATIONS_API(path), method }),
+    request: (path = '', method = 'GET') =>
+      client.request({ url: NOTIFICATIONS_API(path), method }),
   },
   calls: {
-    request: (bookingId, action, payload = {}, sessionToken) => client.post(
-      CALL_API(bookingId, action), payload,
-      action === 'leave' ? {
-        // Axios's fetch adapter preserves delivery during page unload.
-        adapter: 'fetch', fetchOptions: { keepalive: true },
-        ...(sessionToken ? { headers: { Authorization: `Bearer ${sessionToken}` } } : {}),
-      } : {},
-    ),
+    request: (bookingId, action, payload = {}, sessionToken) =>
+      client.post(
+        CALL_API(bookingId, action),
+        payload,
+        action === 'leave'
+          ? {
+              // Axios's fetch adapter preserves delivery during page unload.
+              adapter: 'fetch',
+              fetchOptions: { keepalive: true },
+              ...(sessionToken
+                ? { headers: { Authorization: `Bearer ${sessionToken}` } }
+                : {}),
+            }
+          : {},
+      ),
   },
   auth: {
     updateProfile: (payload) => client.put('/auth/profile', payload),
-    forgotPassword: (payload) => client.post('/auth/forgot-password', payload, publicRequest),
-    verifyOtp: (payload) => client.post('/auth/verify-reset-otp', payload, publicRequest),
-    resetPassword: (payload) => client.post('/auth/reset-password', payload, publicRequest),
-    login: (email, password, role) => client.post(LOGIN_API, { email, password, role }, publicRequest),
-    registerUser: (payload) => client.post(REGISTER_USER_API, payload, publicRequest),
+    forgotPassword: (payload) =>
+      client.post('/auth/forgot-password', payload, publicRequest),
+    verifyOtp: (payload) =>
+      client.post('/auth/verify-reset-otp', payload, publicRequest),
+    resetPassword: (payload) =>
+      client.post('/auth/reset-password', payload, publicRequest),
+    login: (email, password, role) =>
+      client.post(LOGIN_API, { email, password, role }, publicRequest),
+    registerUser: (payload) =>
+      client.post(REGISTER_USER_API, payload, publicRequest),
     registerInfluencer: async (formData) => {
       const payload = new FormData();
       for (const [key, value] of formData.entries()) payload.append(key, value);
       if (import.meta.env.PROD) {
+        const { upload } = await import('@vercel/blob/client');
         const file = payload.get('introVideoFile');
-        const blob = await upload(`introduction_video/intro-${Date.now()}.${file.name.split('.').pop()}`, file, {
-          access: 'public', handleUploadUrl: `${API_BASE}${INTRO_VIDEO_UPLOAD_API}`,
-        });
+        const blob = await upload(
+          `introduction_video/intro-${Date.now()}.${file.name.split('.').pop()}`,
+          file,
+          {
+            access: 'public',
+            handleUploadUrl: `${API_BASE}${INTRO_VIDEO_UPLOAD_API}`,
+          },
+        );
         payload.delete('introVideoFile');
         payload.set('introVideoUrl', blob.url);
       }
@@ -62,22 +83,36 @@ export const api = {
     getMe: () => client.get(CURRENT_USER_API),
   },
   influencers: {
-    getAll: (category = '', search = '') => client.get(INFLUENCERS_API, {
-      ...publicRequest, params: { ...(category && category !== 'All' ? { category } : {}), ...(search ? { search } : {}) },
-    }),
+    getAll: (category = '', search = '') =>
+      client.get(INFLUENCERS_API, {
+        ...publicRequest,
+        params: {
+          ...(category && category !== 'All' ? { category } : {}),
+          ...(search ? { search } : {}),
+        },
+      }),
     getById: (id) => client.get(INFLUENCER_DETAILS_API(id), publicRequest),
-    updateAvailability: (id, availability) => client.put(INFLUENCER_AVAILABILITY_API(id), { availability }),
-    uploadCertificate: (id, formData) => client.post(UPLOAD_CERTIFICATE_API(id), formData),
-    updateProfile: (id, profile) => client.put(INFLUENCER_PROFILE_API(id), profile),
+    updateAvailability: (id, availability) =>
+      client.put(INFLUENCER_AVAILABILITY_API(id), { availability }),
+    uploadCertificate: (id, formData) =>
+      client.post(UPLOAD_CERTIFICATE_API(id), formData),
+    updateProfile: (id, profile) =>
+      client.put(INFLUENCER_PROFILE_API(id), profile),
   },
   bookings: {
-    createPaymentOrder: (data) => client.post(`${CREATE_BOOKING_API}/payment-order`, data),
-    getSlots: (influencerId, date) => client.get(BOOKING_SLOTS_API, { ...publicRequest, params: { influencerId, date } }),
+    createPaymentOrder: (data) =>
+      client.post(`${CREATE_BOOKING_API}/payment-order`, data),
+    getSlots: (influencerId, date) =>
+      client.get(BOOKING_SLOTS_API, {
+        ...publicRequest,
+        params: { influencerId, date },
+      }),
     create: (bookingData) => client.post(CREATE_BOOKING_API, bookingData),
     getMyBookings: (params = {}) => client.get(MY_BOOKINGS_API, { params }),
   },
   chat: {
-    getMessages: (conversationId) => client.get(CHAT_MESSAGES_API(conversationId), publicRequest),
+    getMessages: (conversationId) =>
+      client.get(CHAT_MESSAGES_API(conversationId), publicRequest),
     sendMessage: (payload) => client.post(SEND_MESSAGE_API, payload),
   },
 };

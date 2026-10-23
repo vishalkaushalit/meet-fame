@@ -1,10 +1,17 @@
 export function authPath(role = 'user', tab = 'login') {
-  const slug = ['forgot-password', 'reset-password'].includes(tab) ? tab : tab === 'register' ? 'signup' : 'login';
+  const slug = ['forgot-password', 'reset-password'].includes(tab)
+    ? tab
+    : tab === 'register'
+      ? 'signup'
+      : 'login';
   return `${role === 'influencer' ? '/influencer' : ''}/${slug}`;
 }
 export function matchAuthRoute(pathname) {
   const normalized = pathname.replace(/\/+$/, '') || '/';
-  const match = /^(\/influencer)?\/(login|signup|forgot-password|reset-password)$/.exec(normalized);
+  const match =
+    /^(\/influencer)?\/(login|signup|forgot-password|reset-password)$/.exec(
+      normalized,
+    );
   return match
     ? {
         role: match[1] ? 'influencer' : 'user',

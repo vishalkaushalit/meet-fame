@@ -10,8 +10,13 @@ export default function Pagination({ pagination, label = 'records' }) {
   const { page, pages, total, start, end, setPage } = pagination;
   if (pages <= 1) return null;
   return (
-    <nav className="record-pagination admin-record-pagination" aria-label={`${label} pagination`}>
-      <span role="status">Showing {end - start + 1} of {total} {label}</span>
+    <nav
+      className="record-pagination admin-record-pagination"
+      aria-label={`${label} pagination`}
+    >
+      <span role="status">
+        Showing {end - start + 1} of {total} {label}
+      </span>
       <div>
         <button
           type="button"

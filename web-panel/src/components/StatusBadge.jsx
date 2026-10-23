@@ -5,6 +5,11 @@ export default function StatusBadge({ status, children }) {
     : ['pending', 'pending_review', 'submitted', 'scheduled'].includes(value)
       ? 'status-pending'
       : ['blocked', 'rejected', 'revoked', 'cancelled'].includes(value)
-        ? 'status-blocked' : 'status-neutral';
-  return <span className={`account-status-badge ${color}`}>{children ?? (value.replaceAll('_', ' ') || 'Not provided')}</span>;
+        ? 'status-blocked'
+        : 'status-neutral';
+  return (
+    <span className={`account-status-badge ${color}`}>
+      {children ?? (value.replaceAll('_', ' ') || 'Not provided')}
+    </span>
+  );
 }

@@ -1,14 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
-import AdminLogin from './components/AdminLogin';
-import PasswordRecovery from '../../shared/PasswordRecovery';
+import React, { lazy, Suspense, useState, useEffect, useRef } from 'react';
 import Logo from './components/Logo';
 import ThemeToggle from './components/ThemeToggle';
 import LogoLoader from './components/LogoLoader';
-import AdminDashboard from './components/AdminDashboard';
 import { adminApi } from './api';
-import { adminPath, matchAdminPage, navigateAdmin, cleanAdminReturnUrl } from './routes';
+import {
+  adminPath,
+  matchAdminPage,
+  navigateAdmin,
+  cleanAdminReturnUrl,
+} from './routes';
 
-export default function App() {
+const AdminLogin = lazy(() => import('./components/AdminLogin'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const PasswordRecovery = lazy(() => import('../../shared/PasswordRecovery'));
+
+function AdminAppContent() {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [path, setPath] = useState(() => window.location.pathname);
@@ -16,7 +22,10 @@ export default function App() {
   const page = matchAdminPage(path);
   useEffect(() => {
     cleanAdminReturnUrl();
-    const update = () => { cleanAdminReturnUrl(); setPath(window.location.pathname); };
+    const update = () => {
+      cleanAdminReturnUrl();
+      setPath(window.location.pathname);
+    };
     window.addEventListener('popstate', update);
     return () => window.removeEventListener('popstate', update);
   }, []);
@@ -24,12 +33,21 @@ export default function App() {
     if (loading) return;
     if (['forgot-password', 'reset-password'].includes(page)) return;
     if (!admin && page !== 'login') {
-      if (page) requestedPage.current = { path: window.location.pathname, search: window.location.search, state: window.history.state };
+      if (page)
+        requestedPage.current = {
+          path: window.location.pathname,
+          search: window.location.search,
+          state: window.history.state,
+        };
       navigateAdmin(null, { replace: true });
     } else if (admin && (!page || page === 'login')) {
       const destination = requestedPage.current;
       if (destination) {
-        window.history.replaceState(destination.state || {}, '', destination.path + destination.search);
+        window.history.replaceState(
+          destination.state || {},
+          '',
+          destination.path + destination.search,
+        );
         window.dispatchEvent(new PopStateEvent('popstate'));
         window.scrollTo(0, 0);
       } else navigateAdmin('overview', { replace: true });
@@ -75,7 +93,24 @@ export default function App() {
   };
 
   if (loading) return <LogoLoader label="Loading admin workspace…" />;
-  if (['forgot-password', 'reset-password'].includes(page)) return <PasswordRecovery header={<><Logo /><ThemeToggle /></>} key={page} role="admin" reset={page === 'reset-password'} requestReset={adminApi.auth.forgotPassword} verifyOtp={adminApi.auth.verifyOtp} savePassword={adminApi.auth.resetPassword} loginUrl={adminPath(null)} />;
+  if (['forgot-password', 'reset-password'].includes(page))
+    return (
+      <PasswordRecovery
+        header={
+          <>
+            <Logo />
+            <ThemeToggle />
+          </>
+        }
+        key={page}
+        role="admin"
+        reset={page === 'reset-password'}
+        requestReset={adminApi.auth.forgotPassword}
+        verifyOtp={adminApi.auth.verifyOtp}
+        savePassword={adminApi.auth.resetPassword}
+        loginUrl={adminPath(null)}
+      />
+    );
 
   return (
     <div>
@@ -90,5 +125,13 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Suspense fallback={<LogoLoader label="Loading admin workspace…" />}>
+      <AdminAppContent />
+    </Suspense>
   );
 }

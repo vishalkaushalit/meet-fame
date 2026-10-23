@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+.verified-avatar-overlay { display: grid; place-items: center; width: 24px; height: 24px; padding: 2px; border-radius: 50%; line-height: 0; }
+
 html .notification-tools button {
   display: inline-flex;
   align-items: center;

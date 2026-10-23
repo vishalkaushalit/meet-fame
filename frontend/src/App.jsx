@@ -1,23 +1,19 @@
+import AppPage from './components/layout/AppPage';
+import useFeaturedInfluencers from './hooks/useFeaturedInfluencers';
+import AppHeader from './components/layout/AppHeader';
 import ThemeToggle from './components/ThemeToggle';
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import LandingPage from './components/LandingPage';
-import InfluencerPanel from './components/InfluencerPanel';
-import UserPanel from './components/UserPanel';
-import AuthPage from './components/AuthPage';
-import PasswordRecovery from '../../shared/PasswordRecovery';
 import { authPath, matchAuthRoute, navigate } from './authRoutes';
-import BookingPage from './components/BookingPage';
-import ProfilePage from './components/ProfilePage';
-import ChatModal from './components/ChatModal';
 import StatusAlertModal from './components/StatusAlertModal';
 import Logo from './components/Logo';
 import LogoLoader from './components/LogoLoader';
-import Notifications from './components/Notifications';
-import VideoCall from './components/VideoCall';
-import HeaderProfileMenu from './components/HeaderProfileMenu';
 import { api } from './api';
-import { ExternalLink } from 'lucide-react';
+
+const AuthPage = lazy(() => import('./components/AuthPage'));
+const VideoCall = lazy(() => import('./components/VideoCall'));
+const ChatModal = lazy(() => import('./components/ChatModal'));
+const PasswordRecovery = lazy(() => import('../../shared/PasswordRecovery'));
 
 function AppContent() {
   const { user, role, logout, loading } = useAuth();
@@ -31,13 +27,21 @@ function AppContent() {
     window.addEventListener('popstate', updatePath);
     return () => window.removeEventListener('popstate', updatePath);
   }, []);
+  const authTab = authRoute?.tab;
   useEffect(() => {
-    if (user && authRoute && !['forgot-password', 'reset-password'].includes(authRoute.tab)) {
+    if (
+      user &&
+      authTab &&
+      !['forgot-password', 'reset-password'].includes(authTab)
+    ) {
       const destination = sessionStorage.getItem('meetfame-booking-return');
       sessionStorage.removeItem('meetfame-booking-return');
-      navigate(destination && /^\/book\/[^/]+$/.test(destination) ? destination : '/', { replace: true });
+      navigate(
+        destination && /^\/book\/[^/]+$/.test(destination) ? destination : '/',
+        { replace: true },
+      );
     }
-  }, [user, path]);
+  }, [user, authTab]);
 
   const bookingRoute = /^\/book\/([^/]+)\/?$/.exec(path);
   const profileRoute = /^\/profile(?:\/edit)?\/?$/.test(path);
@@ -49,23 +53,13 @@ function AppContent() {
   const [chatTarget, setChatTarget] = useState(null);
   const [chatTargetRole, setChatTargetRole] = useState('influencer');
 
-  // Featured influencers for landing page
-  const [featured, setFeatured] = useState([]);
+  const showHomepage = !user || /^\/home\/?$/.test(path);
+  const featured = useFeaturedInfluencers(
+    !loading && showHomepage && !authRoute && !bookingRoute && !profileRoute,
+  );
 
-  useEffect(() => {
-    async function loadFeatured() {
-      try {
-        const res = await api.influencers.getAll();
-        setFeatured(res.influencers || []);
-      } catch (err) {
-        console.error('Failed to load featured influencers:', err);
-      }
-    }
-    loadFeatured();
-  }, []);
-
-  const handleOpenAuth = (r = 'user', tab = 'login') => {
-    navigate(authPath(r, tab));
+  const handleOpenAuth = (role = 'user', tab = 'login') => {
+    navigate(authPath(role, tab));
   };
 
   const handleBookInfluencer = (influencer) => {
@@ -78,19 +72,38 @@ function AppContent() {
     navigate(destination);
   };
 
-  const handleOpenChat = (target, targetR) => {
+  const handleOpenChat = (target, targetRole) => {
     if (!user) {
       handleOpenAuth('user', 'login');
       return;
     }
     setChatTarget(target);
-    setChatTargetRole(targetR);
+    setChatTargetRole(targetRole);
     setChatModalOpen(true);
   };
 
   if (loading) return <LogoLoader />;
-  if (authRoute && ['forgot-password', 'reset-password'].includes(authRoute.tab))
-    return <PasswordRecovery header={<><Logo size="header" /><ThemeToggle /></>} key={`${authRoute.role}:${authRoute.tab}`} role={authRoute.role} reset={authRoute.tab === 'reset-password'} requestReset={api.auth.forgotPassword} verifyOtp={api.auth.verifyOtp} savePassword={api.auth.resetPassword} loginUrl={authPath(authRoute.role)} />;
+  if (
+    authRoute &&
+    ['forgot-password', 'reset-password'].includes(authRoute.tab)
+  )
+    return (
+      <PasswordRecovery
+        header={
+          <>
+            <Logo size="header" />
+            <ThemeToggle />
+          </>
+        }
+        key={`${authRoute.role}:${authRoute.tab}`}
+        role={authRoute.role}
+        reset={authRoute.tab === 'reset-password'}
+        requestReset={api.auth.forgotPassword}
+        verifyOtp={api.auth.verifyOtp}
+        savePassword={api.auth.resetPassword}
+        loginUrl={authPath(authRoute.role)}
+      />
+    );
   if (authRoute)
     return (
       <AuthPage
@@ -104,67 +117,33 @@ function AppContent() {
     <div className="min-h-screen bg-[#0A0F1D] text-slate-100 selection:bg-brand-purple selection:text-white flex flex-col">
       {/* If logged in, show app top bar */}
       {user && (
-        <header
-          className={`${role === 'influencer' ? 'creator-site-header ' : ''}fixed inset-x-0 top-0 z-40 bg-[#0A0F1D]/90 backdrop-blur-xl border-b border-slate-800`}
-        >
-          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 h-20 py-4 flex items-center justify-between gap-4">
-            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-              <Logo size="header" className="shrink-0" />
-              <span className="hidden md:inline-flex shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider bg-slate-900 border border-slate-700 text-slate-300">
-                {role === 'influencer' ? 'Influencer Dashboard' : 'User Portal'}
-              </span>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-              <ThemeToggle />
-              <Notifications key={`${user.role}:${user.id}`} />
-              <a
-                href={
-                  import.meta.env.VITE_ADMIN_PANEL_URL ||
-                  (import.meta.env.PROD ? '/admin' : 'http://localhost:5174')
-                }
-                target="_blank"
-                rel="noreferrer"
-                className="hidden lg:flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors"
-                title="Open Admin Command Center in new tab"
-              >
-                <span>Admin Panel</span>
-                <ExternalLink className="w-3 h-3 text-brand-purple" />
-              </a>
-
-              <HeaderProfileMenu user={user} onLogout={() => { setCallBooking(null); logout(); }} />
-            </div>
-          </div>
-        </header>
+        <AppHeader
+          user={user}
+          role={role}
+          onLogout={() => {
+            setCallBooking(null);
+            logout();
+          }}
+        />
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 social-background-host${user ? " pt-20" : ""}`}>
-        {profileRoute && user ? (
-          <ProfilePage edit={/\/edit\/?$/.test(path)} />
-        ) : bookingRoute ? (
-          <BookingPage key={bookingRoute[1]} influencerId={bookingRoute[1]} onClose={() => navigate('/')} onLogin={() => {
-            sessionStorage.setItem('meetfame-booking-return', path);
-            handleOpenAuth('user', 'login');
-          }} />
-        ) : !user ? (
-          <LandingPage
-            onBookInfluencer={handleBookInfluencer}
-            onOpenChat={handleOpenChat}
-            featuredInfluencers={featured}
-          />
-        ) : role === 'influencer' ? (
-          <InfluencerPanel
-            onOpenChat={handleOpenChat}
-            onJoinCall={setCallBooking}
-          />
-        ) : (
-          <UserPanel
+      <main className={`flex-1 social-background-host${user ? ' pt-20' : ''}`}>
+        <Suspense fallback={<LogoLoader />}>
+          <AppPage
+            path={path}
+            user={user}
+            role={role}
+            featured={featured}
             onBookInfluencer={handleBookInfluencer}
             onOpenChat={handleOpenChat}
             onJoinCall={setCallBooking}
+            onBookingLogin={() => {
+              sessionStorage.setItem('meetfame-booking-return', path);
+              handleOpenAuth('user', 'login');
+            }}
           />
-        )}
+        </Suspense>
       </main>
 
       {user && callBooking && (
@@ -177,12 +156,16 @@ function AppContent() {
       )}
       {/* Modals & Dialogs */}
 
-      <ChatModal
-        isOpen={chatModalOpen}
-        targetUser={chatTarget}
-        targetRole={chatTargetRole}
-        onClose={() => setChatModalOpen(false)}
-      />
+      {chatModalOpen && (
+        <Suspense fallback={<LogoLoader />}>
+          <ChatModal
+            isOpen={chatModalOpen}
+            targetUser={chatTarget}
+            targetRole={chatTargetRole}
+            onClose={() => setChatModalOpen(false)}
+          />
+        </Suspense>
+      )}
 
       <StatusAlertModal />
     </div>
@@ -192,7 +175,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <Suspense fallback={<LogoLoader />}>
+        <AppContent />
+      </Suspense>
     </AuthProvider>
   );
 }

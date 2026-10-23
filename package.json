@@ -8,7 +8,9 @@
     "build": "node scripts/build.js",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:web-panel": "npm --prefix web-panel run dev"
+    "dev:web-panel": "npm --prefix web-panel run dev",
+    "format": "prettier --write \"frontend/src/**/*.{js,jsx}\" \"web-panel/src/**/*.{js,jsx}\" \"shared/**/*.{js,jsx}\"",
+    "format:check": "prettier --check \"frontend/src/**/*.{js,jsx}\" \"web-panel/src/**/*.{js,jsx}\" \"shared/**/*.{js,jsx}\""
   },
   "dependencies": {
     "@vercel/blob": "^0.27.1",
@@ -21,5 +23,8 @@
     "mongoose": "^8.9.5",
     "multer": "^1.4.5-lts.1",
     "music-metadata": "^12.2.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10"
   }
 }

@@ -53,7 +53,9 @@ export default function AccountDetailsPage({ account }) {
     };
   }, [account.role, account.id, retry]);
 
-  useEffect(() => { heading.current?.focus(); }, [account.role, account.id]);
+  useEffect(() => {
+    heading.current?.focus();
+  }, [account.role, account.id]);
 
   const fields = details
     ? [
@@ -81,66 +83,88 @@ export default function AccountDetailsPage({ account }) {
     : [];
   const certificateUrl = safeLink(details?.certification?.fileUrl);
   return (
-      <section aria-labelledby="account-details-title" className="account-details-dialog account-details-page">
-        <header>
-          <div>
-            <p>ACCOUNT DETAILS</p>
-            <h2 ref={heading} tabIndex={-1} id="account-details-title">
-              {details?.name || account.name || 'Account details'}
-            </h2>
+    <section
+      aria-labelledby="account-details-title"
+      className="account-details-dialog account-details-page"
+    >
+      <header>
+        <div>
+          <p>ACCOUNT DETAILS</p>
+          <h2 ref={heading} tabIndex={-1} id="account-details-title">
+            {details?.name || account.name || 'Account details'}
+          </h2>
+        </div>
+      </header>
+      <div className="account-details-body">
+        {error ? (
+          <div role="alert" className="account-details-error">
+            <p>{error}</p>
+            <button onClick={() => setRetry((value) => value + 1)}>
+              Retry
+            </button>
           </div>
-
-        </header>
-        <div className="account-details-body">
-          {error ? (
-            <div role="alert" className="account-details-error">
-              <p>{error}</p>
-              <button onClick={() => setRetry((value) => value + 1)}>
-                Retry
-              </button>
-            </div>
-          ) : !details ? (
-            <LogoLoader variant="inline" label="Loading account details…" />
-          ) : (
-            <>
-              <dl className="account-details-fields">
-                {fields.map(([title, value]) => (
-                  <div key={title}>
-                    <dt>{title}</dt>
-                    <dd>
-                      {title === 'Certificate status' ? <StatusBadge status={details.certificateStatus} />
-                        : title === 'Status' ? <StatusBadge status={details.status} />
-                        : title === 'Verified' ? <StatusBadge status={details.isVerified ? 'verified' : 'unverified'}>{value}</StatusBadge>
-                        : text(value)}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-              {details.statusReason && (
+        ) : !details ? (
+          <LogoLoader variant="inline" label="Loading account details…" />
+        ) : (
+          <>
+            <dl className="account-details-fields">
+              {fields.map(([title, value]) => (
+                <div key={title}>
+                  <dt>{title}</dt>
+                  <dd>
+                    {title === 'Certificate status' ? (
+                      <StatusBadge status={details.certificateStatus} />
+                    ) : title === 'Status' ? (
+                      <StatusBadge status={details.status} />
+                    ) : title === 'Verified' ? (
+                      <StatusBadge
+                        status={details.isVerified ? 'verified' : 'unverified'}
+                      >
+                        {value}
+                      </StatusBadge>
+                    ) : (
+                      text(value)
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            {details.statusReason && (
+              <section>
+                <h3>
+                  {details.status === 'blocked'
+                    ? 'Blocking remark'
+                    : 'Admin remark'}
+                </h3>
+                <p>{details.statusReason}</p>
+              </section>
+            )}
+            {details.role === 'influencer' && (
+              <>
                 <section>
-                  <h3>
-                    {details.status === 'blocked'
-                      ? 'Blocking remark'
-                      : 'Admin remark'}
-                  </h3>
-                  <p>{details.statusReason}</p>
+                  <h3>About</h3>
+                  <p>{text(details.bio)}</p>
                 </section>
-              )}
-              {details.role === 'influencer' && (
-                <>
-                  <section>
-                    <h3>About</h3>
-                    <p>{text(details.bio)}</p>
-                  </section>
-                  <div className="account-media-schedule">
+                <div className="account-media-schedule">
                   <section className="account-video-section">
                     <h3>Introduction video</h3>
                     {details.introVideoUrl ? (
-                      <div className="account-intro-player"><IntroVideo influencer={details} apiBase={API_BASE} card /></div>
-                    ) : <p>No introduction video uploaded.</p>}
+                      <div className="account-intro-player">
+                        <IntroVideo
+                          influencer={details}
+                          apiBase={API_BASE}
+                          card
+                        />
+                      </div>
+                    ) : (
+                      <p>No introduction video uploaded.</p>
+                    )}
                   </section>
                   <section className="account-weekly-schedule">
-                    <h3>Weekly availability <span className="account-schedule-zone">(IST)</span></h3>
+                    <h3>
+                      Weekly availability{' '}
+                      <span className="account-schedule-zone">(IST)</span>
+                    </h3>
                     <dl className="account-weekday-grid">
                       {[
                         'monday',
@@ -154,38 +178,48 @@ export default function AccountDetailsPage({ account }) {
                         <div key={day}>
                           <dt className="capitalize">{day}</dt>
                           <dd className="account-availability-badges">
-                            {dayRanges(details.availability?.[day]).length
-                              ? dayRanges(details.availability?.[day]).map((range, index) => (
-                                  <span key={`${range.start}-${range.end}-${index}`} className="account-time-badge">
+                            {dayRanges(details.availability?.[day]).length ? (
+                              dayRanges(details.availability?.[day]).map(
+                                (range, index) => (
+                                  <span
+                                    key={`${range.start}-${range.end}-${index}`}
+                                    className="account-time-badge"
+                                  >
                                     {range.start}–{range.end}
                                   </span>
-                                ))
-                              : <span className="account-time-unavailable">Unavailable</span>}
+                                ),
+                              )
+                            ) : (
+                              <span className="account-time-unavailable">
+                                Unavailable
+                              </span>
+                            )}
                           </dd>
                         </div>
                       ))}
                     </dl>
                   </section>
-                  </div>
-                  <section>
-                    <h3>Certificate</h3>
-                    <div className="account-certificate-card">
-                      <FileCheck size={20} aria-hidden="true" />
-                      <span>Credential: <strong>{text(details.certification?.title)}</strong></span>
+                </div>
+                <section>
+                  <h3>Certificate</h3>
+                  <div className="account-certificate-card">
+                    <FileCheck size={20} aria-hidden="true" />
+                    <span>
+                      Credential:{' '}
+                      <strong>{text(details.certification?.title)}</strong>
+                    </span>
                     {certificateUrl && (
                       <a href={certificateUrl} target="_blank" rel="noreferrer">
                         Preview Document <ExternalLink size={14} />
                       </a>
                     )}
-                    </div>
-                  </section>
-
-                </>
-              )}
-            </>
-          )}
-        </div>
-
-      </section>
+                  </div>
+                </section>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    </section>
   );
 }

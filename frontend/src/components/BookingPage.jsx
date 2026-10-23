@@ -23,22 +23,35 @@ export default function BookingPage({ influencerId, onClose, onLogin }) {
           if (!selected) setError('This influencer is no longer available.');
         }
       } catch {
-        if (active) setError('Unable to load this booking page. Please try again.');
+        if (active)
+          setError('Unable to load this booking page. Please try again.');
       } finally {
         if (active) setLoading(false);
       }
     }
     load();
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [influencerId]);
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <h1 className="text-3xl font-semibold text-white">Book a slot</h1>
-      {loading ? <LogoLoader label="Loading booking…" /> : error ? (
-        <p role="alert" className="mt-6 text-rose-400">{error}</p>
+      {loading ? (
+        <LogoLoader label="Loading booking…" />
+      ) : error ? (
+        <p role="alert" className="mt-6 text-rose-400">
+          {error}
+        </p>
       ) : !user ? (
-        <button type="button" onClick={onLogin} className="mt-6 px-6 py-3 rounded-xl bg-brand-purple text-white">Log in to book a slot</button>
+        <button
+          type="button"
+          onClick={onLogin}
+          className="mt-6 px-6 py-3 rounded-xl bg-brand-purple text-white"
+        >
+          Log in to book a slot
+        </button>
       ) : (
         <BookingModal
           key={influencerId}
@@ -46,7 +59,9 @@ export default function BookingPage({ influencerId, onClose, onLogin }) {
           isOpen
           influencer={influencer}
           onClose={onClose}
-          onBookingSuccess={() => window.dispatchEvent(new Event('meetfame-bookings-updated'))}
+          onBookingSuccess={() =>
+            window.dispatchEvent(new Event('meetfame-bookings-updated'))
+          }
         />
       )}
     </section>

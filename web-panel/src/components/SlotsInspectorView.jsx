@@ -209,30 +209,39 @@ export default function SlotsInspectorView() {
                 className="availability-view-switch"
                 aria-label="Calendar view"
               >
-              <button
-                type="button"
-                className="calendar-arrow-button"
-                aria-label={`Previous ${mode}`}
-                onClick={() =>
-                  changeDate(shiftCalendarDate(date, mode === 'week' ? -7 : -1))
-                }
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                type="button"
-                className="calendar-arrow-button"
-                aria-label={`Next ${mode}`}
-                onClick={() =>
-                  changeDate(shiftCalendarDate(date, mode === 'week' ? 7 : 1))
-                }
-              >
-                <ChevronRight size={16} />
-              </button>
-                <select className="calendar-view-select" aria-label="Calendar view" value={selectedView}
+                <button
+                  type="button"
+                  className="calendar-arrow-button"
+                  aria-label={`Previous ${mode}`}
+                  onClick={() =>
+                    changeDate(
+                      shiftCalendarDate(date, mode === 'week' ? -7 : -1),
+                    )
+                  }
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button
+                  type="button"
+                  className="calendar-arrow-button"
+                  aria-label={`Next ${mode}`}
+                  onClick={() =>
+                    changeDate(shiftCalendarDate(date, mode === 'week' ? 7 : 1))
+                  }
+                >
+                  <ChevronRight size={16} />
+                </button>
+                <select
+                  className="calendar-view-select"
+                  aria-label="Calendar view"
+                  value={selectedView}
                   onChange={(event) => {
                     if (event.target.value === 'today') {
-                      changeDate(new Date(Date.now() + 19800000).toISOString().slice(0, 10));
+                      changeDate(
+                        new Date(Date.now() + 19800000)
+                          .toISOString()
+                          .slice(0, 10),
+                      );
                       setMode('day');
                       setSelectedView('today');
                     } else {
@@ -240,20 +249,25 @@ export default function SlotsInspectorView() {
                       setSelectedView(event.target.value);
                       setSelection(null);
                     }
-                  }}>
+                  }}
+                >
                   <option value="today">Today</option>
                   <option value="week">Week</option>
                   <option value="day">Day</option>
                 </select>
               </div>
             </header>
-            <h4>
-              {formatDate(detailDate)}
-            </h4>
+            <h4>{formatDate(detailDate)}</h4>
             <div className="availability-summary">
-              <span className="slot-summary-badge is-total">{daySlots.length} total slots</span>
-              <span className="slot-summary-badge is-available">{daySlots.length - bookedCount} available</span>
-              <span className="slot-summary-badge is-booked">{bookedCount} booked</span>
+              <span className="slot-summary-badge is-total">
+                {daySlots.length} total slots
+              </span>
+              <span className="slot-summary-badge is-available">
+                {daySlots.length - bookedCount} available
+              </span>
+              <span className="slot-summary-badge is-booked">
+                {bookedCount} booked
+              </span>
             </div>
             <div className="availability-grid-scroll">
               <table
@@ -358,10 +372,7 @@ export default function SlotsInspectorView() {
                   {selected.booking ? 'Booked' : 'Available'}
                 </span>
                 <h4>{selected.label || selected.slotId}</h4>
-                <p>
-                  {formatDate(selected.date)}{' '}
-                  · IST
-                </p>
+                <p>{formatDate(selected.date)} · IST</p>
                 {selected.booking ? (
                   <>
                     <dl>
@@ -394,11 +405,11 @@ export default function SlotsInspectorView() {
                   <strong>{selected.day}</strong>
                   {recurring.length ? (
                     <div className="availability-time-badges">
-                    {recurring.map((range, index) => (
-                      <span className="availability-time-badge" key={index}>
-                        {range.start} – {range.end} IST
-                      </span>
-                    ))}
+                      {recurring.map((range, index) => (
+                        <span className="availability-time-badge" key={index}>
+                          {range.start} – {range.end} IST
+                        </span>
+                      ))}
                     </div>
                   ) : (
                     <p>No recurring availability.</p>

@@ -47,7 +47,11 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   const [fieldErrors, setFieldErrors] = useState({});
   const [step, setStep] = useState(0);
   const isInfluencerSignup = isRegister && role === 'influencer';
-  const steps = ['Account details', 'Influencer profile', 'Video & certification'];
+  const steps = [
+    'Account details',
+    'Influencer profile',
+    'Video & certification',
+  ];
   const stepHeading = useRef(null);
   useEffect(() => {
     if (isInfluencerSignup) stepHeading.current?.focus();
@@ -202,7 +206,10 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
       </header>
       <main ref={areaRef} className="auth-page-main auth-fit-area">
         <AuthSocialBackground />
-        <div ref={cardRef} className="auth-fit-card auth-page-card auth-form-compact relative w-full max-w-2xl p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100">
+        <div
+          ref={cardRef}
+          className="auth-fit-card auth-page-card auth-form-compact relative w-full max-w-2xl p-6 md:p-8 rounded-3xl bg-slate-900 border border-slate-700/80 shadow-2xl text-slate-100"
+        >
           {/* Page heading */}
           <div className="text-center mb-6">
             <h1
@@ -222,7 +229,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
           {/* Role Selector Tabs */}
           <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-950/80 rounded-2xl border border-slate-800 mb-6">
             <a
-              href={authPath('user', tab)} data-app-tab="true" data-active={role === 'user'}
+              href={authPath('user', tab)}
+              data-app-tab="true"
+              data-active={role === 'user'}
               aria-current={role === 'user' ? 'page' : undefined}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 role === 'user'
@@ -235,7 +244,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             </a>
 
             <a
-              href={authPath('influencer', tab)} data-app-tab="true" data-active={role === 'influencer'}
+              href={authPath('influencer', tab)}
+              data-app-tab="true"
+              data-active={role === 'influencer'}
               aria-current={role === 'influencer' ? 'page' : undefined}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 role === 'influencer'
@@ -250,8 +261,8 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
 
           {registered && (
             <p className="auth-page-notice" role="status">
-              Registration submitted. Your account is pending approval.
-              You can sign in once approved.
+              Registration submitted. Your account is pending approval. You can
+              sign in once approved.
             </p>
           )}
           {/* Error notification */}
@@ -278,11 +289,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                   </li>
                 ))}
               </ol>
-              <h2
-                className="sr-only"
-                ref={stepHeading}
-                tabIndex={-1}
-              >
+              <h2 className="sr-only" ref={stepHeading} tabIndex={-1}>
                 Step {step + 1} of {steps.length}: {steps[step]}
               </h2>
             </>
@@ -392,9 +399,16 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         {fieldErrors.phone}
                       </p>
                     )}
-                    <PhoneInput id="auth-phone" value={phone} onChange={setPhone}
-                      required={role === 'influencer'} invalid={Boolean(fieldErrors.phone)}
-                      describedBy={fieldErrors.phone ? 'auth-phone-error' : undefined} />
+                    <PhoneInput
+                      id="auth-phone"
+                      value={phone}
+                      onChange={setPhone}
+                      required={role === 'influencer'}
+                      invalid={Boolean(fieldErrors.phone)}
+                      describedBy={
+                        fieldErrors.phone ? 'auth-phone-error' : undefined
+                      }
+                    />
                   </div>
                 </div>
               )}
@@ -432,16 +446,34 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                     placeholder="Enter your password"
                     className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   />
-                  <button type="button" onClick={() => setShowPassword((visible) => !visible)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                     aria-pressed={showPassword}
-                    className="absolute right-2 bottom-1.5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-purple">
-                    {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                    className="absolute right-2 bottom-1.5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-purple"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-4 w-4" aria-hidden="true" />
+                    )}
                   </button>
                 </div>
               </div>
             </fieldset>
-            {!isRegister && <div className="text-right"><a className="text-sm text-brand-purple hover:underline" href={authPath(role, 'forgot-password')}>Forgot password?</a></div>}
+            {!isRegister && (
+              <div className="text-right">
+                <a
+                  className="text-sm text-brand-purple hover:underline"
+                  href={authPath(role, 'forgot-password')}
+                >
+                  Forgot password?
+                </a>
+              </div>
+            )}
             {/* INFLUENCER REGISTRATION SPECIFIC DETAILS */}
             {isRegister && role === 'influencer' && (
               <div>
@@ -577,48 +609,108 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                 >
                   <legend className="sr-only">Certification</legend>
                   <p className="text-xs text-slate-400">
-                    Upload your required introduction video. Certification is optional and can be added later from your dashboard.
+                    Upload your required introduction video. Certification is
+                    optional and can be added later from your dashboard.
                   </p>
                   <div className="space-y-2">
-                    <label htmlFor="auth-introVideoFile" className="text-sm font-semibold text-slate-200">Introduction video (required)</label>
-                    <p id="intro-video-help" className="text-xs text-slate-400">Introduce yourself and what you offer. Users can watch this on your card before booking. MP4 or WebM, up to 5 MB and 15 seconds.</p>
-                    <label className="cursor-pointer flex w-full items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple focus-within:border-brand-purple bg-slate-900/50 text-xs text-slate-400 hover:text-white transition-colors">
-                      <Upload className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                      <span className="min-w-0 break-all">{introVideoFile ? introVideoFile.name : 'Upload Introduction Video (MP4, WebM)'}</span>
-                    <input id="auth-introVideoFile" type="file" accept=".mp4,.webm,video/mp4,video/webm"
-                      aria-required="true" aria-invalid={Boolean(fieldErrors.introVideoFile)}
-                      aria-describedby="intro-video-help auth-introVideoFile-error"
-                      className="sr-only"
-                      onChange={async (e) => {
-                        const input = e.currentTarget;
-                        const file = input.files?.[0] || null;
-                        setIntroVideoFile(null);
-                        let issue = introVideoError(file);
-                        if (!issue) {
-                          const url = URL.createObjectURL(file);
-                          try {
-                            const duration = await new Promise((resolve, reject) => {
-                              const video = document.createElement('video');
-                              const timeout = setTimeout(() => { video.removeAttribute('src'); reject(); }, 10000);
-                              video.preload = 'metadata';
-                              video.onloadedmetadata = () => { clearTimeout(timeout); resolve(video.duration); video.removeAttribute('src'); };
-                              video.onerror = () => { clearTimeout(timeout); reject(); };
-                              video.src = url;
-                            });
-                            if (!Number.isFinite(duration) || duration <= 0 || duration > 15)
-                              issue = 'Introduction video must be 15 seconds or shorter.';
-                          } catch { issue = 'Unable to read this video. Choose a valid MP4 or WebM.'; }
-                          finally { URL.revokeObjectURL(url); }
-                        }
-                        if (input.files?.[0] !== file) return;
-                        if (!issue) setIntroVideoFile(file);
-                        setFieldErrors((current) => ({ ...current, introVideoFile: issue }));
-                      }} />
+                    <label
+                      htmlFor="auth-introVideoFile"
+                      className="text-sm font-semibold text-slate-200"
+                    >
+                      Introduction video (required)
                     </label>
-                    <p id="auth-introVideoFile-error" className="auth-field-error" role="alert">{fieldErrors.introVideoFile}</p>
+                    <p id="intro-video-help" className="text-xs text-slate-400">
+                      Introduce yourself and what you offer. Users can watch
+                      this on your card before booking. MP4 or WebM, up to 5 MB
+                      and 15 seconds.
+                    </p>
+                    <label className="cursor-pointer flex w-full items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple focus-within:border-brand-purple bg-slate-900/50 text-xs text-slate-400 hover:text-white transition-colors">
+                      <Upload
+                        className="w-3.5 h-3.5 shrink-0"
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 break-all">
+                        {introVideoFile
+                          ? introVideoFile.name
+                          : 'Upload Introduction Video (MP4, WebM)'}
+                      </span>
+                      <input
+                        id="auth-introVideoFile"
+                        type="file"
+                        accept=".mp4,.webm,video/mp4,video/webm"
+                        aria-required="true"
+                        aria-invalid={Boolean(fieldErrors.introVideoFile)}
+                        aria-describedby="intro-video-help auth-introVideoFile-error"
+                        className="sr-only"
+                        onChange={async (e) => {
+                          const input = e.currentTarget;
+                          const file = input.files?.[0] || null;
+                          setIntroVideoFile(null);
+                          let issue = introVideoError(file);
+                          if (!issue) {
+                            const url = URL.createObjectURL(file);
+                            try {
+                              const duration = await new Promise(
+                                (resolve, reject) => {
+                                  const video = document.createElement('video');
+                                  const timeout = setTimeout(() => {
+                                    video.removeAttribute('src');
+                                    reject();
+                                  }, 10000);
+                                  video.preload = 'metadata';
+                                  video.onloadedmetadata = () => {
+                                    clearTimeout(timeout);
+                                    resolve(video.duration);
+                                    video.removeAttribute('src');
+                                  };
+                                  video.onerror = () => {
+                                    clearTimeout(timeout);
+                                    reject();
+                                  };
+                                  video.src = url;
+                                },
+                              );
+                              if (
+                                !Number.isFinite(duration) ||
+                                duration <= 0 ||
+                                duration > 15
+                              )
+                                issue =
+                                  'Introduction video must be 15 seconds or shorter.';
+                            } catch {
+                              issue =
+                                'Unable to read this video. Choose a valid MP4 or WebM.';
+                            } finally {
+                              URL.revokeObjectURL(url);
+                            }
+                          }
+                          if (input.files?.[0] !== file) return;
+                          if (!issue) setIntroVideoFile(file);
+                          setFieldErrors((current) => ({
+                            ...current,
+                            introVideoFile: issue,
+                          }));
+                        }}
+                      />
+                    </label>
+                    <p
+                      id="auth-introVideoFile-error"
+                      className="auth-field-error"
+                      role="alert"
+                    >
+                      {fieldErrors.introVideoFile}
+                    </p>
                   </div>
                   {/* Certification Upload for Verified Badge */}
-                  <details open={fieldErrors.certificateTitle || fieldErrors.certificateFile ? true : undefined} className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800">
+                  <details
+                    open={
+                      fieldErrors.certificateTitle ||
+                      fieldErrors.certificateFile
+                        ? true
+                        : undefined
+                    }
+                    className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800"
+                  >
                     <summary className="cursor-pointer flex items-center justify-between gap-2">
                       <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
                         <FileCheck className="w-4 h-4 text-[#0095F6]" />
@@ -631,84 +723,84 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       </span>
                     </summary>
                     <div className="mt-3">
-                    {fieldErrors.certificateTitle && (
-                      <p
-                        id="auth-certificateTitle-error"
-                        className="auth-field-error"
-                        role="alert"
-                      >
-                        {fieldErrors.certificateTitle}
-                      </p>
-                    )}
-                    <input
-                      type="text"
-                      id="auth-certificateTitle"
-                      name="certificateTitle"
-                      aria-invalid={Boolean(fieldErrors.certificateTitle)}
-                      aria-describedby={
-                        fieldErrors.certificateTitle
-                          ? 'auth-certificateTitle-error'
-                          : undefined
-                      }
-                      value={certificateTitle}
-                      onChange={(e) => setCertificateTitle(e.target.value)}
-                      placeholder="Enter your certificate name"
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white mb-2 focus:outline-none focus:border-brand-purple"
-                    />
-                    <div className="flex items-center gap-3">
-                      <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple bg-slate-900/50 text-xs text-slate-400 hover:text-white transition-colors">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>
-                          {certificateFile
-                            ? certificateFile.name
-                            : 'Upload Certificate / Credential (PDF, PNG)'}
-                        </span>
-                        <input
-                          type="file"
-                          accept=".pdf,.png,.jpg,.jpeg"
-                          className="hidden"
-                          id="auth-certificateFile"
-                          aria-invalid={Boolean(fieldErrors.certificateFile)}
-                          aria-describedby={
-                            fieldErrors.certificateFile
-                              ? 'auth-certificateFile-error'
-                              : undefined
-                          }
-                          onChange={(e) => {
-                            const file = e.target.files[0] || null;
-                            const issue = certificateError(file);
-                            setFieldErrors((prev) => ({
-                              ...prev,
-                              certificateFile: issue,
-                            }));
-                            setCertificateFile(issue ? null : file);
-                            if (issue) e.target.value = '';
-                          }}
-                        />
-                      </label>
-                      {fieldErrors.certificateFile && (
+                      {fieldErrors.certificateTitle && (
                         <p
-                          id="auth-certificateFile-error"
+                          id="auth-certificateTitle-error"
                           className="auth-field-error"
                           role="alert"
                         >
-                          {fieldErrors.certificateFile}
+                          {fieldErrors.certificateTitle}
                         </p>
                       )}
-                      {certificateFile && (
-                        <button
-                          type="button"
-                          onClick={() => setCertificateFile(null)}
-                          className="text-xs text-rose-400 hover:underline"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-slate-500 mt-1.5">
-                      Uploaded certificates will be reviewed to grant
-                      your profile the official Blue Verified badge.
-                    </p>
+                      <input
+                        type="text"
+                        id="auth-certificateTitle"
+                        name="certificateTitle"
+                        aria-invalid={Boolean(fieldErrors.certificateTitle)}
+                        aria-describedby={
+                          fieldErrors.certificateTitle
+                            ? 'auth-certificateTitle-error'
+                            : undefined
+                        }
+                        value={certificateTitle}
+                        onChange={(e) => setCertificateTitle(e.target.value)}
+                        placeholder="Enter your certificate name"
+                        className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white mb-2 focus:outline-none focus:border-brand-purple"
+                      />
+                      <div className="flex items-center gap-3">
+                        <label className="flex-1 cursor-pointer flex items-center justify-center gap-2 py-2 px-3 rounded-xl border border-dashed border-slate-700 hover:border-brand-purple bg-slate-900/50 text-xs text-slate-400 hover:text-white transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>
+                            {certificateFile
+                              ? certificateFile.name
+                              : 'Upload Certificate / Credential (PDF, PNG)'}
+                          </span>
+                          <input
+                            type="file"
+                            accept=".pdf,.png,.jpg,.jpeg"
+                            className="hidden"
+                            id="auth-certificateFile"
+                            aria-invalid={Boolean(fieldErrors.certificateFile)}
+                            aria-describedby={
+                              fieldErrors.certificateFile
+                                ? 'auth-certificateFile-error'
+                                : undefined
+                            }
+                            onChange={(e) => {
+                              const file = e.target.files[0] || null;
+                              const issue = certificateError(file);
+                              setFieldErrors((prev) => ({
+                                ...prev,
+                                certificateFile: issue,
+                              }));
+                              setCertificateFile(issue ? null : file);
+                              if (issue) e.target.value = '';
+                            }}
+                          />
+                        </label>
+                        {fieldErrors.certificateFile && (
+                          <p
+                            id="auth-certificateFile-error"
+                            className="auth-field-error"
+                            role="alert"
+                          >
+                            {fieldErrors.certificateFile}
+                          </p>
+                        )}
+                        {certificateFile && (
+                          <button
+                            type="button"
+                            onClick={() => setCertificateFile(null)}
+                            className="text-xs text-rose-400 hover:underline"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1.5">
+                        Uploaded certificates will be reviewed to grant your
+                        profile the official Blue Verified badge.
+                      </p>
                     </div>
                   </details>
                 </fieldset>
