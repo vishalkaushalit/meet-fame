@@ -302,6 +302,7 @@ export default function ApprovalsView({ onChange, detailId }) {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
         <div className="approval-type-tabs flex flex-wrap items-center gap-3">
         <button
+          data-app-tab="true" data-active={activeTab === 'influencers'}
           onClick={() => {
             setActiveTab('influencers');
             setStatusFilter('all');
@@ -317,6 +318,7 @@ export default function ApprovalsView({ onChange, detailId }) {
         </button>
 
         <button
+          data-app-tab="true" data-active={activeTab === 'users'}
           onClick={() => { setActiveTab('users'); setStatusFilter('all'); }}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
             activeTab === 'users'

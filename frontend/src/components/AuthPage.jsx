@@ -222,7 +222,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
           {/* Role Selector Tabs */}
           <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-950/80 rounded-2xl border border-slate-800 mb-6">
             <a
-              href={authPath('user', tab)}
+              href={authPath('user', tab)} data-app-tab="true" data-active={role === 'user'}
               aria-current={role === 'user' ? 'page' : undefined}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 role === 'user'
@@ -235,7 +235,7 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             </a>
 
             <a
-              href={authPath('influencer', tab)}
+              href={authPath('influencer', tab)} data-app-tab="true" data-active={role === 'influencer'}
               aria-current={role === 'influencer' ? 'page' : undefined}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 role === 'influencer'

@@ -145,6 +145,7 @@ export default function UserPanel({
         {/* Tab Controls */}
         <div className="flex shrink-0 flex-wrap items-center gap-2 bg-slate-950/80 p-1.5 rounded-2xl border border-slate-800 relative z-10">
           <button
+            data-app-tab="true" data-active={activeTab === 'browse'}
             onClick={() => setActiveTab('browse')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'browse'
@@ -157,6 +158,7 @@ export default function UserPanel({
           </button>
 
           <button
+            data-app-tab="true" data-active={activeTab === 'my-bookings'}
             onClick={() => setActiveTab('my-bookings')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
               activeTab === 'my-bookings'
@@ -168,6 +170,7 @@ export default function UserPanel({
             <span>My Bookings ({myBookings.length})</span>
           </button>
           <button
+            data-app-tab="true" data-active={activeTab === 'billing'}
             onClick={() => setActiveTab('billing')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeTab === 'billing' ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
           >

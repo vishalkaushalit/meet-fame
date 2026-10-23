@@ -1448,3 +1448,21 @@ html[data-theme='light'] .time-slot-badge {
   border-color: #ddd6fe;
   color: #5b21b6;
 }
+
+/* Shared selected and inactive navigation colors across both applications. */
+html[data-theme] :is([data-app-tab], [role='tab'], .profile-section-tabs button, .nav-item) {
+  background: var(--button-secondary-background) !important;
+  color: var(--button-secondary-text) !important;
+  border-color: var(--button-secondary-border) !important;
+}
+html[data-theme] :is([data-app-tab][data-active='true'], [role='tab'][aria-selected='true'], .profile-section-tabs button[aria-pressed='true'], .nav-item.selected) {
+  background: var(--button-primary-background) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+html[data-theme] :is([data-app-tab], [role='tab'], .profile-section-tabs button, .nav-item) > svg {
+  color: inherit !important;
+}
+html[data-theme] :is([data-app-tab], [role='tab'], .profile-section-tabs button, .nav-item):hover:not(:disabled) {
+  filter: brightness(1.08);
+}
