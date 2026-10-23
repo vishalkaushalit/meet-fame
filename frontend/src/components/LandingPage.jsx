@@ -83,7 +83,7 @@ export default function LandingPage({
       )}
 
       {/* HERO SECTION */}
-      <section className="social-background-host relative pt-16 pb-20 overflow-hidden">
+      <section className="social-background-host relative pt-16 pb-8 overflow-hidden">
         {/* Ambient Glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-brand-glow pointer-events-none" />
 
@@ -187,7 +187,7 @@ export default function LandingPage({
       {/* FEATURED INFLUENCERS SHOWCASE */}
       <section
         id="creators"
-        className="social-background-host py-16 bg-slate-950/60 border-t border-slate-800/80"
+        className="social-background-host pt-8 pb-8 bg-slate-950/60"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
@@ -297,10 +297,10 @@ export default function LandingPage({
       {/* HOW IT WORKS SECTION */}
       <section
         id="how-it-works"
-        className="social-background-host py-20 bg-[#0A0F1D]"
+        className="social-background-host py-10 bg-[#0A0F1D]"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-16">
+          <div className="text-center max-w-2xl mx-auto mb-8">
             <h2 className="text-3xl md:text-4xl font-semibold text-white">
               How MeetFame Works
             </h2>
