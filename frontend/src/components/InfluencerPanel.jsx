@@ -240,21 +240,16 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
                 alt={user?.name}
                 className="creator-avatar w-20 h-20 rounded-2xl object-cover ring-2 ring-brand-purple/50 shadow-md"
               />
-              {user?.isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-slate-900 p-0.5 rounded-full w-[24px] h-[24px] flex items-center justify-center border border-blue-500/30">
-                  <VerifiedBadge size="md" />
-                </div>
-              )}
             </div>
 
             <div>
               <div className="creator-name flex items-center gap-2">
                 <h1 className="text-2xl font-semibold text-white">{user?.name}</h1>
                 {user?.isVerified ? (
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-semibold">
-                    <VerifiedBadge size="sm" />
-                    <span>Verified Influencer</span>
-                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/15 border border-blue-500/30 text-blue-400 text-xs font-semibold">
+                    <VerifiedBadge size="md" />
+                    Verified
+                  </span>
                 ) : (
                   <span className="px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 text-xs font-semibold border border-slate-700">
                     Standard Profile
