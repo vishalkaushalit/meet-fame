@@ -13,7 +13,11 @@ export default function SecureInput({ label = 'password', ...props }) {
         disabled={props.disabled}
         aria-label={`${visible ? 'Hide' : 'Show'} ${label}`}
         aria-pressed={visible}
-        onClick={() => setVisible((value) => !value)}
+        onClick={() => {
+          return setVisible((value) => {
+            return !value;
+          });
+        }}
       >
         {visible ? (
           <EyeOff size={18} aria-hidden="true" />

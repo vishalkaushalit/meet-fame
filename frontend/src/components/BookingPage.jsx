@@ -15,18 +15,23 @@ export default function BookingPage({ influencerId, onClose, onLogin }) {
     async function load() {
       try {
         const result = await api.influencers.getAll();
-        const selected = (result.influencers || []).find(
-          (item) => encodeURIComponent(item.id) === influencerId,
-        );
+        const selected = (result.influencers || []).find((item) => {
+          return encodeURIComponent(item.id) === influencerId;
+        });
         if (active) {
           setInfluencer(selected);
-          if (!selected) setError('This influencer is no longer available.');
+          if (!selected) {
+            setError('This influencer is no longer available.');
+          }
         }
       } catch {
-        if (active)
+        if (active) {
           setError('Unable to load this booking page. Please try again.');
+        }
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
     load();
@@ -59,9 +64,9 @@ export default function BookingPage({ influencerId, onClose, onLogin }) {
           isOpen
           influencer={influencer}
           onClose={onClose}
-          onBookingSuccess={() =>
-            window.dispatchEvent(new Event('meetfame-bookings-updated'))
-          }
+          onBookingSuccess={() => {
+            return window.dispatchEvent(new Event('meetfame-bookings-updated'));
+          }}
         />
       )}
     </section>

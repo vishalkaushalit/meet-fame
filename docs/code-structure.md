@@ -64,4 +64,4 @@ npm --prefix frontend run build
 npm --prefix web-panel run build
 ```
 
-Prettier uses the repository's `.prettierrc.json` and covers JavaScript and JSX in both apps and `shared/`. Lint currently reports existing React and unused-code warnings; successful builds do not prove browser interactions, so review the affected routes after behavior changes.
+The formatting script uses Prettier with the repository's `.prettierrc.json`, then keeps dotted property and method chains on the same line and covers JavaScript, JSX, MJS and CJS in both apps, the backend, shared code, API entry points and scripts. Use explicit function bodies and braces for every control-flow branch, including single statements. Arrow functions use parenthesized parameters and explicit returns. Indent with two spaces and retain operator grouping and precedence. The app lint configurations enforce control-flow braces. Lint currently reports existing React and unused-code warnings; successful builds do not prove browser interactions, so review the affected routes after behavior changes.

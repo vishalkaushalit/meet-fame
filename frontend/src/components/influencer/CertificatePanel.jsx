@@ -74,7 +74,9 @@ export default function CertificatePanel({
             type="text"
             required
             value={certTitle}
-            onChange={(e) => setCertTitle(e.target.value)}
+            onChange={(e) => {
+              return setCertTitle(e.target.value);
+            }}
             placeholder="Enter your certificate name"
             className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
           />
@@ -94,13 +96,17 @@ export default function CertificatePanel({
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg"
                 className="hidden"
-                onChange={(e) => setCertFile(e.target.files[0] || null)}
+                onChange={(e) => {
+                  return setCertFile(e.target.files[0] || null);
+                }}
               />
             </label>
             {certFile && (
               <button
                 type="button"
-                onClick={() => setCertFile(null)}
+                onClick={() => {
+                  return setCertFile(null);
+                }}
                 className="text-xs text-rose-400 hover:underline"
               >
                 Remove

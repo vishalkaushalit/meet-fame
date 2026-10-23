@@ -39,38 +39,45 @@ router.get('/', (req, res) => {
   try {
     const { category, search } = req.query;
     const data = db.read();
-    let list = data.influencers.filter((i) => i.status === 'approved');
+    let list = data.influencers.filter((i) => {
+      return i.status === 'approved';
+    });
 
     if (category && category !== 'All') {
-      list = list.filter(
-        (i) => i.category.toLowerCase() === category.toLowerCase(),
-      );
+      list = list.filter((i) => {
+        return i.category.toLowerCase() === category.toLowerCase();
+      });
     }
 
     if (search) {
       const q = search.toLowerCase();
-      list = list.filter(
-        (i) =>
+      list = list.filter((i) => {
+        return (
           i.name.toLowerCase().includes(q) ||
           i.specialization.toLowerCase().includes(q) ||
-          i.category.toLowerCase().includes(q),
-      );
+          i.category.toLowerCase().includes(q)
+        );
+      });
     }
 
-    const safeList = list.map(({ password, statusReason, ...rest }) => ({
-      ...rest,
-      // Provide preview of weekly total slots
-      totalWeeklySlots: Object.values(rest.availability || {}).reduce(
-        (acc, ranges) => {
-          return acc + generateDaySlots(ranges).length;
-        },
-        0,
-      ),
-    }));
+    const safeList = list.map(({ password, statusReason, ...rest }) => {
+      return {
+        ...rest,
+        // Provide preview of weekly total slots
+        totalWeeklySlots: Object.values(rest.availability || {}).reduce(
+          (acc, ranges) => {
+            return acc + generateDaySlots(ranges).length;
+          },
+          0,
+        ),
+      };
+    });
 
     return res.json({ influencers: safeList });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch influencers' });
+    return res.status(500).json({
+      error: 'Failed to fetch influencers',
+    });
   }
 });
 
@@ -80,9 +87,13 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   try {
     const data = db.read();
-    const influencer = data.influencers.find((i) => i.id === req.params.id);
+    const influencer = data.influencers.find((i) => {
+      return i.id === req.params.id;
+    });
     if (!influencer) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
     const { password, statusReason, ...safeInfluencer } = influencer;
@@ -109,7 +120,9 @@ router.get('/:id', (req, res) => {
       generatedSlotsByDay,
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch influencer' });
+    return res.status(500).json({
+      error: 'Failed to fetch influencer',
+    });
   }
 });
 
@@ -122,19 +135,26 @@ router.put('/:id/availability', requireSession, (req, res) => {
     if (
       req.session.role !== 'admin' &&
       !(req.session.role === 'influencer' && req.session.id === req.params.id)
-    )
-      return res
-        .status(403)
-        .json({ error: 'You cannot change this schedule.' });
+    ) {
+      return res.status(403).json({
+        error: 'You cannot change this schedule.',
+      });
+    }
     const { availability } = req.body;
     if (!availability) {
-      return res.status(400).json({ error: 'Availability data is required' });
+      return res.status(400).json({
+        error: 'Availability data is required',
+      });
     }
 
     const data = db.read();
-    const idx = data.influencers.findIndex((i) => i.id === req.params.id);
+    const idx = data.influencers.findIndex((i) => {
+      return i.id === req.params.id;
+    });
     if (idx === -1) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
     const changed =
@@ -151,16 +171,17 @@ router.put('/:id/availability', requireSession, (req, res) => {
         'Your weekly availability has been updated. Existing booked sessions keep their scheduled times.',
       );
       const clients = new Set(
-        data.bookings
-          .filter(
-            (booking) =>
+        data.bookings.filter((booking) => {
+            return (
               booking.influencerId === creator.id &&
               booking.status === 'confirmed' &&
-              booking.date >= new Date().toISOString().slice(0, 10),
-          )
-          .map((booking) => booking.userId),
+              booking.date >= new Date().toISOString().slice(0, 10)
+            );
+          }).map((booking) => {
+            return booking.userId;
+          }),
       );
-      for (const id of clients)
+      for (const id of clients) {
         addNotification(
           data,
           id,
@@ -168,6 +189,7 @@ router.put('/:id/availability', requireSession, (req, res) => {
           'Creator availability updated',
           `${creator.name} updated their weekly availability. Your existing booked sessions keep their scheduled times.`,
         );
+      }
     }
     db.write(data);
 
@@ -184,7 +206,9 @@ router.put('/:id/availability', requireSession, (req, res) => {
       generatedSlotsByDay,
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to update availability' });
+    return res.status(500).json({
+      error: 'Failed to update availability',
+    });
   }
 });
 
@@ -199,9 +223,13 @@ router.post(
     try {
       const { title } = req.body;
       const data = db.read();
-      const idx = data.influencers.findIndex((i) => i.id === req.params.id);
+      const idx = data.influencers.findIndex((i) => {
+        return i.id === req.params.id;
+      });
       if (idx === -1) {
-        return res.status(404).json({ error: 'Influencer not found' });
+        return res.status(404).json({
+          error: 'Influencer not found',
+        });
       }
 
       let fileUrl = '/uploads/sample_cert.pdf';
@@ -228,7 +256,9 @@ router.post(
         certificateStatus: 'pending',
       });
     } catch (err) {
-      return res.status(500).json({ error: 'Failed to upload certificate' });
+      return res.status(500).json({
+        error: 'Failed to upload certificate',
+      });
     }
   },
 );
@@ -237,7 +267,11 @@ router.post(
  * Update Profile details
  */
 router.put('/:id/profile', requireSession, (req, res) => {
-  if (req.session.role !== 'influencer') return res.status(403).json({ error: 'Influencer access required.' });
+  if (req.session.role !== 'influencer') {
+    return res.status(403).json({
+      error: 'Influencer access required.',
+    });
+  }
   return updateOwnProfile(req, res);
 });
 

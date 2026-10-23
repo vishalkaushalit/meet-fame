@@ -129,8 +129,12 @@ async function checkAndSync() {
         });
 
         console.log(`   ✓ Live Blob URL: ${blob.url}`);
-        if (item.influencerId) avatarMap[item.influencerId] = blob.url;
-        if (item.userId) avatarMap[item.userId] = blob.url;
+        if (item.influencerId) {
+          avatarMap[item.influencerId] = blob.url;
+        }
+        if (item.userId) {
+          avatarMap[item.userId] = blob.url;
+        }
       } catch (e) {
         console.warn(`   ⚠️ Could not upload avatar ${item.name}:`, e.message);
       }
@@ -163,10 +167,12 @@ async function checkAndSync() {
 
       // Update Users
       if (dbData.users) {
-        dbData.users = dbData.users.map((u) => ({
-          ...u,
-          avatar: avatarMap[u.id] || u.avatar,
-        }));
+        dbData.users = dbData.users.map((u) => {
+          return {
+            ...u,
+            avatar: avatarMap[u.id] || u.avatar,
+          };
+        });
       }
 
       fs.writeFileSync(dbPath, JSON.stringify(dbData, null, 2), 'utf-8');

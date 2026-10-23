@@ -3,14 +3,16 @@ import { Landmark, Save } from 'lucide-react';
 import './bank-details.css';
 import SecureInput from './SecureInput';
 
-const empty = () => ({
-  accountHolder: '',
-  bankName: '',
-  country: 'IN',
-  accountNumber: '',
-  confirmAccountNumber: '',
-  routingCode: '',
-});
+const empty = () => {
+  return {
+    accountHolder: '',
+    bankName: '',
+    country: 'IN',
+    accountNumber: '',
+    confirmAccountNumber: '',
+    routingCode: '',
+  };
+};
 
 export default function BankDetailsForm({ api, demoDetails = null }) {
   const [details, setDetails] = useState(null);
@@ -26,10 +28,10 @@ export default function BankDetailsForm({ api, demoDetails = null }) {
     let active = true;
     setLoading(true);
     setError('');
-    api
-      .get()
-      .then((result) => {
-        if (!active) return;
+    api.get().then((result) => {
+        if (!active) {
+          return;
+        }
         setDetails(result.bankDetails);
         const initial = result.bankDetails || demoDetails;
         setValues(
@@ -42,12 +44,14 @@ export default function BankDetailsForm({ api, demoDetails = null }) {
             : empty(),
         );
         setEditing(true);
-      })
-      .catch((err) => {
-        if (active) setError(err.message || 'Unable to load bank details.');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+      }).catch((err) => {
+        if (active) {
+          setError(err.message || 'Unable to load bank details.');
+        }
+      }).finally(() => {
+        if (active) {
+          setLoading(false);
+        }
       });
     return () => {
       active = false;
@@ -55,7 +59,9 @@ export default function BankDetailsForm({ api, demoDetails = null }) {
   }, [api, retry, demoDetails]);
   const submit = async (event) => {
     event.preventDefault();
-    if (saving) return;
+    if (saving) {
+      return;
+    }
     setFields({});
     setError('');
     setSaved(false);
@@ -98,8 +104,12 @@ export default function BankDetailsForm({ api, demoDetails = null }) {
           aria-invalid={Boolean(fields[key])}
           aria-describedby={fields[key] ? `bank-${key}-error` : undefined}
           onChange={(event) => {
-            setValues((current) => ({ ...current, [key]: event.target.value }));
-            setFields((current) => ({ ...current, [key]: '' }));
+            setValues((current) => {
+              return { ...current, [key]: event.target.value };
+            });
+            setFields((current) => {
+              return { ...current, [key]: '' };
+            });
           }}
         />
         {fields[key] && (
@@ -190,7 +200,11 @@ export default function BankDetailsForm({ api, demoDetails = null }) {
           {!editing && !details && error && (
             <button
               type="button"
-              onClick={() => setRetry((value) => value + 1)}
+              onClick={() => {
+                return setRetry((value) => {
+                  return value + 1;
+                });
+              }}
             >
               Retry
             </button>

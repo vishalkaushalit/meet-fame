@@ -29,9 +29,7 @@ export function initializeTheme() {
       window.dispatchEvent(new Event('meetfame-theme-change'));
     }
   });
-  window
-    .matchMedia('(prefers-color-scheme: dark)')
-    .addEventListener('change', () => {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       applyTheme(getTheme());
       window.dispatchEvent(new Event('meetfame-theme-change'));
     });

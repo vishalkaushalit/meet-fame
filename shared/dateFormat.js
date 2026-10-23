@@ -12,7 +12,9 @@ const timeFormatter = new Intl.DateTimeFormat('en-GB', {
 });
 
 const dateValue = (value) => {
-  if (!value) return null;
+  if (!value) {
+    return null;
+  }
   const date = new Date(
     /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00+05:30` : value,
   );
@@ -20,9 +22,15 @@ const dateValue = (value) => {
 };
 export function formatDate(value) {
   const date = dateValue(value);
-  if (!date) return '—';
+  if (!date) {
+    return '—';
+  }
   const parts = dateFormatter.formatToParts(date);
-  const part = (type) => parts.find((item) => item.type === type)?.value;
+  const part = (type) => {
+    return parts.find((item) => {
+      return item.type === type;
+    })?.value;
+  };
   return `${part('day')} ${part('month')}, ${part('year')}`;
 }
 export function formatDateTime(value) {

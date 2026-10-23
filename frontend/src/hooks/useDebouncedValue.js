@@ -5,8 +5,12 @@ export default function useDebouncedValue(value, delay = 250) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(timer);
+    const timer = setTimeout(() => {
+      return setDebouncedValue(value);
+    }, delay);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [value, delay]);
 
   return debouncedValue;

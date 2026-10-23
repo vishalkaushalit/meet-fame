@@ -9,9 +9,9 @@ import { User, Sparkles, Eye, Search } from 'lucide-react';
 export default function ConversationsView({ detailId }) {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const selectedConv = conversations.find(
-    (conversation) => conversation.conversationId === detailId,
-  );
+  const selectedConv = conversations.find((conversation) => {
+    return conversation.conversationId === detailId;
+  });
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -30,7 +30,9 @@ export default function ConversationsView({ detailId }) {
   }, []);
 
   const filtered = conversations.filter((c) => {
-    if (!searchTerm) return true;
+    if (!searchTerm) {
+      return true;
+    }
     const q = searchTerm.toLowerCase();
     return (
       c.userName?.toLowerCase().includes(q) ||
@@ -67,7 +69,9 @@ export default function ConversationsView({ detailId }) {
                   <input
                     type="text"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      return setSearchTerm(e.target.value);
+                    }}
                     placeholder="Search conversations..."
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
                   />
@@ -99,38 +103,40 @@ export default function ConversationsView({ detailId }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {threadPagination.items.map((conv, index) => (
-                      <tr key={conv.conversationId}>
-                        <td>{threadPagination.start + index}</td>
-                        <td>{conv.userName}</td>
-                        <td>{conv.influencerName}</td>
-                        <td>{conv.messageCount}</td>
-                        <td>
-                          <span className="conversation-preview">
-                            {conv.lastMessage || '—'}
-                          </span>
-                        </td>
-                        <td>{formatDateTime(conv.lastTimestamp)}</td>
-                        <td>
-                          <div className="account-icon-actions">
-                            <button
-                              type="button"
-                              className="user-view-button"
-                              aria-label={`View conversation between ${conv.userName} and ${conv.influencerName}`}
-                              title="View conversation"
-                              onClick={() =>
-                                navigateAdminRecord(
-                                  'conversations',
-                                  conv.conversationId,
-                                )
-                              }
-                            >
-                              <Eye size={18} aria-hidden="true" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                    {threadPagination.items.map((conv, index) => {
+                      return (
+                        <tr key={conv.conversationId}>
+                          <td>{threadPagination.start + index}</td>
+                          <td>{conv.userName}</td>
+                          <td>{conv.influencerName}</td>
+                          <td>{conv.messageCount}</td>
+                          <td>
+                            <span className="conversation-preview">
+                              {conv.lastMessage || '—'}
+                            </span>
+                          </td>
+                          <td>{formatDateTime(conv.lastTimestamp)}</td>
+                          <td>
+                            <div className="account-icon-actions">
+                              <button
+                                type="button"
+                                className="user-view-button"
+                                aria-label={`View conversation between ${conv.userName} and ${conv.influencerName}`}
+                                title="View conversation"
+                                onClick={() => {
+                                  return navigateAdminRecord(
+                                    'conversations',
+                                    conv.conversationId,
+                                  );
+                                }}
+                              >
+                                <Eye size={18} aria-hidden="true" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                     {!filtered.length && (
                       <tr>
                         <td colSpan={7}>No conversations match your search.</td>

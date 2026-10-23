@@ -8,7 +8,9 @@ export default function useBookings(accountId, role, polling) {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!accountId) return;
+    if (!accountId) {
+      return;
+    }
     let active = true;
     let pending = false;
     let refreshQueued = false;
@@ -20,7 +22,9 @@ export default function useBookings(accountId, role, polling) {
         return;
       }
       pending = true;
-      if (showLoading) setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       try {
         const key = role === 'influencer' ? 'influencerId' : 'userId';
         const result = await api.bookings.getMyBookings({ [key]: accountId });
@@ -29,10 +33,14 @@ export default function useBookings(accountId, role, polling) {
           setError('');
         }
       } catch {
-        if (active) setError('Unable to load bookings. Please try again.');
+        if (active) {
+          setError('Unable to load bookings. Please try again.');
+        }
       } finally {
         pending = false;
-        if (active && showLoading) setLoading(false);
+        if (active && showLoading) {
+          setLoading(false);
+        }
         if (active && refreshQueued) {
           refreshQueued = false;
           load();
@@ -40,7 +48,9 @@ export default function useBookings(accountId, role, polling) {
       }
     };
 
-    const refresh = () => load();
+    const refresh = () => {
+      return load();
+    };
     load(true);
     window.addEventListener('meetfame-bookings-updated', refresh);
     window.addEventListener('focus', refresh);

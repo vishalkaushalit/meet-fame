@@ -19,15 +19,25 @@ export function paginate(items, requestedPage = 1, size = 10) {
 
 export function paginationNumbers(page, pages) {
   const values = new Set([1, pages]);
-  for (let n = Math.max(1, page - 1); n <= Math.min(pages, page + 1); n++)
+  for (let n = Math.max(1, page - 1); n <= Math.min(pages, page + 1); n++) {
     values.add(n);
-  if (page <= 3) for (let n = 1; n <= Math.min(5, pages); n++) values.add(n);
-  if (page >= pages - 2)
-    for (let n = Math.max(1, pages - 4); n <= pages; n++) values.add(n);
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted.flatMap((value, index) =>
-    index && value - sorted[index - 1] > 1
+  }
+  if (page <= 3) {
+    for (let n = 1; n <= Math.min(5, pages); n++) {
+      values.add(n);
+    }
+  }
+  if (page >= pages - 2) {
+    for (let n = Math.max(1, pages - 4); n <= pages; n++) {
+      values.add(n);
+    }
+  }
+  const sorted = [...values].sort((a, b) => {
+    return a - b;
+  });
+  return sorted.flatMap((value, index) => {
+    return index && value - sorted[index - 1] > 1
       ? ['ellipsis-' + value, value]
-      : [value],
-  );
+      : [value];
+  });
 }

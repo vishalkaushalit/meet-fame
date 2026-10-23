@@ -9,7 +9,9 @@ import { Calendar, DollarSign, Search, Eye } from 'lucide-react';
 
 export default function BookingsView({ detailId }) {
   const [bookings, setBookings] = useState([]);
-  const selectedBooking = bookings.find((booking) => booking.id === detailId);
+  const selectedBooking = bookings.find((booking) => {
+    return booking.id === detailId;
+  });
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +32,9 @@ export default function BookingsView({ detailId }) {
   }, [statusFilter]);
 
   const filtered = bookings.filter((b) => {
-    if (!searchTerm) return true;
+    if (!searchTerm) {
+      return true;
+    }
     const q = searchTerm.toLowerCase();
 
     return (
@@ -41,7 +45,9 @@ export default function BookingsView({ detailId }) {
     );
   });
 
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
+  const totalRevenue = bookings.reduce((sum, b) => {
+    return sum + (b.price || 0);
+  }, 0);
 
   const bookingPagination = usePagination(
     filtered,
@@ -76,12 +82,14 @@ export default function BookingsView({ detailId }) {
         </div>
         <div className="account-details-body">
           <dl className="account-details-fields">
-            {details.map(([label, value]) => (
-              <div key={label}>
-                <dt>{label}</dt>
-                <dd>{value || '—'}</dd>
-              </div>
-            ))}
+            {details.map(([label, value]) => {
+              return (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value || '—'}</dd>
+                </div>
+              );
+            })}
           </dl>
         </div>
       </section>
@@ -128,7 +136,9 @@ export default function BookingsView({ detailId }) {
           <input
             type="text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              return setSearchTerm(e.target.value);
+            }}
             placeholder="Search by influencer, user, topic..."
             className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
           />
@@ -139,7 +149,9 @@ export default function BookingsView({ detailId }) {
           <select
             aria-label="Filter bookings by status"
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
+            onChange={(event) => {
+              return setStatusFilter(event.target.value);
+            }}
             className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white"
           >
             <option value="all">All statuses</option>
@@ -186,48 +198,54 @@ export default function BookingsView({ detailId }) {
                     'Status',
                     'Fee',
                     'Action',
-                  ].map((label) => (
-                    <th scope="col" key={label}>
-                      {label}
-                    </th>
-                  ))}
+                  ].map((label) => {
+                    return (
+                      <th scope="col" key={label}>
+                        {label}
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody>
-                {bookingPagination.items.map((b, index) => (
-                  <tr key={b.id}>
-                    <td className="record-serial-cell">
-                      {bookingPagination.start + index}
-                    </td>
-                    <td>
-                      <span>{b.userName}</span>
-                    </td>
-                    <td>{b.influencerName}</td>
-                    <td>{formatDate(b.date)}</td>
-                    <td className="whitespace-nowrap">
-                      <span className="time-slot-badge">
-                        {b.slotLabel || b.slot || '—'}
-                      </span>
-                    </td>
-                    <td>
-                      <StatusBadge status={b.status} />
-                    </td>
-                    <td>${b.price ?? 0}</td>
-                    <td>
-                      <div className="account-icon-actions">
-                        <button
-                          type="button"
-                          className="user-view-button"
-                          title="View booking details"
-                          aria-label={`View booking details for ${b.userName} with ${b.influencerName}`}
-                          onClick={() => navigateAdminRecord('bookings', b.id)}
-                        >
-                          <Eye size={18} aria-hidden="true" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {bookingPagination.items.map((b, index) => {
+                  return (
+                    <tr key={b.id}>
+                      <td className="record-serial-cell">
+                        {bookingPagination.start + index}
+                      </td>
+                      <td>
+                        <span>{b.userName}</span>
+                      </td>
+                      <td>{b.influencerName}</td>
+                      <td>{formatDate(b.date)}</td>
+                      <td className="whitespace-nowrap">
+                        <span className="time-slot-badge">
+                          {b.slotLabel || b.slot || '—'}
+                        </span>
+                      </td>
+                      <td>
+                        <StatusBadge status={b.status} />
+                      </td>
+                      <td>${b.price ?? 0}</td>
+                      <td>
+                        <div className="account-icon-actions">
+                          <button
+                            type="button"
+                            className="user-view-button"
+                            title="View booking details"
+                            aria-label={`View booking details for ${b.userName} with ${b.influencerName}`}
+                            onClick={() => {
+                              return navigateAdminRecord('bookings', b.id);
+                            }}
+                          >
+                            <Eye size={18} aria-hidden="true" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

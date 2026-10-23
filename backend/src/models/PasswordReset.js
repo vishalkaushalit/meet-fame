@@ -13,4 +13,5 @@ const schema = new mongoose.Schema({
   resetExpiresAt: Date,
 });
 addPersistenceFields(schema);
-export const PasswordReset = mongoose.models.PasswordReset || mongoose.model('PasswordReset', schema);
+export const PasswordReset =
+  mongoose.models.PasswordReset || mongoose.model('PasswordReset', schema);

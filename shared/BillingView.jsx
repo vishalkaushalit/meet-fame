@@ -12,16 +12,18 @@ import {
 } from 'lucide-react';
 import { formatDate } from './dateFormat';
 
-const money = (amount, currency) =>
-  new Intl.NumberFormat(undefined, {
+const money = (amount, currency) => {
+  return new Intl.NumberFormat(undefined, {
     style: 'currency',
     currency,
     currencyDisplay: 'narrowSymbol',
   }).format(amount / 100);
-const reportingAmount = (item) =>
-  Number.isSafeInteger(item.usdAmount)
+};
+const reportingAmount = (item) => {
+  return Number.isSafeInteger(item.usdAmount)
     ? { amount: item.usdAmount, currency: 'USD' }
     : { amount: item.amount, currency: item.currency };
+};
 const statusLabel = {
   pending: 'Awaiting payment',
   paid: 'Paid',
@@ -43,23 +45,27 @@ export default function BillingView({
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [revision, setRevision] = useState(0);
-  const refresh = useCallback(() => setRevision((value) => value + 1), []);
+  const refresh = useCallback(() => {
+    return setRevision((value) => {
+      return value + 1;
+    });
+  }, []);
   useEffect(() => {
     let active = true;
     setLoading(true);
-    loadTransactions()
-      .then((result) => {
+    loadTransactions().then((result) => {
         if (active) {
           setTransactions(result.transactions || []);
           setError('');
         }
-      })
-      .catch(() => {
-        if (active)
+      }).catch(() => {
+        if (active) {
           setError('Unable to load billing history. Please try again.');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+        }
+      }).finally(() => {
+        if (active) {
+          setLoading(false);
+        }
       });
     return () => {
       active = false;
@@ -74,8 +80,8 @@ export default function BillingView({
     };
   }, [refresh]);
   const query = search.trim().toLowerCase();
-  const filtered = transactions.filter(
-    (item) =>
+  const filtered = transactions.filter((item) => {
+    return (
       (status === 'all' || item.status === status) &&
       [
         item.influencerName,
@@ -86,18 +92,18 @@ export default function BillingView({
         item.refundId,
         item.date,
         item.slot,
-      ].some((value) =>
-        String(value || '')
-          .toLowerCase()
-          .includes(query),
-      ),
-  );
+      ].some((value) => {
+        return String(value || '').toLowerCase().includes(query);
+      })
+    );
+  });
   const pages = Math.max(1, Math.ceil(filtered.length / 10));
   const currentPage = Math.min(page, pages);
   const totals = transactions.reduce((result, item) => {
     const { amount, currency } = reportingAmount(item);
-    if (item.status === 'paid')
+    if (item.status === 'paid') {
       result[currency] = (result[currency] || 0) + amount;
+    }
     return result;
   }, {});
   const billingToolbar = (
@@ -128,11 +134,13 @@ export default function BillingView({
         }}
       >
         <option value="all">All statuses</option>
-        {Object.entries(statusLabel).map(([value, label]) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
+        {Object.entries(statusLabel).map(([value, label]) => {
+          return (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          );
+        })}
       </FilterSelect>
     </div>
   );
@@ -187,36 +195,39 @@ export default function BillingView({
                   <strong>{transactions.length.toLocaleString()}</strong>
                   <p className="billing-summary-caption">All payment records</p>
                 </div>
-                {Object.entries(totals).map(([currency, amount]) => (
-                  <div
-                    key={currency}
-                    className="billing-summary-card billing-summary-collected"
-                  >
-                    <div className="billing-summary-top">
-                      <span className="billing-summary-label">
-                        {admin ? 'Collected' : 'Paid'}{' '}
-                        <span className="billing-summary-currency">
-                          {currency}
+                {Object.entries(totals).map(([currency, amount]) => {
+                  return (
+                    <div
+                      key={currency}
+                      className="billing-summary-card billing-summary-collected"
+                    >
+                      <div className="billing-summary-top">
+                        <span className="billing-summary-label">
+                          {admin ? 'Collected' : 'Paid'}{' '}
+                          <span className="billing-summary-currency">
+                            {currency}
+                          </span>
                         </span>
-                      </span>
-                      <span className="billing-summary-icon">
-                        <Wallet size={20} aria-hidden="true" />
-                      </span>
+                        <span className="billing-summary-icon">
+                          <Wallet size={20} aria-hidden="true" />
+                        </span>
+                      </div>
+                      <strong>{money(amount, currency)}</strong>
+                      <p className="billing-summary-caption">
+                        <CheckCircle2 size={13} aria-hidden="true" />
+                        {currency === 'USD' &&
+                        transactions.some((item) => {
+                          return (
+                            item.currency !== 'USD' &&
+                            Number.isSafeInteger(item.usdAmount)
+                          );
+                        })
+                          ? 'Includes USD equivalents'
+                          : 'Confirmed payments'}
+                      </p>
                     </div>
-                    <strong>{money(amount, currency)}</strong>
-                    <p className="billing-summary-caption">
-                      <CheckCircle2 size={13} aria-hidden="true" />
-                      {currency === 'USD' &&
-                      transactions.some(
-                        (item) =>
-                          item.currency !== 'USD' &&
-                          Number.isSafeInteger(item.usdAmount),
-                      )
-                        ? 'Includes USD equivalents'
-                        : 'Confirmed payments'}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
             {!headerTarget && billingToolbar}
@@ -250,76 +261,76 @@ export default function BillingView({
                       </tr>
                     </thead>
                     <tbody>
-                      {filtered
-                        .slice((currentPage - 1) * 10, currentPage * 10)
-                        .map((item, index) => (
-                          <tr key={item.id}>
-                            <td>{(currentPage - 1) * 10 + index + 1}</td>
-                            <td className="billing-created-date">
-                              {formatDate(item.createdAt)}
-                            </td>
-                            {admin && <td>{item.userName || item.userId}</td>}
-                            <td className="billing-session-cell">
-                              <div className="billing-session">
-                                <strong className="billing-session-name">
-                                  {item.influencerName || item.influencerId}
-                                </strong>
-                                <div className="billing-session-schedule">
-                                  <span className="billing-session-date">
-                                    <CalendarDays
-                                      size={14}
-                                      aria-hidden="true"
-                                    />
-                                    {formatDate(item.date)}
-                                  </span>
-                                  <span className="time-slot-badge">
-                                    <Clock size={13} aria-hidden="true" />
-                                    {item.slot || 'Time unavailable'}
-                                    {item.slot && (
-                                      <span className="billing-timezone">
-                                        IST
-                                      </span>
-                                    )}
-                                  </span>
+                      {filtered.slice((currentPage - 1) * 10, currentPage * 10).map((item, index) => {
+                          return (
+                            <tr key={item.id}>
+                              <td>{(currentPage - 1) * 10 + index + 1}</td>
+                              <td className="billing-created-date">
+                                {formatDate(item.createdAt)}
+                              </td>
+                              {admin && <td>{item.userName || item.userId}</td>}
+                              <td className="billing-session-cell">
+                                <div className="billing-session">
+                                  <strong className="billing-session-name">
+                                    {item.influencerName || item.influencerId}
+                                  </strong>
+                                  <div className="billing-session-schedule">
+                                    <span className="billing-session-date">
+                                      <CalendarDays
+                                        size={14}
+                                        aria-hidden="true"
+                                      />
+                                      {formatDate(item.date)}
+                                    </span>
+                                    <span className="time-slot-badge">
+                                      <Clock size={13} aria-hidden="true" />
+                                      {item.slot || 'Time unavailable'}
+                                      {item.slot && (
+                                        <span className="billing-timezone">
+                                          IST
+                                        </span>
+                                      )}
+                                    </span>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="billing-booking-id">
-                              {item.bookingId ? (
-                                <span>{item.bookingId}</span>
-                              ) : (
-                                <span aria-label="No linked booking">—</span>
-                              )}
-                            </td>
-                            <td className="billing-amount">
-                              {money(
-                                reportingAmount(item).amount,
-                                reportingAmount(item).currency,
-                              )}
-                              {item.currency !== 'USD' &&
-                                Number.isSafeInteger(item.usdAmount) && (
-                                  <small>
-                                    Originally charged{' '}
-                                    {money(item.amount, item.currency)}
-                                  </small>
+                              </td>
+                              <td className="billing-booking-id">
+                                {item.bookingId ? (
+                                  <span>{item.bookingId}</span>
+                                ) : (
+                                  <span aria-label="No linked booking">—</span>
                                 )}
-                            </td>
-                            <td>
-                              <span
-                                className={`billing-status is-${item.status}`}
-                              >
-                                {statusLabel[item.status] || item.status}
-                              </span>
-                            </td>
-                            <td className="billing-reference">
-                              {item.paymentId || 'Payment not confirmed'}
-                              <small>Order ID: {item.orderId}</small>
-                              {item.refundId && (
-                                <small>Refund: {item.refundId}</small>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                              </td>
+                              <td className="billing-amount">
+                                {money(
+                                  reportingAmount(item).amount,
+                                  reportingAmount(item).currency,
+                                )}
+                                {item.currency !== 'USD' &&
+                                  Number.isSafeInteger(item.usdAmount) && (
+                                    <small>
+                                      Originally charged{' '}
+                                      {money(item.amount, item.currency)}
+                                    </small>
+                                  )}
+                              </td>
+                              <td>
+                                <span
+                                  className={`billing-status is-${item.status}`}
+                                >
+                                  {statusLabel[item.status] || item.status}
+                                </span>
+                              </td>
+                              <td className="billing-reference">
+                                {item.paymentId || 'Payment not confirmed'}
+                                <small>Order ID: {item.orderId}</small>
+                                {item.refundId && (
+                                  <small>Refund: {item.refundId}</small>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -328,7 +339,9 @@ export default function BillingView({
                     <button
                       type="button"
                       disabled={currentPage === 1}
-                      onClick={() => setPage(currentPage - 1)}
+                      onClick={() => {
+                        return setPage(currentPage - 1);
+                      }}
                     >
                       Previous
                     </button>
@@ -338,7 +351,9 @@ export default function BillingView({
                     <button
                       type="button"
                       disabled={currentPage === pages}
-                      onClick={() => setPage(currentPage + 1)}
+                      onClick={() => {
+                        return setPage(currentPage + 1);
+                      }}
                     >
                       Next
                     </button>

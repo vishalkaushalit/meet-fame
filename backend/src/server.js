@@ -43,12 +43,9 @@ app.use('/uploads', express.static(uploadsPath));
 // MongoDB Connectivity
 const MONGODB_URI = process.env.MONGODB_URI;
 if (MONGODB_URI) {
-  mongoConnection
-    .connect()
-    .then(() => {
+  mongoConnection.connect().then(() => {
       console.log('MongoDB connected. Persistent API storage is active.');
-    })
-    .catch(() => {
+    }).catch(() => {
       console.warn(
         'MongoDB connection unavailable:',
         mongoConnection.status().issue,
@@ -75,13 +72,18 @@ if (process.env.BLOB_READ_WRITE_TOKEN) {
 // acknowledge writes to an ephemeral Vercel filesystem.
 const persistentDatabase = createDatabaseMiddleware(mongoStore);
 app.use('/api', (req, res, next) => {
-  if (req.path === '/health') return next();
-  if (process.env.MONGODB_URI) return persistentDatabase(req, res, next);
-  if (process.env.VERCEL)
+  if (req.path === '/health') {
+    return next();
+  }
+  if (process.env.MONGODB_URI) {
+    return persistentDatabase(req, res, next);
+  }
+  if (process.env.VERCEL) {
     return res.status(503).json({
       error:
         'Booking service is temporarily unavailable. Please try again later.',
     });
+  }
   return next();
 });
 
@@ -116,12 +118,14 @@ app.get('/api/blob/status', async (req, res) => {
       connected: true,
       tokenConfigured: true,
       totalBlobs: blobList.blobs.length,
-      blobs: blobList.blobs.map((b) => ({
-        pathname: b.pathname,
-        url: b.url,
-        size: b.size,
-        uploadedAt: b.uploadedAt,
-      })),
+      blobs: blobList.blobs.map((b) => {
+        return {
+          pathname: b.pathname,
+          url: b.url,
+          size: b.size,
+          uploadedAt: b.uploadedAt,
+        };
+      }),
     });
   } catch (err) {
     return res.status(500).json({

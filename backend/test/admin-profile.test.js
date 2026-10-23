@@ -2,20 +2,22 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import adminRoutes from '../src/routes/admin.routes.js';
 import { db } from '../src/db.js';
-const update = adminRoutes.stack.find(
-  (layer) => layer.route?.path === '/profile',
-).route.stack[0].handle;
-const response = () => ({
-  code: 200,
-  status(code) {
-    this.code = code;
-    return this;
-  },
-  json(body) {
-    this.body = body;
-    return this;
-  },
-});
+const update = adminRoutes.stack.find((layer) => {
+  return layer.route?.path === '/profile';
+}).route.stack[0].handle;
+const response = () => {
+  return {
+    code: 200,
+    status(code) {
+      this.code = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
+};
 test('admin profile updates only the signed-in account and rejects invalid or duplicate emails', () => {
   const read = db.read,
     write = db.write;
@@ -37,8 +39,12 @@ test('admin profile updates only the signed-in account and rejects invalid or du
       },
     ],
   };
-  db.read = () => data;
-  db.write = () => true;
+  db.read = () => {
+    return data;
+  };
+  db.write = () => {
+    return true;
+  };
   const submit = (body) => {
     const res = response();
     update({ adminId: 'a1', body }, res);
@@ -75,8 +81,7 @@ test('admin profile updates only the signed-in account and rejects invalid or du
       400,
     );
     assert.equal(
-      submit({ name: 'Admin', email: 'ok@example.com', phone: '1'.repeat(41) })
-        .code,
+      submit({ name: 'Admin', email: 'ok@example.com', phone: '1'.repeat(41) }).code,
       400,
     );
   } finally {

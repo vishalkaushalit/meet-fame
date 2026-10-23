@@ -8,13 +8,16 @@ import {
 import { phoneError } from './phoneValidation';
 
 const names = new Intl.DisplayNames(['en'], { type: 'region' });
-const countries = getCountries().sort((a, b) =>
-  names.of(a).localeCompare(names.of(b)),
-);
-const flag = (country) =>
-  String.fromCodePoint(
-    ...[...country].map((letter) => letter.charCodeAt(0) + 127397),
+const countries = getCountries().sort((a, b) => {
+  return names.of(a).localeCompare(names.of(b));
+});
+const flag = (country) => {
+  return String.fromCodePoint(
+    ...[...country].map((letter) => {
+      return letter.charCodeAt(0) + 127397;
+    }),
   );
+};
 
 export default function PhoneInput({
   id,
@@ -63,11 +66,13 @@ export default function PhoneInput({
           }}
           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
         >
-          {countries.map((code) => (
-            <option key={code} value={code}>
-              {flag(code)} {names.of(code)} (+{getCountryCallingCode(code)})
-            </option>
-          ))}
+          {countries.map((code) => {
+            return (
+              <option key={code} value={code}>
+                {flag(code)} {names.of(code)} (+{getCountryCallingCode(code)})
+              </option>
+            );
+          })}
         </select>
       </div>
       <span
@@ -92,9 +97,7 @@ export default function PhoneInput({
         aria-describedby={describedBy}
         placeholder="Enter your phone number"
         onChange={(e) => {
-          const digits = e.target.value
-            .replace(/[^0-9]/g, '')
-            .slice(0, 15 - prefix.length + 1);
+          const digits = e.target.value.replace(/[^0-9]/g, '').slice(0, 15 - prefix.length + 1);
           onChange(digits ? `${prefix}${digits}` : '');
         }}
         className="phone-national min-w-0 flex-1 rounded-r-xl border-0 bg-transparent px-3 py-2.5 text-sm text-white outline-none"

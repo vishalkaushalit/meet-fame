@@ -5,8 +5,12 @@ import { callAvailability } from '../../../shared/bookingTime';
 export default function JoinCallButton({ booking, onJoinCall }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(timer);
+    const timer = setInterval(() => {
+      return setNow(Date.now());
+    }, 1000);
+    return () => {
+      return clearInterval(timer);
+    };
   }, []);
   const availability = callAvailability(booking, now);
   return (
@@ -14,7 +18,9 @@ export default function JoinCallButton({ booking, onJoinCall }) {
       disabled={!availability.allowed}
       title={`${formatDate(booking.date)}, ${booking.slotLabel || booking.slot} IST`}
       onClick={() => {
-        if (callAvailability(booking).allowed) onJoinCall(booking);
+        if (callAvailability(booking).allowed) {
+          onJoinCall(booking);
+        }
       }}
       className="px-4 py-2 rounded-xl bg-brand-purple text-white text-xs font-semibold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
     >

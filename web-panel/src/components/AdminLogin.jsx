@@ -102,7 +102,9 @@ export default function AdminLogin({ onLoginSuccess }) {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    return setEmail(e.target.value);
+                  }}
                   placeholder="Enter your email address"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
                 />
@@ -119,13 +121,19 @@ export default function AdminLogin({ onLoginSuccess }) {
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    return setPassword(e.target.value);
+                  }}
                   placeholder="Enter your password"
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-12 py-2.5 text-xs text-white focus:outline-none focus:border-brand-purple"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((visible) => !visible)}
+                  onClick={() => {
+                    return setShowPassword((visible) => {
+                      return !visible;
+                    });
+                  }}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   aria-pressed={showPassword}
                   className="absolute right-2 bottom-1.5 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-purple"

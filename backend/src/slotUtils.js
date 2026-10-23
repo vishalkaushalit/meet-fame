@@ -5,7 +5,9 @@ import { dayRanges } from '../../shared/availability.js';
  * Convert 24-hour time "09:00" or "17:00" to minutes from midnight
  */
 export function timeToMinutes(timeStr) {
-  if (!timeStr) return 0;
+  if (!timeStr) {
+    return 0;
+  }
   const [hours, minutes] = timeStr.split(':').map(Number);
   return (hours || 0) * 60 + (minutes || 0);
 }
@@ -23,13 +25,18 @@ export function minutesToTime(minutes) {
  * Format "09:00" to "9:00 AM" or "17:00" to "5:00 PM"
  */
 export function formatTo12Hour(time24) {
-  if (!time24) return '';
+  if (!time24) {
+    return '';
+  }
   const [hStr, mStr] = time24.split(':');
   let h = parseInt(hStr, 10);
   const m = mStr || '00';
   const period = h >= 12 ? 'PM' : 'AM';
-  if (h === 0) h = 12;
-  else if (h > 12) h -= 12;
+  if (h === 0) {
+    h = 12;
+  } else if (h > 12) {
+    h -= 12;
+  }
   return `${h}:${m} ${period}`;
 }
 
@@ -77,16 +84,18 @@ export function generateDaySlots(ranges = []) {
   for (const s of allSlots) {
     map.set(s.slotId, s);
   }
-  return Array.from(map.values()).sort(
-    (a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime),
-  );
+  return Array.from(map.values()).sort((a, b) => {
+    return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+  });
 }
 
 /**
  * Get day name from date string "YYYY-MM-DD" (e.g. "monday", "tuesday")
  */
 export function getDayNameFromDate(dateStr) {
-  if (!dateStr) return '';
+  if (!dateStr) {
+    return '';
+  }
   const date = new Date(dateStr + 'T00:00:00');
   const days = [
     'sunday',

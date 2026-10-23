@@ -12,13 +12,13 @@ const uploadDir = path.join(__dirname, '../../data/uploads');
  * Falls back to local storage if BLOB_READ_WRITE_TOKEN is not configured
  */
 export async function uploadToStorage(file, filenamePrefix = 'upload') {
-  if (!file) return null;
+  if (!file) {
+    return null;
+  }
 
   const originalName = file.originalname || 'file.bin';
   const ext = path.extname(originalName);
-  const cleanBase = path
-    .basename(originalName, ext)
-    .replace(/[^a-zA-Z0-9_-]/g, '');
+  const cleanBase = path.basename(originalName, ext).replace(/[^a-zA-Z0-9_-]/g, '');
   const folder = filenamePrefix === 'intro' ? 'introduction_video' : 'meetfame';
   const pathname = `${folder}/${filenamePrefix}-${cleanBase}-${Date.now()}${ext}`;
 
@@ -43,7 +43,9 @@ export async function uploadToStorage(file, filenamePrefix = 'upload') {
       console.log(`[Vercel Blob] Upload successful! URL:`, blob.url);
       return blob.url;
     } catch (err) {
-      if (process.env.VERCEL) throw err;
+      if (process.env.VERCEL) {
+        throw err;
+      }
       console.error(
         '[Vercel Blob] Error uploading to Vercel Blob, falling back to local storage:',
         err.message,
@@ -51,14 +53,22 @@ export async function uploadToStorage(file, filenamePrefix = 'upload') {
     }
   }
 
-  if (process.env.VERCEL) throw new Error('Cloud upload storage is unavailable.');
-  const localDir = filenamePrefix === 'intro' ? path.join(uploadDir, 'introduction_video') : uploadDir;
+  if (process.env.VERCEL) {
+    throw new Error('Cloud upload storage is unavailable.');
+  }
+  const localDir =
+    filenamePrefix === 'intro'
+      ? path.join(uploadDir, 'introduction_video')
+      : uploadDir;
   fs.mkdirSync(localDir, { recursive: true });
 
   // Local storage fallback (saved in data/uploads)
   if (filenamePrefix === 'intro' && (file.buffer || file.path)) {
     const filename = `intro-${Date.now()}${ext}`;
-    fs.writeFileSync(path.join(localDir, filename), file.buffer || fs.readFileSync(file.path));
+    fs.writeFileSync(
+      path.join(localDir, filename),
+      file.buffer || fs.readFileSync(file.path),
+    );
     return `/uploads/introduction_video/${filename}`;
   }
   if (file.filename) {

@@ -7,10 +7,11 @@ export default function AnnouncementsView({ announcement }) {
   const [title, setTitle] = useState(announcement?.title || '');
   const [message, setMessage] = useState(announcement?.message || '');
   const [audience, setAudience] = useState(announcement?.audience || 'all');
-  const localDate = (value) =>
-    value
+  const localDate = (value) => {
+    return value
       ? new Date(Date.parse(value) + 19800000).toISOString().slice(0, 10)
       : '';
+  };
   const [activeFrom, setActiveFrom] = useState(
     localDate(announcement?.activeFrom),
   );
@@ -22,7 +23,9 @@ export default function AnnouncementsView({ announcement }) {
   const [error, setError] = useState('');
   const submit = async (event) => {
     event.preventDefault();
-    if (sending || !title.trim() || !message.trim()) return;
+    if (sending || !title.trim() || !message.trim()) {
+      return;
+    }
     setSending(true);
     setNotice('');
     setError('');
@@ -77,7 +80,9 @@ export default function AnnouncementsView({ announcement }) {
           disabled={sending}
           placeholder="Enter your announcement title"
           value={title}
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={(event) => {
+            return setTitle(event.target.value);
+          }}
           className={field}
         />
       </label>
@@ -86,7 +91,9 @@ export default function AnnouncementsView({ announcement }) {
         <select
           disabled={sending || Boolean(announcement)}
           value={audience}
-          onChange={(event) => setAudience(event.target.value)}
+          onChange={(event) => {
+            return setAudience(event.target.value);
+          }}
           className={field}
         >
           <option value="all">Users and influencers</option>
@@ -103,7 +110,9 @@ export default function AnnouncementsView({ announcement }) {
           disabled={sending}
           placeholder="Enter your announcement message"
           value={message}
-          onChange={(event) => setMessage(event.target.value)}
+          onChange={(event) => {
+            return setMessage(event.target.value);
+          }}
           className={field}
         />
       </label>
@@ -114,7 +123,9 @@ export default function AnnouncementsView({ announcement }) {
             required
             className={field}
             value={activeFrom}
-            onChange={(event) => setActiveFrom(event.target.value)}
+            onChange={(event) => {
+              return setActiveFrom(event.target.value);
+            }}
             disabled={sending}
           />
         </label>
@@ -124,7 +135,9 @@ export default function AnnouncementsView({ announcement }) {
             className={field}
             value={expiresAt}
             min={activeFrom || undefined}
-            onChange={(event) => setExpiresAt(event.target.value)}
+            onChange={(event) => {
+              return setExpiresAt(event.target.value);
+            }}
             disabled={sending}
           />
         </label>

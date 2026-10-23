@@ -6,21 +6,24 @@ import authRoutes from '../src/routes/auth.routes.js';
 import adminRoutes from '../src/routes/admin.routes.js';
 import { db } from '../src/db.js';
 
-const handler = (router, path, method) =>
-  router.stack.find(
-    (layer) => layer.route?.path === path && layer.route.methods[method],
-  ).route.stack[0].handle;
-const response = () => ({
-  code: 200,
-  status(code) {
-    this.code = code;
-    return this;
-  },
-  json(body) {
-    this.body = body;
-    return this;
-  },
-});
+const handler = (router, path, method) => {
+  return router.stack.find((layer) => {
+    return layer.route?.path === path && layer.route.methods[method];
+  }).route.stack[0].handle;
+};
+const response = () => {
+  return {
+    code: 200,
+    status(code) {
+      this.code = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
+};
 
 test('admin blocking denies login and session verification; unblocking restores login', () => {
   const originalRead = db.read;
@@ -37,8 +40,12 @@ test('admin blocking denies login and session verification; unblocking restores 
     ],
     admins: [{ id: 'test-admin' }],
   };
-  db.read = () => data;
-  db.write = () => true;
+  db.read = () => {
+    return data;
+  };
+  db.write = () => {
+    return true;
+  };
   try {
     const login = () => {
       const res = response();
@@ -163,7 +170,9 @@ test('admin blocking denies login and session verification; unblocking restores 
     assert.equal(data.influencers[0].statusReason, '');
     assert.equal(creatorLogin().code, 200);
 
-    const guard = adminRoutes.stack.find((layer) => !layer.route).handle;
+    const guard = adminRoutes.stack.find((layer) => {
+      return !layer.route;
+    }).handle;
     const checkGuard = (token) => {
       const res = response();
       let passed = false;
@@ -184,8 +193,7 @@ test('admin blocking denies login and session verification; unblocking restores 
       true,
     );
     assert.equal(
-      checkGuard(jwt.sign({ id: 'deleted-admin', role: 'admin' }, secret)).res
-        .code,
+      checkGuard(jwt.sign({ id: 'deleted-admin', role: 'admin' }, secret)).res.code,
       403,
     );
   } finally {
@@ -198,16 +206,18 @@ test('login, session verification and admin APIs use configuration loaded after 
   const originalSecret = process.env.JWT_SECRET;
   const originalRead = db.read;
   process.env.JWT_SECRET = 'regression-test-secret-loaded-after-import';
-  db.read = () => ({
-    admins: [
-      {
-        id: 'config-admin',
-        email: 'admin@test.example',
-        password: bcrypt.hashSync('test-password', 4),
-        role: 'admin',
-      },
-    ],
-  });
+  db.read = () => {
+    return {
+      admins: [
+        {
+          id: 'config-admin',
+          email: 'admin@test.example',
+          password: bcrypt.hashSync('test-password', 4),
+          role: 'admin',
+        },
+      ],
+    };
+  };
   try {
     const login = response();
     handler(
@@ -235,57 +245,66 @@ test('login, session verification and admin APIs use configuration loaded after 
     assert.equal(session.code, 200);
     assert.equal(session.body.user.id, 'config-admin');
     let passed = false;
-    adminRoutes.stack
-      .find((layer) => !layer.route)
-      .handle({ headers }, response(), () => {
+    adminRoutes.stack.find((layer) => {
+        return !layer.route;
+      }).handle({ headers }, response(), () => {
         passed = true;
       });
     assert.equal(passed, true);
   } finally {
     db.read = originalRead;
-    if (originalSecret === undefined) delete process.env.JWT_SECRET;
-    else process.env.JWT_SECRET = originalSecret;
+    if (originalSecret === undefined) {
+      delete process.env.JWT_SECRET;
+    } else {
+      process.env.JWT_SECRET = originalSecret;
+    }
   }
 });
 
 test('account directory includes every role without password data', () => {
   const originalRead = db.read;
-  db.read = () => ({
-    users: [
-      {
-        id: 'shared-id',
-        name: 'Client',
-        password: 'private',
-        role: 'user',
-        status: 'blocked',
-        statusReason: 'Client remark',
-      },
-    ],
-    influencers: [
-      {
-        id: 'shared-id',
-        name: 'Creator',
-        password: 'private',
-        role: 'influencer',
-        status: 'approved',
-      },
-    ],
-    admins: [
-      { id: 'admin-id', name: 'Admin', password: 'private', role: 'admin' },
-    ],
-  });
+  db.read = () => {
+    return {
+      users: [
+        {
+          id: 'shared-id',
+          name: 'Client',
+          password: 'private',
+          role: 'user',
+          status: 'blocked',
+          statusReason: 'Client remark',
+        },
+      ],
+      influencers: [
+        {
+          id: 'shared-id',
+          name: 'Creator',
+          password: 'private',
+          role: 'influencer',
+          status: 'approved',
+        },
+      ],
+      admins: [
+        { id: 'admin-id', name: 'Admin', password: 'private', role: 'admin' },
+      ],
+    };
+  };
   try {
     const res = response();
     handler(adminRoutes, '/accounts', 'get')({}, res);
     assert.equal(res.code, 200);
     assert.deepEqual(
-      res.body.accounts.map((account) => account.role),
+      res.body.accounts.map((account) => {
+        return account.role;
+      }),
       ['user', 'influencer', 'admin'],
     );
     assert.equal(res.body.accounts[0].statusReason, 'Client remark');
     assert.equal(res.body.accounts[2].status, 'active');
     assert.ok(
-      res.body.accounts.every((account) => !Object.hasOwn(account, 'password')),
+      res.body.accounts.every((account) => {
+        return !Object.hasOwn(account, 'password');
+      }),
     );
   } finally {
     db.read = originalRead;
@@ -294,23 +313,30 @@ test('account directory includes every role without password data', () => {
 
 test('account details selects the requested role and excludes passwords', () => {
   const originalRead = db.read;
-  db.read = () => ({
-    users: [
-      { id: 'same-id', name: 'Client', password: 'private-user', phone: '123' },
-    ],
-    influencers: [
-      {
-        id: 'same-id',
-        name: 'Creator',
-        password: 'private-creator',
-        specialization: 'Coaching',
-        certification: { title: 'Certificate' },
-      },
-    ],
-    admins: [
-      { id: 'same-id', name: 'Administrator', password: 'private-admin' },
-    ],
-  });
+  db.read = () => {
+    return {
+      users: [
+        {
+          id: 'same-id',
+          name: 'Client',
+          password: 'private-user',
+          phone: '123',
+        },
+      ],
+      influencers: [
+        {
+          id: 'same-id',
+          name: 'Creator',
+          password: 'private-creator',
+          specialization: 'Coaching',
+          certification: { title: 'Certificate' },
+        },
+      ],
+      admins: [
+        { id: 'same-id', name: 'Administrator', password: 'private-admin' },
+      ],
+    };
+  };
   try {
     const details = (role, id = 'same-id') => {
       const res = response();

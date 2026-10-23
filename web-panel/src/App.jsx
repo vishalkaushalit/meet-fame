@@ -10,14 +10,22 @@ import {
   cleanAdminReturnUrl,
 } from './routes';
 
-const AdminLogin = lazy(() => import('./components/AdminLogin'));
-const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
-const PasswordRecovery = lazy(() => import('../../shared/PasswordRecovery'));
+const AdminLogin = lazy(() => {
+  return import('./components/AdminLogin');
+});
+const AdminDashboard = lazy(() => {
+  return import('./components/AdminDashboard');
+});
+const PasswordRecovery = lazy(() => {
+  return import('../../shared/PasswordRecovery');
+});
 
 function AdminAppContent() {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [path, setPath] = useState(() => window.location.pathname);
+  const [path, setPath] = useState(() => {
+    return window.location.pathname;
+  });
   const requestedPage = useRef(null);
   const page = matchAdminPage(path);
   useEffect(() => {
@@ -27,18 +35,25 @@ function AdminAppContent() {
       setPath(window.location.pathname);
     };
     window.addEventListener('popstate', update);
-    return () => window.removeEventListener('popstate', update);
+    return () => {
+      return window.removeEventListener('popstate', update);
+    };
   }, []);
   useEffect(() => {
-    if (loading) return;
-    if (['forgot-password', 'reset-password'].includes(page)) return;
+    if (loading) {
+      return;
+    }
+    if (['forgot-password', 'reset-password'].includes(page)) {
+      return;
+    }
     if (!admin && page !== 'login') {
-      if (page)
+      if (page) {
         requestedPage.current = {
           path: window.location.pathname,
           search: window.location.search,
           state: window.history.state,
         };
+      }
       navigateAdmin(null, { replace: true });
     } else if (admin && (!page || page === 'login')) {
       const destination = requestedPage.current;
@@ -50,7 +65,9 @@ function AdminAppContent() {
         );
         window.dispatchEvent(new PopStateEvent('popstate'));
         window.scrollTo(0, 0);
-      } else navigateAdmin('overview', { replace: true });
+      } else {
+        navigateAdmin('overview', { replace: true });
+      }
       requestedPage.current = null;
     }
   }, [admin, loading, page]);
@@ -92,8 +109,10 @@ function AdminAppContent() {
     navigateAdmin(null, { replace: true });
   };
 
-  if (loading) return <LogoLoader label="Loading admin workspace…" />;
-  if (['forgot-password', 'reset-password'].includes(page))
+  if (loading) {
+    return <LogoLoader label="Loading admin workspace…" />;
+  }
+  if (['forgot-password', 'reset-password'].includes(page)) {
     return (
       <PasswordRecovery
         header={
@@ -111,6 +130,7 @@ function AdminAppContent() {
         loginUrl={adminPath(null)}
       />
     );
+  }
 
   return (
     <div>

@@ -41,9 +41,11 @@ export default function InfluencerBookings({
           {bookingsError}
           <button
             className="ml-3 underline"
-            onClick={() =>
-              window.dispatchEvent(new Event('meetfame-bookings-updated'))
-            }
+            onClick={() => {
+              return window.dispatchEvent(
+                new Event('meetfame-bookings-updated'),
+              );
+            }}
           >
             Retry
           </button>
@@ -58,67 +60,74 @@ export default function InfluencerBookings({
         </div>
       ) : (
         <div className="space-y-3">
-          {bookingPagination.items.map((b) => (
-            <article key={b.id} className="creator-appointment">
-              <div className="creator-client">
-                <span className="creator-client-avatar" aria-hidden="true">
-                  {b.userName?.charAt(0) || 'U'}
-                </span>
-                <div>
-                  <h4>{b.userName}</h4>
-                  <p>{b.userEmail}</p>
-                </div>
-              </div>
-              <div className="creator-session-info">
-                <div className="creator-topic">
-                  <MessageSquare size={17} aria-hidden="true" />
+          {bookingPagination.items.map((b) => {
+            return (
+              <article key={b.id} className="creator-appointment">
+                <div className="creator-client">
+                  <span className="creator-client-avatar" aria-hidden="true">
+                    {b.userName?.charAt(0) || 'U'}
+                  </span>
                   <div>
-                    <span>Topic</span>
-                    <strong>{b.topic || '1-on-1 session'}</strong>
+                    <h4>{b.userName}</h4>
+                    <p>{b.userEmail}</p>
                   </div>
                 </div>
-                <div className="creator-session-time">
-                  <span>
-                    <Calendar size={16} aria-hidden="true" />
-                    {formatDate(b.date)}{' '}
-                    <span className="capitalize">({b.dayOfWeek})</span>
-                  </span>
-                  <span className="time-slot-badge">
-                    <Clock size={16} aria-hidden="true" />
-                    {b.slotLabel || b.slot} <small>IST</small>
-                  </span>
-                </div>
-              </div>
-              <div className="creator-session-meta">
-                <div className="creator-status-field">
-                  <span className={`creator-status creator-status-${b.status}`}>
-                    <CheckCircle size={13} aria-hidden="true" />
-                    {b.status}
-                  </span>
-                </div>
-                <div className="creator-fee">
-                  <div>
-                    <span>Fee</span>
-                    <strong>${b.price ?? 0}</strong>
+                <div className="creator-session-info">
+                  <div className="creator-topic">
+                    <MessageSquare size={17} aria-hidden="true" />
+                    <div>
+                      <span>Topic</span>
+                      <strong>{b.topic || '1-on-1 session'}</strong>
+                    </div>
+                  </div>
+                  <div className="creator-session-time">
+                    <span>
+                      <Calendar size={16} aria-hidden="true" />
+                      {formatDate(b.date)}{' '}
+                      <span className="capitalize">({b.dayOfWeek})</span>
+                    </span>
+                    <span className="time-slot-badge">
+                      <Clock size={16} aria-hidden="true" />
+                      {b.slotLabel || b.slot} <small>IST</small>
+                    </span>
                   </div>
                 </div>
-              </div>
-              <div className="creator-session-actions">
-                {b.status === 'confirmed' && b.meetingType === 'video' && (
-                  <JoinCallButton booking={b} onJoinCall={onJoinCall} />
-                )}
-                <button
-                  className="creator-chat-button"
-                  onClick={() =>
-                    onOpenChat?.({ id: b.userId, name: b.userName }, 'user')
-                  }
-                >
-                  <MessageSquare size={17} aria-hidden="true" />
-                  Chat with User
-                </button>
-              </div>
-            </article>
-          ))}
+                <div className="creator-session-meta">
+                  <div className="creator-status-field">
+                    <span
+                      className={`creator-status creator-status-${b.status}`}
+                    >
+                      <CheckCircle size={13} aria-hidden="true" />
+                      {b.status}
+                    </span>
+                  </div>
+                  <div className="creator-fee">
+                    <div>
+                      <span>Fee</span>
+                      <strong>${b.price ?? 0}</strong>
+                    </div>
+                  </div>
+                </div>
+                <div className="creator-session-actions">
+                  {b.status === 'confirmed' && b.meetingType === 'video' && (
+                    <JoinCallButton booking={b} onJoinCall={onJoinCall} />
+                  )}
+                  <button
+                    className="creator-chat-button"
+                    onClick={() => {
+                      return onOpenChat?.(
+                        { id: b.userId, name: b.userName },
+                        'user',
+                      );
+                    }}
+                  >
+                    <MessageSquare size={17} aria-hidden="true" />
+                    Chat with User
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       )}
       {!loadingBookings && (

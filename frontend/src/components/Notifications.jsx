@@ -23,14 +23,19 @@ export default function Notifications() {
       setItems(result.notifications);
       setUnread(result.unreadCount);
       setError('');
-      const reminder = result.notifications.find(
-        (item) =>
+      const reminder = result.notifications.find((item) => {
+        return (
           item.kind === 'reminder' &&
           !item.readAt &&
-          !shown.current.has(item.id),
-      );
-      for (const item of result.notifications) shown.current.add(item.id);
-      if (reminder) setBanner(reminder);
+          !shown.current.has(item.id)
+        );
+      });
+      for (const item of result.notifications) {
+        shown.current.add(item.id);
+      }
+      if (reminder) {
+        setBanner(reminder);
+      }
       return result.nextDueAt
         ? Math.min(10000, Math.max(250, result.nextDueAt - result.serverNow))
         : 10000;
@@ -47,12 +52,16 @@ export default function Notifications() {
     const poll = async () => {
       clearTimeout(timer);
       const delay = await load();
-      if (active) timer = setTimeout(poll, delay);
+      if (active) {
+        timer = setTimeout(poll, delay);
+      }
     };
     refresh.current = poll;
     poll();
     const focus = () => {
-      if (document.visibilityState === 'visible') poll();
+      if (document.visibilityState === 'visible') {
+        poll();
+      }
     };
     document.addEventListener('visibilitychange', focus);
     window.addEventListener('meetfame-bookings-updated', poll);
@@ -65,10 +74,14 @@ export default function Notifications() {
     };
   }, [load]);
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     refresh.current?.();
     const outside = (event) => {
-      if (!root.current?.contains(event.target)) setOpen(false);
+      if (!root.current?.contains(event.target)) {
+        setOpen(false);
+      }
     };
     const escape = (event) => {
       if (event.key === 'Escape') {
@@ -85,7 +98,14 @@ export default function Notifications() {
   }, [open]);
   // Dismiss a reminder banner once the session ends or is cancelled.
   useEffect(() => {
-    if (banner && !items.some((item) => item.id === banner.id)) setBanner(null);
+    if (
+      banner &&
+      !items.some((item) => {
+        return item.id === banner.id;
+      })
+    ) {
+      setBanner(null);
+    }
   }, [items, banner]);
   const mark = async (id) => {
     setSaving(true);
@@ -112,8 +132,9 @@ export default function Notifications() {
         className="notification-root"
         ref={root}
         onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget))
+          if (!event.currentTarget.contains(event.relatedTarget)) {
             setOpen(false);
+          }
         }}
       >
         <button
@@ -123,7 +144,11 @@ export default function Notifications() {
           aria-label={`Notifications, ${unread} unread`}
           aria-expanded={open}
           aria-controls="meeting-notifications"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => {
+            return setOpen((value) => {
+              return !value;
+            });
+          }}
         >
           <Bell size={20} aria-hidden="true" />
           {unread > 0 && <span>{unread > 99 ? '99+' : unread}</span>}
@@ -141,7 +166,9 @@ export default function Notifications() {
               <button
                 type="button"
                 aria-label="Close notifications"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  return setOpen(false);
+                }}
               >
                 <X size={18} />
               </button>
@@ -150,7 +177,9 @@ export default function Notifications() {
               <button
                 type="button"
                 disabled={saving || !unread}
-                onClick={() => mark()}
+                onClick={() => {
+                  return mark();
+                }}
               >
                 <CheckCheck size={16} aria-hidden="true" />
                 Mark all read
@@ -159,7 +188,13 @@ export default function Notifications() {
             {error && (
               <p role="alert" className="notification-error">
                 {error}{' '}
-                <button onClick={() => refresh.current?.()}>Retry</button>
+                <button
+                  onClick={() => {
+                    return refresh.current?.();
+                  }}
+                >
+                  Retry
+                </button>
               </p>
             )}
             <div className="notification-feed">
@@ -171,26 +206,33 @@ export default function Notifications() {
                   before your session.
                 </p>
               ) : (
-                items.map((item) => (
-                  <article
-                    key={item.id}
-                    className={item.readAt ? '' : 'is-unread'}
-                  >
-                    <h3>{item.title}</h3>
-                    <p>{item.message}</p>
-                    <div className="notification-actions">
-                      <button onClick={viewBookings}>View booking</button>
-                      {!item.readAt && (
-                        <button disabled={saving} onClick={() => mark(item.id)}>
-                          Mark read
-                        </button>
-                      )}
-                    </div>
-                    <time dateTime={item.createdAt}>
-                      {formatDateTime(item.createdAt)} IST
-                    </time>
-                  </article>
-                ))
+                items.map((item) => {
+                  return (
+                    <article
+                      key={item.id}
+                      className={item.readAt ? '' : 'is-unread'}
+                    >
+                      <h3>{item.title}</h3>
+                      <p>{item.message}</p>
+                      <div className="notification-actions">
+                        <button onClick={viewBookings}>View booking</button>
+                        {!item.readAt && (
+                          <button
+                            disabled={saving}
+                            onClick={() => {
+                              return mark(item.id);
+                            }}
+                          >
+                            Mark read
+                          </button>
+                        )}
+                      </div>
+                      <time dateTime={item.createdAt}>
+                        {formatDateTime(item.createdAt)} IST
+                      </time>
+                    </article>
+                  );
+                })
               )}
             </div>
           </section>
@@ -208,7 +250,9 @@ export default function Notifications() {
             <button
               className="reminder-dismiss"
               aria-label="Dismiss meeting reminder"
-              onClick={() => setBanner(null)}
+              onClick={() => {
+                return setBanner(null);
+              }}
             >
               <X size={18} />
             </button>

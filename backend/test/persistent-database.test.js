@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { createDatabaseMiddleware } from '../src/databaseContext.js';
 import { db } from '../src/db.js';
 
-const invoke = (store, route) =>
-  new Promise((resolve) => {
+const invoke = (store, route) => {
+  return new Promise((resolve) => {
     const res = {
       statusCode: 200,
       status(code) {
@@ -16,12 +16,17 @@ const invoke = (store, route) =>
         return this;
       },
     };
-    createDatabaseMiddleware(store)({}, res, () => route(res));
+    createDatabaseMiddleware(store)({}, res, () => {
+      return route(res);
+    });
   });
+};
 test('confirmation is withheld until durable changes have committed', async () => {
   let committed = false;
   const store = {
-    load: async () => ({ state: { bookings: [], influencers: [] } }),
+    load: async () => {
+      return { state: { bookings: [], influencers: [] } };
+    },
     commit: async (snapshot, state) => {
       assert.equal(snapshot.state.bookings.length, 0);
       assert.equal(state.bookings.length, 1);
@@ -47,7 +52,9 @@ test('failed durable writes return an error instead of a false booking confirmat
   ]) {
     const result = await invoke(
       {
-        load: async () => ({ state: { bookings: [], influencers: [] } }),
+        load: async () => {
+          return { state: { bookings: [], influencers: [] } };
+        },
         commit: async () => {
           throw Object.assign(new Error('test'), { code });
         },
@@ -63,19 +70,25 @@ test('failed durable writes return an error instead of a false booking confirmat
   }
 });
 test('request snapshots are isolated and database outages do not fall back to seed bookings', async () => {
-  const makeStore = (id) => ({
-    load: async () => ({ state: { bookings: [{ id }], influencers: [] } }),
-    commit: async () => {},
-  });
+  const makeStore = (id) => {
+    return {
+      load: async () => {
+        return { state: { bookings: [{ id }], influencers: [] } };
+      },
+      commit: async () => {},
+    };
+  };
   const results = await Promise.all(
-    ['one', 'two'].map((id) =>
-      invoke(makeStore(id), (res) =>
-        res.json({ id: db.read().bookings[0].id }),
-      ),
-    ),
+    ['one', 'two'].map((id) => {
+      return invoke(makeStore(id), (res) => {
+        return res.json({ id: db.read().bookings[0].id });
+      });
+    }),
   );
   assert.deepEqual(
-    results.map((result) => result.body.id),
+    results.map((result) => {
+      return result.body.id;
+    }),
     ['one', 'two'],
   );
   const unavailable = await invoke(
@@ -84,7 +97,9 @@ test('request snapshots are isolated and database outages do not fall back to se
         throw new Error('offline');
       },
     },
-    () => assert.fail('Routes must not run without durable storage'),
+    () => {
+      return assert.fail('Routes must not run without durable storage');
+    },
   );
   assert.equal(unavailable.status, 503);
 });
@@ -95,17 +110,28 @@ test('refund ledger can explicitly commit alongside a booking conflict response'
   const result = await new Promise((resolve) => {
     const res = {
       statusCode: 200,
-      status(code) { this.statusCode = code; return this; },
-      json(body) { resolve({ status: this.statusCode, body }); return this; },
+      status(code) {
+        this.statusCode = code;
+        return this;
+      },
+      json(body) {
+        resolve({ status: this.statusCode, body });
+        return this;
+      },
     };
     createDatabaseMiddleware({
-      load: async () => ({ state: { transactions: [], influencers: [] } }),
+      load: async () => {
+        return { state: { transactions: [], influencers: [] } };
+      },
       commit: async (_, state) => {
         assert.equal(state.transactions[0].status, 'refund_pending');
         committed = true;
       },
     })(request, res, () => {
-      db.write({ transactions: [{ id: 't1', status: 'refund_pending' }], influencers: [] });
+      db.write({
+        transactions: [{ id: 't1', status: 'refund_pending' }],
+        influencers: [],
+      });
       request.persistDatabaseOnError = true;
       res.status(409).json({ error: 'Slot unavailable; refund requested.' });
     });

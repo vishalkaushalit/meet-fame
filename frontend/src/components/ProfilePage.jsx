@@ -47,7 +47,9 @@ export default function ProfilePage({ edit = false }) {
     }
     const url = URL.createObjectURL(photo);
     setPhotoPreview(url);
-    return () => URL.revokeObjectURL(url);
+    return () => {
+      return URL.revokeObjectURL(url);
+    };
   }, [photo]);
   useEffect(() => {
     let active = true;
@@ -55,16 +57,18 @@ export default function ProfilePage({ edit = false }) {
     setError('');
     setFields({});
     setPhoto(null);
-    api.auth
-      .getMe()
-      .then((result) => {
-        if (active) setProfile(result.user);
-      })
-      .catch(() => {
-        if (active) setError('Unable to load your profile. Please try again.');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+    api.auth.getMe().then((result) => {
+        if (active) {
+          setProfile(result.user);
+        }
+      }).catch(() => {
+        if (active) {
+          setError('Unable to load your profile. Please try again.');
+        }
+      }).finally(() => {
+        if (active) {
+          setLoading(false);
+        }
       });
     return () => {
       active = false;
@@ -72,13 +76,19 @@ export default function ProfilePage({ edit = false }) {
   }, [edit, user.id]);
   const influencer = user.role === 'influencer';
   const change = (key, value) => {
-    setProfile((current) => ({ ...current, [key]: value }));
-    setFields((current) => ({ ...current, [key]: '' }));
+    setProfile((current) => {
+      return { ...current, [key]: value };
+    });
+    setFields((current) => {
+      return { ...current, [key]: '' };
+    });
     setSaved(false);
   };
   const submit = async (event) => {
     event.preventDefault();
-    if (saving) return;
+    if (saving) {
+      return;
+    }
     setSaving(true);
     setError('');
     setFields({});
@@ -89,15 +99,20 @@ export default function ProfilePage({ edit = false }) {
         'phone',
         'avatar',
         ...(influencer ? ['bio', 'specialization', 'category'] : []),
-      ].map((key) => [key, profile[key] || '']),
+      ].map((key) => {
+        return [key, profile[key] || ''];
+      }),
     );
-    if (influencer) payload.hourlyRate = Number(profile.hourlyRate);
+    if (influencer) {
+      payload.hourlyRate = Number(profile.hourlyRate);
+    }
     try {
       let body = payload;
       if (photo) {
         body = new FormData();
-        for (const [key, value] of Object.entries(payload))
+        for (const [key, value] of Object.entries(payload)) {
           body.append(key, String(value));
+        }
         body.append('avatarFile', photo);
       }
       const result = await api.auth.updateProfile(body);
@@ -112,33 +127,39 @@ export default function ProfilePage({ edit = false }) {
       setSaving(false);
     }
   };
-  const input = (key, label, type = 'text', required = false, maxLength) => (
-    <div className="profile-field" key={key}>
-      <label htmlFor={`profile-${key}`}>{label}</label>
-      <input
-        id={`profile-${key}`}
-        type={type}
-        required={required}
-        maxLength={maxLength}
-        value={profile[key] ?? ''}
-        disabled={saving}
-        onChange={(event) => change(key, event.target.value)}
-        aria-invalid={Boolean(fields[key])}
-        aria-describedby={fields[key] ? `profile-${key}-error` : undefined}
-      />
-      {fields[key] && (
-        <small id={`profile-${key}-error`} role="alert">
-          {fields[key]}
-        </small>
-      )}
-    </div>
-  );
-  const detail = (label, value) => (
-    <div className="profile-detail" key={label}>
-      <dt>{label}</dt>
-      <dd>{value || 'Not provided'}</dd>
-    </div>
-  );
+  const input = (key, label, type = 'text', required = false, maxLength) => {
+    return (
+      <div className="profile-field" key={key}>
+        <label htmlFor={`profile-${key}`}>{label}</label>
+        <input
+          id={`profile-${key}`}
+          type={type}
+          required={required}
+          maxLength={maxLength}
+          value={profile[key] ?? ''}
+          disabled={saving}
+          onChange={(event) => {
+            return change(key, event.target.value);
+          }}
+          aria-invalid={Boolean(fields[key])}
+          aria-describedby={fields[key] ? `profile-${key}-error` : undefined}
+        />
+        {fields[key] && (
+          <small id={`profile-${key}-error`} role="alert">
+            {fields[key]}
+          </small>
+        )}
+      </div>
+    );
+  };
+  const detail = (label, value) => {
+    return (
+      <div className="profile-detail" key={label}>
+        <dt>{label}</dt>
+        <dd>{value || 'Not provided'}</dd>
+      </div>
+    );
+  };
   return (
     <section
       className={`profile-page${influencer ? ' profile-page-influencer' : ''}`}
@@ -148,7 +169,9 @@ export default function ProfilePage({ edit = false }) {
           <button
             type="button"
             className="profile-back"
-            onClick={() => navigate(edit ? '/profile' : '/')}
+            onClick={() => {
+              return navigate(edit ? '/profile' : '/');
+            }}
             aria-label={edit ? 'Back to profile' : 'Back to dashboard'}
           >
             <ArrowLeft size={18} />
@@ -211,7 +234,9 @@ export default function ProfilePage({ edit = false }) {
                   aria-pressed={activeSection === 'profile'}
                   aria-controls="profile-details-panel"
                   disabled={saving}
-                  onClick={() => setActiveSection('profile')}
+                  onClick={() => {
+                    return setActiveSection('profile');
+                  }}
                 >
                   <UserRound size={18} />
                   Profile details
@@ -221,7 +246,9 @@ export default function ProfilePage({ edit = false }) {
                   aria-pressed={activeSection === 'bank'}
                   aria-controls="profile-bank-panel"
                   disabled={saving}
-                  onClick={() => setActiveSection('bank')}
+                  onClick={() => {
+                    return setActiveSection('bank');
+                  }}
                 >
                   <Briefcase size={18} />
                   Bank details
@@ -248,7 +275,9 @@ export default function ProfilePage({ edit = false }) {
                       id="profile-phone"
                       required
                       value={profile.phone || ''}
-                      onChange={(value) => change('phone', value)}
+                      onChange={(value) => {
+                        return change('phone', value);
+                      }}
                       disabled={saving}
                       invalid={Boolean(fields.phone)}
                       describedBy={
@@ -277,7 +306,9 @@ export default function ProfilePage({ edit = false }) {
                         disabled={saving}
                         onChange={(event) => {
                           const file = event.target.files?.[0];
-                          if (!file) return;
+                          if (!file) {
+                            return;
+                          }
                           if (
                             !['image/jpeg', 'image/png', 'image/webp'].includes(
                               file.type,
@@ -285,16 +316,20 @@ export default function ProfilePage({ edit = false }) {
                             file.size > 2 * 1024 * 1024 ||
                             !file.size
                           ) {
-                            setFields((current) => ({
-                              ...current,
-                              avatar:
-                                'Choose a JPG, PNG, or WebP image up to 2 MB.',
-                            }));
+                            setFields((current) => {
+                              return {
+                                ...current,
+                                avatar:
+                                  'Choose a JPG, PNG, or WebP image up to 2 MB.',
+                              };
+                            });
                             event.target.value = '';
                             return;
                           }
                           setPhoto(file);
-                          setFields((current) => ({ ...current, avatar: '' }));
+                          setFields((current) => {
+                            return { ...current, avatar: '' };
+                          });
                         }}
                       />
                     </label>
@@ -309,7 +344,9 @@ export default function ProfilePage({ edit = false }) {
                           setPhoto(null);
                           const input =
                             document.getElementById('profile-photo');
-                          if (input) input.value = '';
+                          if (input) {
+                            input.value = '';
+                          }
                         }}
                       >
                         <X size={14} />
@@ -341,17 +378,17 @@ export default function ProfilePage({ edit = false }) {
                           id="profile-category"
                           value={profile.category || ''}
                           disabled={saving}
-                          onChange={(event) =>
-                            change('category', event.target.value)
-                          }
+                          onChange={(event) => {
+                            return change('category', event.target.value);
+                          }}
                           required
                         >
                           {!REGISTRATION_CATEGORIES.includes(
                             profile.category,
                           ) && <option value="">Select a category</option>}
-                          {REGISTRATION_CATEGORIES.map((category) => (
-                            <option key={category}>{category}</option>
-                          ))}
+                          {REGISTRATION_CATEGORIES.map((category) => {
+                            return <option key={category}>{category}</option>;
+                          })}
                         </select>
                         {fields.category && (
                           <small role="alert">{fields.category}</small>
@@ -368,9 +405,9 @@ export default function ProfilePage({ edit = false }) {
                           required
                           value={profile.hourlyRate ?? ''}
                           disabled={saving}
-                          onChange={(event) =>
-                            change('hourlyRate', event.target.value)
-                          }
+                          onChange={(event) => {
+                            return change('hourlyRate', event.target.value);
+                          }}
                         />
                         {fields.hourlyRate && (
                           <small role="alert">{fields.hourlyRate}</small>
@@ -384,9 +421,9 @@ export default function ProfilePage({ edit = false }) {
                           maxLength={2000}
                           value={profile.bio || ''}
                           disabled={saving}
-                          onChange={(event) =>
-                            change('bio', event.target.value)
-                          }
+                          onChange={(event) => {
+                            return change('bio', event.target.value);
+                          }}
                         />
                         {fields.bio && <small role="alert">{fields.bio}</small>}
                       </div>
@@ -404,7 +441,9 @@ export default function ProfilePage({ edit = false }) {
                   </button>
                   <button
                     type="button"
-                    onClick={() => navigate('/profile')}
+                    onClick={() => {
+                      return navigate('/profile');
+                    }}
                     disabled={saving}
                   >
                     Cancel

@@ -14,7 +14,11 @@ test('daily availability is one object and preserves multiple time ranges and br
   assert.deepEqual(normalizeAvailability(schedule), schedule);
   const slots = generateDaySlots(schedule.monday);
   assert.equal(slots.length, 6);
-  assert.ok(!slots.some((slot) => slot.startTime === '12:00'));
+  assert.ok(
+    !slots.some((slot) => {
+      return slot.startTime === '12:00';
+    }),
+  );
   assert.deepEqual(slots, generateDaySlots(ranges));
   const creator = new Influencer({
     name: 'Creator',

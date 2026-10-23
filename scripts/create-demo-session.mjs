@@ -18,7 +18,9 @@ try {
   const password = `Demo-${randomUUID().slice(0, 12)}!`;
   const hash = await bcrypt.hash(password, 10);
   function demoAccount(collection, name, email, role) {
-    let account = collection.find((item) => item.email === email);
+    let account = collection.find((item) => {
+      return item.email === email;
+    });
     if (!account) {
       account = {
         id: `demo_${randomUUID()}`,
@@ -30,7 +32,7 @@ try {
         phone: '+1 555-0100',
         createdAt: new Date().toISOString(),
       };
-      if (role === 'influencer')
+      if (role === 'influencer') {
         Object.assign(account, {
           specialization: 'Video call testing',
           category: 'Technology & AI',
@@ -38,6 +40,7 @@ try {
           hourlyRate: 0,
           availability: {},
         });
+      }
       collection.push(account);
     }
     return account;
@@ -55,14 +58,15 @@ try {
     'influencer',
   );
   const now = Date.now();
-  const existing = data.bookings.find(
-    (item) =>
+  const existing = data.bookings.find((item) => {
+    return (
       item.topic === 'Demo video session — testing only' &&
       item.userId === user.id &&
       item.influencerId === influencer.id &&
       item.status === 'confirmed' &&
-      bookingWindow(item)?.end > now,
-  );
+      bookingWindow(item)?.end > now
+    );
+  });
   if (existing) {
     console.log(
       JSON.stringify({
@@ -77,23 +81,26 @@ try {
     const date = ist.toISOString().slice(0, 10);
     const minutes = ist.getUTCHours() * 60 + ist.getUTCMinutes();
     const end = Math.min(minutes + 60, 1440);
-    const time = (value) =>
-      `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+    const time = (value) => {
+      return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+    };
     const slot = `${time(minutes)} - ${time(end)}`;
     const window = bookingWindow({ date, slot });
     const conflict = data.bookings.some((item) => {
       if (
         item.status !== 'confirmed' ||
         (item.userId !== user.id && item.influencerId !== influencer.id)
-      )
+      ) {
         return false;
+      }
       const other = bookingWindow(item);
       return other && other.start < window.end && other.end > window.start;
     });
-    if (conflict)
+    if (conflict) {
       throw new Error(
         'A confirmed booking overlaps this demo. Try after the existing session ends.',
       );
+    }
     const booking = {
       id: `demo_${randomUUID()}`,
       userId: user.id,
@@ -123,8 +130,11 @@ try {
     user.password = hash;
     influencer.password = hash;
     data.bookings.push(booking);
-    if (snapshot) await mongoStore.commit(snapshot, data);
-    else if (!db.write(data)) throw new Error('Unable to save demo booking.');
+    if (snapshot) {
+      await mongoStore.commit(snapshot, data);
+    } else if (!db.write(data)) {
+      throw new Error('Unable to save demo booking.');
+    }
     console.log(
       JSON.stringify({
         message: 'Demo session created.',

@@ -10,4 +10,5 @@ const schema = new mongoose.Schema({
 });
 addPersistenceFields(schema);
 schema.index({ ownerRole: 1, ownerId: 1 }, { unique: true });
-export const BankDetails = mongoose.models.BankDetails || mongoose.model('BankDetails', schema);
+export const BankDetails =
+  mongoose.models.BankDetails || mongoose.model('BankDetails', schema);

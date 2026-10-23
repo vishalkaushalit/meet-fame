@@ -15,7 +15,11 @@ router.use((req, res, next) => {
   const token = req.headers.authorization?.startsWith('Bearer ')
     ? req.headers.authorization.slice(7)
     : null;
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  if (!token) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+    });
+  }
   try {
     const decoded = jwt.verify(
       token,
@@ -23,14 +27,23 @@ router.use((req, res, next) => {
     );
     if (
       decoded.role !== 'admin' ||
-      !db.read().admins.some((admin) => admin.id === decoded.id && (admin.sessionVersion || 0) === (decoded.sessionVersion || 0))
+      !db.read().admins.some((admin) => {
+        return (
+          admin.id === decoded.id &&
+          (admin.sessionVersion || 0) === (decoded.sessionVersion || 0)
+        );
+      })
     ) {
-      return res.status(403).json({ error: 'Administrator access required' });
+      return res.status(403).json({
+        error: 'Administrator access required',
+      });
     }
     req.adminId = decoded.id;
     return next();
   } catch {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.status(401).json({
+      error: 'Invalid or expired token',
+    });
   }
 });
 
@@ -45,28 +58,48 @@ router.put('/profile', (req, res) => {
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
     typeof phone !== 'string' ||
     phone.trim().length > 40
-  )
+  ) {
     return res.status(400).json({
       error:
         'Enter a valid name, email and phone number (up to 40 characters).',
     });
+  }
   const phoneIssue = phoneError(phone);
-  if (phoneIssue) return res.status(400).json({ error: phoneIssue });
+  if (phoneIssue) {
+    return res.status(400).json({
+      error: phoneIssue,
+    });
+  }
   const data = db.read();
-  const account = data.admins.find((item) => item.id === req.adminId);
-  if (!account)
-    return res.status(404).json({ error: 'Administrator account not found.' });
+  const account = data.admins.find((item) => {
+    return item.id === req.adminId;
+  });
+  if (!account) {
+    return res.status(404).json({
+      error: 'Administrator account not found.',
+    });
+  }
   const normalizedEmail = email.trim().toLowerCase();
-  const duplicates = identityErrors(data, { email: normalizedEmail, phone }, { collection: 'admins', id: account.id });
-  if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
+  const duplicates = identityErrors(
+    data,
+    { email: normalizedEmail, phone },
+    { collection: 'admins', id: account.id },
+  );
+  if (Object.keys(duplicates).length) {
+    return res.status(409).json({
+      error: Object.values(duplicates)[0],
+      fields: duplicates,
+    });
+  }
   account.name = name.trim();
   account.email = normalizedEmail;
   account.phone = normalizePhone(phone);
   account.updatedAt = new Date().toISOString();
-  if (!db.write(data))
-    return res
-      .status(500)
-      .json({ error: 'Unable to save profile. Please try again.' });
+  if (!db.write(data)) {
+    return res.status(500).json({
+      error: 'Unable to save profile. Please try again.',
+    });
+  }
   const { password, ...user } = account;
   return res.json({ success: true, user });
 });
@@ -75,49 +108,126 @@ router.put('/profile', (req, res) => {
  * ADMIN PLATFORM STATS & METRICS
  */
 const announcementDates = (body) => {
-  if (!body.activeFrom) return null;
+  if (!body.activeFrom) {
+    return null;
+  }
   const activeFrom = Date.parse(body.activeFrom);
   const expiresAt = body.expiresAt ? Date.parse(body.expiresAt) : null;
-  if (!Number.isFinite(activeFrom) || (expiresAt !== null && (!Number.isFinite(expiresAt) || expiresAt <= activeFrom))) return null;
-  return { activeFrom: new Date(activeFrom).toISOString(), expiresAt: expiresAt === null ? null : new Date(expiresAt).toISOString() };
+  if (
+    !Number.isFinite(activeFrom) ||
+    (expiresAt !== null &&
+      (!Number.isFinite(expiresAt) || expiresAt <= activeFrom))
+  ) {
+    return null;
+  }
+  return {
+    activeFrom: new Date(activeFrom).toISOString(),
+    expiresAt: expiresAt === null ? null : new Date(expiresAt).toISOString(),
+  };
 };
 router.get('/announcements', (req, res) => {
-  const announcements = [...(db.read().announcements || [])].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const announcements = [...(db.read().announcements || [])].sort((a, b) => {
+    return b.createdAt.localeCompare(a.createdAt);
+  });
   res.json({ announcements });
 });
 router.get('/announcements/:id', (req, res) => {
-  const announcement = (db.read().announcements || []).find((item) => item.id === req.params.id);
-  if (!announcement) return res.status(404).json({ error: 'Announcement not found.' });
+  const announcement = (db.read().announcements || []).find((item) => {
+    return item.id === req.params.id;
+  });
+  if (!announcement) {
+    return res.status(404).json({
+      error: 'Announcement not found.',
+    });
+  }
   res.json({ announcement });
 });
 router.put('/announcements/:id', (req, res) => {
   const dates = announcementDates(req.body);
-  if (!dates) return res.status(400).json({ error: 'Choose an activation date. If provided, expiry must be after activation.' });
-  const { title, message } = req.body;
-  if (typeof title !== 'string' || !title.trim() || title.trim().length > 100 || typeof message !== 'string' || !message.trim() || message.trim().length > 2000)
-    return res.status(400).json({ error: 'Provide a valid title and message.' });
-  const data = db.read();
-  const announcement = (data.announcements || []).find((item) => item.id === req.params.id);
-  if (!announcement) return res.status(404).json({ error: 'Announcement not found.' });
-  Object.assign(announcement, { ...dates, title: title.trim(), message: message.trim(), updatedAt: new Date().toISOString() });
-  for (const notification of data.notifications || []) {
-    if (notification.announcementId === announcement.id) Object.assign(notification, { title: announcement.title, message: announcement.message, dueAt: Date.parse(dates.activeFrom), expiresAt: dates.expiresAt ? Date.parse(dates.expiresAt) : null });
+  if (!dates) {
+    return res.status(400).json({
+      error:
+        'Choose an activation date. If provided, expiry must be after activation.',
+    });
   }
-  if (!db.write(data)) return res.status(500).json({ error: 'Unable to update announcement.' });
+  const { title, message } = req.body;
+  if (
+    typeof title !== 'string' ||
+    !title.trim() ||
+    title.trim().length > 100 ||
+    typeof message !== 'string' ||
+    !message.trim() ||
+    message.trim().length > 2000
+  ) {
+    return res.status(400).json({
+      error: 'Provide a valid title and message.',
+    });
+  }
+  const data = db.read();
+  const announcement = (data.announcements || []).find((item) => {
+    return item.id === req.params.id;
+  });
+  if (!announcement) {
+    return res.status(404).json({
+      error: 'Announcement not found.',
+    });
+  }
+  Object.assign(announcement, {
+    ...dates,
+    title: title.trim(),
+    message: message.trim(),
+    updatedAt: new Date().toISOString(),
+  });
+  for (const notification of data.notifications || []) {
+    if (notification.announcementId === announcement.id) {
+      Object.assign(notification, {
+        title: announcement.title,
+        message: announcement.message,
+        dueAt: Date.parse(dates.activeFrom),
+        expiresAt: dates.expiresAt ? Date.parse(dates.expiresAt) : null,
+      });
+    }
+  }
+  if (!db.write(data)) {
+    return res.status(500).json({
+      error: 'Unable to update announcement.',
+    });
+  }
   res.json({ announcement });
 });
 router.delete('/announcements/:id', (req, res) => {
   const data = db.read();
-  if (!(data.announcements || []).some((item) => item.id === req.params.id)) return res.status(404).json({ error: 'Announcement not found.' });
-  data.announcements = data.announcements.filter((item) => item.id !== req.params.id);
-  data.notifications = (data.notifications || []).filter((item) => item.announcementId !== req.params.id);
-  if (!db.write(data)) return res.status(500).json({ error: 'Unable to delete announcement.' });
+  if (
+    !(data.announcements || []).some((item) => {
+      return item.id === req.params.id;
+    })
+  ) {
+    return res.status(404).json({
+      error: 'Announcement not found.',
+    });
+  }
+  data.announcements = data.announcements.filter((item) => {
+    return item.id !== req.params.id;
+  });
+  data.notifications = (data.notifications || []).filter((item) => {
+    return item.announcementId !== req.params.id;
+  });
+  if (!db.write(data)) {
+    return res.status(500).json({
+      error: 'Unable to delete announcement.',
+    });
+  }
   res.json({ success: true });
 });
 
 router.post('/announcements', (req, res) => {
   const dates = announcementDates(req.body);
-  if (!dates) return res.status(400).json({ error: 'Choose an activation date. If provided, expiry must be after activation.' });
+  if (!dates) {
+    return res.status(400).json({
+      error:
+        'Choose an activation date. If provided, expiry must be after activation.',
+    });
+  }
   const { title, message, audience } = req.body;
   if (
     typeof title !== 'string' ||
@@ -127,10 +237,11 @@ router.post('/announcements', (req, res) => {
     !message.trim() ||
     message.trim().length > 2000 ||
     !['all', 'user', 'influencer'].includes(audience)
-  )
-    return res
-      .status(400)
-      .json({ error: 'Provide a title, message and valid audience.' });
+  ) {
+    return res.status(400).json({
+      error: 'Provide a title, message and valid audience.',
+    });
+  }
   const data = db.read();
   const announcementId = randomUUID();
   let sent = 0;
@@ -138,54 +249,79 @@ router.post('/announcements', (req, res) => {
     ['user', data.users],
     ['influencer', data.influencers],
   ]) {
-    if (audience !== 'all' && audience !== role) continue;
-    for (const account of accounts.filter(
-      (item) => item.status === 'approved',
-    )) {
-      const notification = addNotification(data, account.id, role, title.trim(), message.trim());
+    if (audience !== 'all' && audience !== role) {
+      continue;
+    }
+    for (const account of accounts.filter((item) => {
+      return item.status === 'approved';
+    })) {
+      const notification = addNotification(
+        data,
+        account.id,
+        role,
+        title.trim(),
+        message.trim(),
+      );
       notification.announcementId = announcementId;
       notification.dueAt = Date.parse(dates.activeFrom);
-      notification.expiresAt = dates.expiresAt ? Date.parse(dates.expiresAt) : null;
+      notification.expiresAt = dates.expiresAt
+        ? Date.parse(dates.expiresAt)
+        : null;
       sent++;
     }
   }
   data.announcements ||= [];
-  data.announcements.push({ ...dates, id: announcementId, title: title.trim(), message: message.trim(), audience, sent, adminId: req.adminId, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
-  if (!db.write(data))
-    return res.status(500).json({ error: 'Unable to save announcement.' });
-  return res.status(201).json({ success: true, sent });
+  data.announcements.push({
+    ...dates,
+    id: announcementId,
+    title: title.trim(),
+    message: message.trim(),
+    audience,
+    sent,
+    adminId: req.adminId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+  if (!db.write(data)) {
+    return res.status(500).json({
+      error: 'Unable to save announcement.',
+    });
+  }
+  return res.status(201).json({
+    success: true,
+    sent,
+  });
 });
 
 router.get('/stats', (req, res) => {
   try {
     const data = db.read();
     const totalInfluencers = data.influencers.length;
-    const pendingInfluencers = data.influencers.filter(
-      (i) => i.status === 'pending_review',
-    ).length;
-    const approvedInfluencers = data.influencers.filter(
-      (i) => i.status === 'approved',
-    ).length;
-    const pendingCertificates = data.influencers.filter(
-      (i) => i.certificateStatus === 'pending',
-    ).length;
-    const verifiedInfluencers = data.influencers.filter(
-      (i) => i.isVerified,
-    ).length;
+    const pendingInfluencers = data.influencers.filter((i) => {
+      return i.status === 'pending_review';
+    }).length;
+    const approvedInfluencers = data.influencers.filter((i) => {
+      return i.status === 'approved';
+    }).length;
+    const pendingCertificates = data.influencers.filter((i) => {
+      return i.certificateStatus === 'pending';
+    }).length;
+    const verifiedInfluencers = data.influencers.filter((i) => {
+      return i.isVerified;
+    }).length;
 
     const totalUsers = data.users.length;
-    const pendingUsers = data.users.filter(
-      (u) => u.status === 'pending_review',
-    ).length;
+    const pendingUsers = data.users.filter((u) => {
+      return u.status === 'pending_review';
+    }).length;
 
     const totalBookings = data.bookings.length;
-    const confirmedBookings = data.bookings.filter(
-      (b) => b.status === 'confirmed',
-    ).length;
-    const totalVolume = data.bookings.reduce(
-      (sum, b) => sum + (b.price || 0),
-      0,
-    );
+    const confirmedBookings = data.bookings.filter((b) => {
+      return b.status === 'confirmed';
+    }).length;
+    const totalVolume = data.bookings.reduce((sum, b) => {
+      return sum + (b.price || 0);
+    }, 0);
 
     return res.json({
       totalInfluencers,
@@ -200,7 +336,9 @@ router.get('/stats', (req, res) => {
       totalVolume,
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch admin stats' });
+    return res.status(500).json({
+      error: 'Failed to fetch admin stats',
+    });
   }
 });
 
@@ -213,12 +351,18 @@ router.get('/influencers', (req, res) => {
     const data = db.read();
     let list = data.influencers;
     if (status && status !== 'all') {
-      list = list.filter((i) => i.status === status);
+      list = list.filter((i) => {
+        return i.status === status;
+      });
     }
-    const safeList = list.map(({ password, ...rest }) => rest);
+    const safeList = list.map(({ password, ...rest }) => {
+      return rest;
+    });
     return res.json({ influencers: safeList });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch influencers' });
+    return res.status(500).json({
+      error: 'Failed to fetch influencers',
+    });
   }
 });
 
@@ -233,21 +377,25 @@ router.get('/accounts', (req, res) => {
       ['user', data.users],
       ['influencer', data.influencers],
       ['admin', data.admins],
-    ].flatMap(([role, records]) =>
-      records.map((account) => ({
-        id: account.id,
-        name: account.name,
-        email: account.email,
-        phone: account.phone,
-        createdAt: account.createdAt,
-        role,
-        status: role === 'admin' ? 'active' : account.status,
-        statusReason: role === 'admin' ? '' : account.statusReason || '',
-      })),
-    );
+    ].flatMap(([role, records]) => {
+      return records.map((account) => {
+        return {
+          id: account.id,
+          name: account.name,
+          email: account.email,
+          phone: account.phone,
+          createdAt: account.createdAt,
+          role,
+          status: role === 'admin' ? 'active' : account.status,
+          statusReason: role === 'admin' ? '' : account.statusReason || '',
+        };
+      });
+    });
     return res.json({ accounts });
   } catch {
-    return res.status(500).json({ error: 'Failed to fetch account directory' });
+    return res.status(500).json({
+      error: 'Failed to fetch account directory',
+    });
   }
 });
 
@@ -261,12 +409,19 @@ router.get('/accounts/:role/:id', (req, res) => {
     const collection = Object.hasOwn(collections, req.params.role)
       ? collections[req.params.role]
       : null;
-    if (!collection)
-      return res.status(400).json({ error: 'Invalid account role' });
-    const account = db
-      .read()
-      [collection].find((item) => item.id === req.params.id);
-    if (!account) return res.status(404).json({ error: 'Account not found' });
+    if (!collection) {
+      return res.status(400).json({
+        error: 'Invalid account role',
+      });
+    }
+    const account = db.read()[collection].find((item) => {
+      return item.id === req.params.id;
+    });
+    if (!account) {
+      return res.status(404).json({
+        error: 'Account not found',
+      });
+    }
     const { password, ...safeAccount } = account;
     return res.json({
       account: {
@@ -276,7 +431,9 @@ router.get('/accounts/:role/:id', (req, res) => {
       },
     });
   } catch {
-    return res.status(500).json({ error: 'Failed to fetch account details' });
+    return res.status(500).json({
+      error: 'Failed to fetch account details',
+    });
   }
 });
 
@@ -286,12 +443,18 @@ router.get('/users', (req, res) => {
     const data = db.read();
     let list = data.users;
     if (status && status !== 'all') {
-      list = list.filter((u) => u.status === status);
+      list = list.filter((u) => {
+        return u.status === status;
+      });
     }
-    const safeList = list.map(({ password, ...rest }) => rest);
+    const safeList = list.map(({ password, ...rest }) => {
+      return rest;
+    });
     return res.json({ users: safeList });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch users' });
+    return res.status(500).json({
+      error: 'Failed to fetch users',
+    });
   }
 });
 
@@ -305,7 +468,9 @@ router.put('/influencers/:id/status', (req, res) => {
     if (
       !['approved', 'rejected', 'pending_review', 'blocked'].includes(status)
     ) {
-      return res.status(400).json({ error: 'Invalid status' });
+      return res.status(400).json({
+        error: 'Invalid status',
+      });
     }
 
     if (
@@ -320,9 +485,13 @@ router.put('/influencers/:id/status', (req, res) => {
     }
 
     const data = db.read();
-    const idx = data.influencers.findIndex((i) => i.id === req.params.id);
+    const idx = data.influencers.findIndex((i) => {
+      return i.id === req.params.id;
+    });
     if (idx === -1) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
     data.influencers[idx].status = status;
@@ -342,9 +511,9 @@ router.put('/influencers/:id/status', (req, res) => {
       influencer: safeInfluencer,
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: 'Failed to update influencer status' });
+    return res.status(500).json({
+      error: 'Failed to update influencer status',
+    });
   }
 });
 
@@ -354,10 +523,10 @@ router.put('/influencers/:id/status', (req, res) => {
 router.put('/users/:id/status', (req, res) => {
   try {
     const { status, reason } = req.body;
-    if (
-      !['approved', 'blocked'].includes(status)
-    ) {
-      return res.status(400).json({ error: 'Invalid status' });
+    if (!['approved', 'blocked'].includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid status',
+      });
     }
     if (
       status === 'blocked' &&
@@ -371,9 +540,13 @@ router.put('/users/:id/status', (req, res) => {
     }
 
     const data = db.read();
-    const idx = data.users.findIndex((u) => u.id === req.params.id);
+    const idx = data.users.findIndex((u) => {
+      return u.id === req.params.id;
+    });
     if (idx === -1) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({
+        error: 'User not found',
+      });
     }
 
     data.users[idx].status = status;
@@ -392,7 +565,9 @@ router.put('/users/:id/status', (req, res) => {
       user: safeUser,
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to update user status' });
+    return res.status(500).json({
+      error: 'Failed to update user status',
+    });
   }
 });
 
@@ -404,9 +579,13 @@ router.put('/influencers/:id/verify-certificate', (req, res) => {
   try {
     const { isVerified, certificateStatus } = req.body;
     const data = db.read();
-    const idx = data.influencers.findIndex((i) => i.id === req.params.id);
+    const idx = data.influencers.findIndex((i) => {
+      return i.id === req.params.id;
+    });
     if (idx === -1) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
     data.influencers[idx].isVerified = Boolean(isVerified);
@@ -424,9 +603,9 @@ router.put('/influencers/:id/verify-certificate', (req, res) => {
       influencer: safeInfluencer,
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ error: 'Failed to update certificate verification' });
+    return res.status(500).json({
+      error: 'Failed to update certificate verification',
+    });
   }
 });
 
@@ -440,9 +619,13 @@ router.get('/influencers/:id/slots-overview', (req, res) => {
   try {
     const { date } = req.query; // optional date YYYY-MM-DD
     const data = db.read();
-    const influencer = data.influencers.find((i) => i.id === req.params.id);
+    const influencer = data.influencers.find((i) => {
+      return i.id === req.params.id;
+    });
     if (!influencer) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
     const days = [
@@ -469,22 +652,31 @@ router.get('/influencers/:id/slots-overview', (req, res) => {
     if (date) {
       const dayName = getDayNameFromDate(date);
       const daySlots = weeklySlotPlan[dayName]?.generatedSlots || [];
-      const bookingsOnDate = data.bookings.filter(
-        (b) =>
+      const bookingsOnDate = data.bookings.filter((b) => {
+        return (
           b.influencerId === influencer.id &&
           b.date === date &&
-          b.status !== 'cancelled',
+          b.status !== 'cancelled'
+        );
+      });
+      const bookedSet = new Set(
+        bookingsOnDate.map((b) => {
+          return b.slot;
+        }),
       );
-      const bookedSet = new Set(bookingsOnDate.map((b) => b.slot));
 
       dateInspection = {
         date,
         dayName,
-        availableSlots: daySlots.filter((s) => !bookedSet.has(s.slotId)),
-        bookedSlots: daySlots
-          .filter((s) => bookedSet.has(s.slotId))
-          .map((s) => {
-            const bInfo = bookingsOnDate.find((b) => b.slot === s.slotId);
+        availableSlots: daySlots.filter((s) => {
+          return !bookedSet.has(s.slotId);
+        }),
+        bookedSlots: daySlots.filter((s) => {
+            return bookedSet.has(s.slotId);
+          }).map((s) => {
+            const bInfo = bookingsOnDate.find((b) => {
+              return b.slot === s.slotId;
+            });
             return {
               ...s,
               bookedBy: bInfo ? bInfo.userName : 'Unknown',
@@ -497,9 +689,9 @@ router.get('/influencers/:id/slots-overview', (req, res) => {
     }
 
     // All active bookings for this influencer
-    const allBookings = data.bookings.filter(
-      (b) => b.influencerId === influencer.id,
-    );
+    const allBookings = data.bookings.filter((b) => {
+      return b.influencerId === influencer.id;
+    });
 
     return res.json({
       influencerId: influencer.id,
@@ -510,7 +702,9 @@ router.get('/influencers/:id/slots-overview', (req, res) => {
     });
   } catch (err) {
     console.error('Error getting slots overview:', err);
-    return res.status(500).json({ error: 'Failed to fetch slots overview' });
+    return res.status(500).json({
+      error: 'Failed to fetch slots overview',
+    });
   }
 });
 
@@ -525,16 +719,24 @@ router.get('/bookings', (req, res) => {
     let bookings = data.bookings;
 
     if (status && status !== 'all') {
-      bookings = bookings.filter((b) => b.status === status);
+      bookings = bookings.filter((b) => {
+        return b.status === status;
+      });
     }
     if (influencerId) {
-      bookings = bookings.filter((b) => b.influencerId === influencerId);
+      bookings = bookings.filter((b) => {
+        return b.influencerId === influencerId;
+      });
     }
 
-    bookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    bookings.sort((a, b) => {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
     return res.json({ bookings });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch bookings' });
+    return res.status(500).json({
+      error: 'Failed to fetch bookings',
+    });
   }
 });
 
@@ -571,13 +773,15 @@ router.get('/conversations', (req, res) => {
       }
     }
 
-    const conversations = Array.from(conversationsMap.values()).sort(
-      (a, b) => new Date(b.lastTimestamp) - new Date(a.lastTimestamp),
-    );
+    const conversations = Array.from(conversationsMap.values()).sort((a, b) => {
+      return new Date(b.lastTimestamp) - new Date(a.lastTimestamp);
+    });
 
     return res.json({ conversations });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch conversations' });
+    return res.status(500).json({
+      error: 'Failed to fetch conversations',
+    });
   }
 });
 

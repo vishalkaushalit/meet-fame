@@ -1,8 +1,10 @@
 let checkoutScript;
 export function openRazorpay(options) {
-  if (!checkoutScript)
+  if (!checkoutScript) {
     checkoutScript = new Promise((resolve, reject) => {
-      if (window.Razorpay) return resolve();
+      if (window.Razorpay) {
+        return resolve();
+      }
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = resolve;
@@ -12,20 +14,21 @@ export function openRazorpay(options) {
       };
       document.head.appendChild(script);
     });
-  return checkoutScript.then(
-    () =>
-      new Promise((resolve, reject) => {
-        const checkout = new window.Razorpay({
-          ...options,
-          handler: resolve,
-          modal: {
-            ondismiss: () =>
-              reject(
-                new Error('Payment cancelled. Your slot has not been booked.'),
-              ),
+  }
+  return checkoutScript.then(() => {
+    return new Promise((resolve, reject) => {
+      const checkout = new window.Razorpay({
+        ...options,
+        handler: resolve,
+        modal: {
+          ondismiss: () => {
+            return reject(
+              new Error('Payment cancelled. Your slot has not been booked.'),
+            );
           },
-        });
-        checkout.open();
-      }),
-  );
+        },
+      });
+      checkout.open();
+    });
+  });
 }

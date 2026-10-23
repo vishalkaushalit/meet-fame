@@ -24,7 +24,9 @@ export default function ChatModal({
       : null;
 
   useEffect(() => {
-    if (!conversationId || !isOpen) return;
+    if (!conversationId || !isOpen) {
+      return;
+    }
 
     let timer;
     async function fetchMessages() {
@@ -39,18 +41,24 @@ export default function ChatModal({
     fetchMessages();
     timer = setInterval(fetchMessages, 3000); // Polling for live chat updates
 
-    return () => clearInterval(timer);
+    return () => {
+      return clearInterval(timer);
+    };
   }, [conversationId, isOpen]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  if (!isOpen || !targetUser || !user) return null;
+  if (!isOpen || !targetUser || !user) {
+    return null;
+  }
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim()) {
+      return;
+    }
 
     const text = inputText;
     setInputText('');
@@ -73,7 +81,9 @@ export default function ChatModal({
         text,
       });
 
-      setMessages((prev) => [...prev, res.message]);
+      setMessages((prev) => {
+        return [...prev, res.message];
+      });
     } catch (err) {
       console.error('Failed to send message:', err);
     }
@@ -169,7 +179,9 @@ export default function ChatModal({
           <input
             type="text"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(e) => {
+              return setInputText(e.target.value);
+            }}
             placeholder={`Enter your message to ${targetUser.name}`}
             className="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
           />

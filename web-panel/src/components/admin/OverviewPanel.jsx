@@ -27,21 +27,23 @@ export default function OverviewPanel({
   return (
     <>
       <div className="dashboard-metrics">
-        {metrics.map((metric) => (
-          <article
-            className={`metric-card metric-card-${metric.color}`}
-            key={metric.label}
-          >
-            <div className="metric-top">
-              <span>{metric.label}</span>
-              <span className={`metric-icon ${metric.color}`}>
-                <metric.icon size={18} />
-              </span>
-            </div>
-            <strong className="metric-value">{metric.value ?? '—'}</strong>
-            <p>{metric.detail}</p>
-          </article>
-        ))}
+        {metrics.map((metric) => {
+          return (
+            <article
+              className={`metric-card metric-card-${metric.color}`}
+              key={metric.label}
+            >
+              <div className="metric-top">
+                <span>{metric.label}</span>
+                <span className={`metric-icon ${metric.color}`}>
+                  <metric.icon size={18} />
+                </span>
+              </div>
+              <strong className="metric-value">{metric.value ?? '—'}</strong>
+              <p>{metric.detail}</p>
+            </article>
+          );
+        })}
       </div>
       <div className="dashboard-middle">
         <section className="dashboard-card activity-card">
@@ -53,7 +55,9 @@ export default function OverviewPanel({
             <select
               aria-label="Booking activity period"
               value={days}
-              onChange={(event) => setDays(Number(event.target.value))}
+              onChange={(event) => {
+                return setDays(Number(event.target.value));
+              }}
             >
               <option value={7}>Last 7 days</option>
               <option value={14}>Last 14 days</option>
@@ -62,7 +66,11 @@ export default function OverviewPanel({
           </div>
           <div className="activity-total">
             <strong>
-              {stats ? activity.reduce((sum, day) => sum + day.count, 0) : '—'}
+              {stats
+                ? activity.reduce((sum, day) => {
+                    return sum + day.count;
+                  }, 0)
+                : '—'}
             </strong>
             <span>scheduled sessions</span>
           </div>
@@ -71,39 +79,43 @@ export default function OverviewPanel({
             role="img"
             aria-label={
               stats
-                ? activity
-                    .map((day) => `${day.label}: ${day.count} bookings`)
-                    .join(', ')
+                ? activity.map((day) => {
+                      return `${day.label}: ${day.count} bookings`;
+                    }).join(', ')
                 : 'Booking activity unavailable'
             }
           >
             <div className="chart-scale" aria-hidden="true">
-              {[4, 3, 2, 1, 0].map((tick) => (
-                <span key={tick}>{(maximum * tick) / 4}</span>
-              ))}
+              {[4, 3, 2, 1, 0].map((tick) => {
+                return <span key={tick}>{(maximum * tick) / 4}</span>;
+              })}
             </div>
-            {activity.map((day, index) => (
-              <div className="chart-column" key={day.key}>
-                <div className="chart-track">
-                  <div
-                    className="chart-bar"
-                    style={{
-                      height: stats ? `${(day.count / maximum) * 100}%` : '0%',
-                    }}
-                    title={`${day.label}: ${day.count} bookings`}
-                  >
-                    <span className="chart-count">
-                      {stats ? day.count : '—'}
-                    </span>
+            {activity.map((day, index) => {
+              return (
+                <div className="chart-column" key={day.key}>
+                  <div className="chart-track">
+                    <div
+                      className="chart-bar"
+                      style={{
+                        height: stats
+                          ? `${(day.count / maximum) * 100}%`
+                          : '0%',
+                      }}
+                      title={`${day.label}: ${day.count} bookings`}
+                    >
+                      <span className="chart-count">
+                        {stats ? day.count : '—'}
+                      </span>
+                    </div>
                   </div>
+                  <span>
+                    {days <= 7 || index % Math.ceil(days / 7) === 0
+                      ? day.label
+                      : ''}
+                  </span>
                 </div>
-                <span>
-                  {days <= 7 || index % Math.ceil(days / 7) === 0
-                    ? day.label
-                    : ''}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
         <section className="dashboard-card review-card">
@@ -134,21 +146,27 @@ export default function OverviewPanel({
               value: stats?.pendingUsers,
               icon: CheckCircle2,
             },
-          ].map((item) => (
-            <button
-              className="review-row"
-              key={item.label}
-              onClick={() => navigate('approvals')}
-            >
-              <item.icon size={17} />
-              <span>{item.label}</span>
-              <strong>{item.value ?? '—'}</strong>
-              <ArrowRight size={15} />
-            </button>
-          ))}
+          ].map((item) => {
+            return (
+              <button
+                className="review-row"
+                key={item.label}
+                onClick={() => {
+                  return navigate('approvals');
+                }}
+              >
+                <item.icon size={17} />
+                <span>{item.label}</span>
+                <strong>{item.value ?? '—'}</strong>
+                <ArrowRight size={15} />
+              </button>
+            );
+          })}
           <button
             className="primary-dashboard-button"
-            onClick={() => navigate('approvals')}
+            onClick={() => {
+              return navigate('approvals');
+            }}
           >
             Open review queue <ArrowUpRight size={17} />
           </button>
@@ -162,7 +180,9 @@ export default function OverviewPanel({
           </div>
           <button
             className="dashboard-button button-primary"
-            onClick={() => navigate('bookings')}
+            onClick={() => {
+              return navigate('bookings');
+            }}
           >
             View All <ArrowRight size={16} />
           </button>
@@ -191,39 +211,41 @@ export default function OverviewPanel({
               </tr>
             </thead>
             <tbody>
-              {bookings.slice(0, 5).map((booking, index) => (
-                <tr key={booking.id}>
-                  <td>{index + 1}</td>
-                  <td>
-                    <div className="booking-person">
-                      <span className="booking-avatar">
-                        {initials(booking.userName)}
-                      </span>
-                      <div>
-                        <strong>{booking.userName}</strong>
-                        <small>with {booking.influencerName}</small>
+              {bookings.slice(0, 5).map((booking, index) => {
+                return (
+                  <tr key={booking.id}>
+                    <td>{index + 1}</td>
+                    <td>
+                      <div className="booking-person">
+                        <span className="booking-avatar">
+                          {initials(booking.userName)}
+                        </span>
+                        <div>
+                          <strong>{booking.userName}</strong>
+                          <small>with {booking.influencerName}</small>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>
-                    {booking.topic || 'Consultation'}
-                    <div className="recent-booking-time">
-                      <span className="time-slot-badge">
-                        {booking.slotLabel || booking.slot || '—'}
+                    </td>
+                    <td>
+                      {booking.topic || 'Consultation'}
+                      <div className="recent-booking-time">
+                        <span className="time-slot-badge">
+                          {booking.slotLabel || booking.slot || '—'}
+                        </span>
+                      </div>
+                    </td>
+                    <td>{formatDate(booking.date)}</td>
+                    <td className="booking-amount">{money(booking.price)}</td>
+                    <td>
+                      <span
+                        className={`booking-status ${statuses.includes(booking.status) ? booking.status : ''}`}
+                      >
+                        {booking.status || 'Unknown'}
                       </span>
-                    </div>
-                  </td>
-                  <td>{formatDate(booking.date)}</td>
-                  <td className="booking-amount">{money(booking.price)}</td>
-                  <td>
-                    <span
-                      className={`booking-status ${statuses.includes(booking.status) ? booking.status : ''}`}
-                    >
-                      {booking.status || 'Unknown'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           {!bookings.length && (

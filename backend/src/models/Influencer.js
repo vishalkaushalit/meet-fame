@@ -81,8 +81,8 @@ const influencerSchema = new mongoose.Schema(
     // Day-wise time ranges
     availability: {
       type: dayAvailabilitySchema,
-      default: () =>
-        normalizeAvailability({
+      default: () => {
+        return normalizeAvailability({
           monday: [
             { start: '09:00', end: '12:00' },
             { start: '17:00', end: '20:00' },
@@ -93,7 +93,8 @@ const influencerSchema = new mongoose.Schema(
           friday: [{ start: '09:00', end: '13:00' }],
           saturday: [],
           sunday: [],
-        }),
+        });
+      },
     },
   },
   { timestamps: true },

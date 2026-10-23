@@ -8,31 +8,42 @@ export function usePagination(items, resetKey = '', pageSize = 10) {
     state.key === resetKey ? state.page : 1,
     pageSize,
   );
-  return { ...result, setPage: (page) => setState({ key: resetKey, page }) };
+  return {
+    ...result,
+    setPage: (page) => {
+      return setState({ key: resetKey, page });
+    },
+  };
 }
 export default function Pagination({ pagination, label = 'records' }) {
   const { page, pages, setPage } = pagination;
-  if (pages <= 1) return null;
+  if (pages <= 1) {
+    return null;
+  }
   return (
     <nav className="record-pagination" aria-label={`${label} pagination`}>
       <div>
         <button
           type="button"
           disabled={page === 1}
-          onClick={() => setPage(page - 1)}
+          onClick={() => {
+            return setPage(page - 1);
+          }}
           aria-label={`Previous page of ${label}`}
         >
           <ChevronLeft size={15} />
           Prev
         </button>
-        {paginationNumbers(page, pages).map((number) =>
-          typeof number === 'number' ? (
+        {paginationNumbers(page, pages).map((number) => {
+          return typeof number === 'number' ? (
             <button
               key={number}
               type="button"
               aria-label={`Page ${number} of ${label}`}
               aria-current={page === number ? 'page' : undefined}
-              onClick={() => setPage(number)}
+              onClick={() => {
+                return setPage(number);
+              }}
             >
               {number}
             </button>
@@ -40,12 +51,14 @@ export default function Pagination({ pagination, label = 'records' }) {
             <span key={number} aria-hidden="true">
               …
             </span>
-          ),
-        )}
+          );
+        })}
         <button
           type="button"
           disabled={page === pages}
-          onClick={() => setPage(page + 1)}
+          onClick={() => {
+            return setPage(page + 1);
+          }}
           aria-label={`Next page of ${label}`}
         >
           Next

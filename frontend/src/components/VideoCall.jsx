@@ -39,14 +39,18 @@ export default function VideoCall({ booking, role, onClose }) {
     role === 'user' ? booking.influencerName : booking.userName;
   const cleanup = () => {
     const run = runtime.current;
-    previewStream.current?.getTracks().forEach((track) => track.stop());
+    previewStream.current?.getTracks().forEach((track) => {
+      return track.stop();
+    });
     previewStream.current = null;
     if (mounted.current) {
       setPreviewing(false);
       setConnected(false);
       setSharing(false);
     }
-    if (!run) return;
+    if (!run) {
+      return;
+    }
     run.alive = false;
     clearTimeout(run.timer);
     clearTimeout(run.endTimer);
@@ -56,13 +60,18 @@ export default function VideoCall({ booking, role, onClose }) {
       track.stop();
     });
     run.pc?.close();
-    run.stream?.getTracks().forEach((track) => track.stop());
-    if (localVideo.current) localVideo.current.srcObject = null;
-    if (remoteVideo.current) remoteVideo.current.srcObject = null;
-    if (run.sessionId)
-      api.calls
-        .request(booking.id, 'leave', { sessionId: run.sessionId }, run.token)
-        .catch(() => {});
+    run.stream?.getTracks().forEach((track) => {
+      return track.stop();
+    });
+    if (localVideo.current) {
+      localVideo.current.srcObject = null;
+    }
+    if (remoteVideo.current) {
+      remoteVideo.current.srcObject = null;
+    }
+    if (run.sessionId) {
+      api.calls.request(booking.id, 'leave', { sessionId: run.sessionId }, run.token).catch(() => {});
+    }
     runtime.current = null;
   };
   useEffect(() => {
@@ -71,7 +80,9 @@ export default function VideoCall({ booking, role, onClose }) {
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     closeButton.current?.focus();
-    const unload = () => cleanup();
+    const unload = () => {
+      return cleanup();
+    };
     const endSession = () => {
       cleanup();
       onClose();
@@ -89,41 +100,53 @@ export default function VideoCall({ booking, role, onClose }) {
   }, []);
 
   const preview = async () => {
-    if (previewRequest.current || previewStream.current) return;
+    if (previewRequest.current || previewStream.current) {
+      return;
+    }
     previewRequest.current = true;
     setPreviewBusy(true);
     setError('');
     try {
-      if (!navigator.mediaDevices?.getUserMedia)
+      if (!navigator.mediaDevices?.getUserMedia) {
         throw new Error('Camera preview requires HTTPS or localhost.');
+      }
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
         audio: true,
       });
       if (!mounted.current) {
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((track) => {
+          return track.stop();
+        });
         return;
       }
       previewStream.current = stream;
-      if (localVideo.current) localVideo.current.srcObject = stream;
+      if (localVideo.current) {
+        localVideo.current.srcObject = stream;
+      }
       setMuted(false);
       setCameraOff(false);
       setPreviewing(true);
       setStatus('Check your camera and microphone, then join.');
     } catch (error) {
-      if (mounted.current)
+      if (mounted.current) {
         setError(
           error.name === 'NotAllowedError'
             ? 'Allow camera and microphone access in your browser, then try again.'
             : error.message,
         );
+      }
     } finally {
       previewRequest.current = false;
-      if (mounted.current) setPreviewBusy(false);
+      if (mounted.current) {
+        setPreviewBusy(false);
+      }
     }
   };
   const stopSharing = async (run) => {
-    if (!run?.display) return;
+    if (!run?.display) {
+      return;
+    }
     const display = run.display;
     run.display = null;
     display.getTracks().forEach((track) => {
@@ -131,22 +154,29 @@ export default function VideoCall({ booking, role, onClose }) {
       track.stop();
     });
     try {
-      const sender = run.pc
-        ?.getSenders()
-        .find((item) => item.track?.kind === 'video');
-      if (sender) await sender.replaceTrack(run.stream.getVideoTracks()[0]);
+      const sender = run.pc?.getSenders().find((item) => {
+        return item.track?.kind === 'video';
+      });
+      if (sender) {
+        await sender.replaceTrack(run.stream.getVideoTracks()[0]);
+      }
     } catch {
-      if (run.alive)
+      if (run.alive) {
         setError('Could not restore the camera. Leave and rejoin.');
+      }
     }
     if (run.alive) {
-      if (localVideo.current) localVideo.current.srcObject = run.stream;
+      if (localVideo.current) {
+        localVideo.current.srcObject = run.stream;
+      }
       setSharing(false);
     }
   };
   const shareScreen = async () => {
     const run = runtime.current;
-    if (!run?.alive || shareBusy) return;
+    if (!run?.alive || shareBusy) {
+      return;
+    }
     setShareBusy(true);
     try {
       if (run.display) {
@@ -158,14 +188,18 @@ export default function VideoCall({ booking, role, onClose }) {
         audio: false,
       });
       if (!run.alive) {
-        display.getTracks().forEach((track) => track.stop());
+        display.getTracks().forEach((track) => {
+          return track.stop();
+        });
         return;
       }
-      const sender = run.pc
-        ?.getSenders()
-        .find((item) => item.track?.kind === 'video');
+      const sender = run.pc?.getSenders().find((item) => {
+        return item.track?.kind === 'video';
+      });
       if (!sender) {
-        display.getTracks().forEach((track) => track.stop());
+        display.getTracks().forEach((track) => {
+          return track.stop();
+        });
         throw new Error(
           'Wait for the other participant to connect before presenting.',
         );
@@ -173,30 +207,43 @@ export default function VideoCall({ booking, role, onClose }) {
       try {
         await sender.replaceTrack(display.getVideoTracks()[0]);
       } catch (error) {
-        display.getTracks().forEach((track) => track.stop());
+        display.getTracks().forEach((track) => {
+          return track.stop();
+        });
         throw error;
       }
       if (!run.alive) {
-        display.getTracks().forEach((track) => track.stop());
+        display.getTracks().forEach((track) => {
+          return track.stop();
+        });
         return;
       }
       run.display = display;
-      display.getVideoTracks()[0].onended = () => stopSharing(run);
-      if (localVideo.current) localVideo.current.srcObject = display;
+      display.getVideoTracks()[0].onended = () => {
+        return stopSharing(run);
+      };
+      if (localVideo.current) {
+        localVideo.current.srcObject = display;
+      }
       setSharing(true);
       setError('');
     } catch (error) {
-      if (run.alive && error.name !== 'NotAllowedError')
+      if (run.alive && error.name !== 'NotAllowedError') {
         setError(
           error.message || 'Screen sharing is unavailable in this browser.',
         );
+      }
     } finally {
-      if (mounted.current) setShareBusy(false);
+      if (mounted.current) {
+        setShareBusy(false);
+      }
     }
   };
 
   const join = async () => {
-    if (runtime.current) return;
+    if (runtime.current) {
+      return;
+    }
     const availability = callAvailability(booking);
     if (!availability.allowed) {
       setError(
@@ -223,50 +270,59 @@ export default function VideoCall({ booking, role, onClose }) {
       restartAttempts: 0,
     };
     runtime.current = run;
-    const send = (type, payload) =>
-      api.calls.request(booking.id, 'signal', {
+    const send = (type, payload) => {
+      return api.calls.request(booking.id, 'signal', {
         sessionId: run.sessionId,
         to: run.peerId,
         type,
         payload,
       });
+    };
     const resetPeer = () => {
       run.pc?.close();
       run.pc = null;
       run.pending = [];
       setConnected(false);
-      if (remoteVideo.current) remoteVideo.current.srcObject = null;
+      if (remoteVideo.current) {
+        remoteVideo.current.srcObject = null;
+      }
     };
     const createPeer = () => {
       const pc = new RTCPeerConnection({ iceServers: run.iceServers });
       run.pc = pc;
-      for (const track of run.stream.getTracks())
+      for (const track of run.stream.getTracks()) {
         pc.addTrack(
           track.kind === 'video' && run.display
             ? run.display.getVideoTracks()[0]
             : track,
           run.stream,
         );
+      }
       pc.ontrack = (event) => {
-        if (!run.alive || run.pc !== pc) return;
+        if (!run.alive || run.pc !== pc) {
+          return;
+        }
         if (remoteVideo.current) {
           remoteVideo.current.srcObject =
             event.streams[0] || new MediaStream([event.track]);
-          remoteVideo.current
-            .play()
-            .catch(() =>
-              setError('Click the remote video to enable playback.'),
-            );
+          remoteVideo.current.play().catch(() => {
+            return setError('Click the remote video to enable playback.');
+          });
         }
       };
       pc.onicecandidate = (event) => {
-        if (event.candidate && run.alive && run.pc === pc)
+        if (event.candidate && run.alive && run.pc === pc) {
           send('candidate', event.candidate.toJSON()).catch((error) => {
-            if (run.alive) setError(error.message);
+            if (run.alive) {
+              setError(error.message);
+            }
           });
+        }
       };
       pc.onconnectionstatechange = () => {
-        if (!run.alive || run.pc !== pc) return;
+        if (!run.alive || run.pc !== pc) {
+          return;
+        }
         if (pc.connectionState === 'connected') {
           setConnected(true);
           run.restartAttempts = 0;
@@ -284,18 +340,22 @@ export default function VideoCall({ booking, role, onClose }) {
               await pc.setLocalDescription(
                 await pc.createOffer({ iceRestart: true }),
               );
-              if (run.alive && run.pc === pc)
+              if (run.alive && run.pc === pc) {
                 await send('offer', {
                   type: pc.localDescription.type,
                   sdp: pc.localDescription.sdp,
                 });
+              }
             })().catch((error) => {
-              if (run.alive) setError(error.message);
+              if (run.alive) {
+                setError(error.message);
+              }
             });
-          } else
+          } else {
             setError(
               'Connection failed. Leave and rejoin, or try another network.',
             );
+          }
         } else if (pc.connectionState === 'disconnected') {
           setConnected(false);
           setStatus('Connection interrupted. Trying to reconnect…');
@@ -304,13 +364,17 @@ export default function VideoCall({ booking, role, onClose }) {
       return pc;
     };
     const poll = async () => {
-      if (!run.alive) return;
+      if (!run.alive) {
+        return;
+      }
       try {
         const result = await api.calls.request(booking.id, 'poll', {
           sessionId: run.sessionId,
           after: run.after,
         });
-        if (!run.alive) return;
+        if (!run.alive) {
+          return;
+        }
         run.failures = 0;
         if (result.peerId !== run.peerId) {
           resetPeer();
@@ -328,7 +392,9 @@ export default function VideoCall({ booking, role, onClose }) {
           }
         }
         for (const signal of result.signals) {
-          if (!run.alive || !run.pc || signal.from !== run.peerId) continue;
+          if (!run.alive || !run.pc || signal.from !== run.peerId) {
+            continue;
+          }
           const pc = run.pc;
           if (signal.type === 'offer') {
             await pc.setRemoteDescription(signal.payload);
@@ -337,17 +403,22 @@ export default function VideoCall({ booking, role, onClose }) {
               type: pc.localDescription.type,
               sdp: pc.localDescription.sdp,
             });
-          } else if (signal.type === 'answer')
+          } else if (signal.type === 'answer') {
             await pc.setRemoteDescription(signal.payload);
-          else if (signal.type === 'candidate')
+          } else if (signal.type === 'candidate') {
             run.pending.push(signal.payload);
-          if (pc.remoteDescription)
-            while (run.pending.length)
+          }
+          if (pc.remoteDescription) {
+            while (run.pending.length) {
               await pc.addIceCandidate(run.pending.shift());
+            }
+          }
         }
         run.after = result.sequence;
       } catch (error) {
-        if (!run.alive) return;
+        if (!run.alive) {
+          return;
+        }
         setError(
           error.message || 'Signaling connection interrupted. Retrying…',
         );
@@ -362,17 +433,20 @@ export default function VideoCall({ booking, role, onClose }) {
           return;
         }
       }
-      if (run.alive) run.timer = setTimeout(poll, 2000);
+      if (run.alive) {
+        run.timer = setTimeout(poll, 2000);
+      }
     };
     try {
       if (
         !window.isSecureContext ||
         !navigator.mediaDevices?.getUserMedia ||
         !window.RTCPeerConnection
-      )
+      ) {
         throw new Error(
           'Video calls require a supported browser on HTTPS or localhost.',
         );
+      }
       run.stream =
         previewStream.current ||
         (await navigator.mediaDevices.getUserMedia({
@@ -381,34 +455,40 @@ export default function VideoCall({ booking, role, onClose }) {
         }));
       previewStream.current = null;
       if (!run.alive) {
-        run.stream.getTracks().forEach((track) => track.stop());
+        run.stream.getTracks().forEach((track) => {
+          return track.stop();
+        });
         return;
       }
-      if (localVideo.current) localVideo.current.srcObject = run.stream;
+      if (localVideo.current) {
+        localVideo.current.srcObject = run.stream;
+      }
       const result = await api.calls.request(booking.id, 'join');
       run.sessionId = result.sessionId;
       run.iceServers = result.iceServers;
       if (!run.alive) {
-        api.calls
-          .request(booking.id, 'leave', { sessionId: run.sessionId }, run.token)
-          .catch(() => {});
+        api.calls.request(booking.id, 'leave', { sessionId: run.sessionId }, run.token).catch(() => {});
         return;
       }
       // Use the server's remaining duration instead of trusting the browser clock.
       const remaining = result.endsAt - result.serverNow;
-      if (!Number.isFinite(remaining) || remaining <= 0)
+      if (!Number.isFinite(remaining) || remaining <= 0) {
         throw new Error('Your booked session has ended.');
+      }
       const deadline = performance.now() + remaining;
       const updateCountdown = () => {
-        if (run.alive)
+        if (run.alive) {
           setSecondsLeft(
             Math.max(0, Math.ceil((deadline - performance.now()) / 1000)),
           );
+        }
       };
       updateCountdown();
       run.countdownTimer = setInterval(updateCountdown, 250);
       run.endTimer = setTimeout(() => {
-        if (!run.alive) return;
+        if (!run.alive) {
+          return;
+        }
         cleanup();
         setJoined(false);
         setJoining(false);
@@ -417,12 +497,22 @@ export default function VideoCall({ booking, role, onClose }) {
       }, remaining);
       setJoined(true);
       setJoining(false);
-      setMuted(!run.stream.getAudioTracks().some((track) => track.enabled));
-      setCameraOff(!run.stream.getVideoTracks().some((track) => track.enabled));
+      setMuted(
+        !run.stream.getAudioTracks().some((track) => {
+          return track.enabled;
+        }),
+      );
+      setCameraOff(
+        !run.stream.getVideoTracks().some((track) => {
+          return track.enabled;
+        }),
+      );
       setStatus(`Waiting for ${counterpart}…`);
       poll();
     } catch (error) {
-      if (!run.alive) return;
+      if (!run.alive) {
+        return;
+      }
       cleanup();
       setJoining(false);
       setJoined(false);
@@ -439,11 +529,21 @@ export default function VideoCall({ booking, role, onClose }) {
   const toggle = (kind) => {
     const tracks =
       (runtime.current?.stream || previewStream.current)
-        ?.getTracks()
-        .filter((track) => track.kind === kind) || [];
-    for (const track of tracks) track.enabled = !track.enabled;
-    if (kind === 'audio') setMuted((value) => !value);
-    else setCameraOff((value) => !value);
+        ?.getTracks().filter((track) => {
+          return track.kind === kind;
+        }) || [];
+    for (const track of tracks) {
+      track.enabled = !track.enabled;
+    }
+    if (kind === 'audio') {
+      setMuted((value) => {
+        return !value;
+      });
+    } else {
+      setCameraOff((value) => {
+        return !value;
+      });
+    }
   };
   return createPortal(
     <div className="video-call-overlay">
@@ -544,7 +644,9 @@ export default function VideoCall({ booking, role, onClose }) {
             playsInline
             style={{ visibility: connected ? 'visible' : 'hidden' }}
             controls={false}
-            onClick={() => remoteVideo.current?.play().catch(() => {})}
+            onClick={() => {
+              return remoteVideo.current?.play().catch(() => {});
+            }}
             onKeyDown={(event) => {
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
@@ -595,14 +697,18 @@ export default function VideoCall({ booking, role, onClose }) {
               <button
                 aria-label={muted ? 'Unmute microphone' : 'Mute microphone'}
                 aria-pressed={muted}
-                onClick={() => toggle('audio')}
+                onClick={() => {
+                  return toggle('audio');
+                }}
               >
                 {muted ? <MicOff size={20} /> : <Mic size={20} />}
               </button>
               <button
                 aria-label={cameraOff ? 'Turn camera on' : 'Turn camera off'}
                 aria-pressed={cameraOff}
-                onClick={() => toggle('video')}
+                onClick={() => {
+                  return toggle('video');
+                }}
               >
                 {cameraOff ? <VideoOff size={20} /> : <Video size={20} />}
               </button>
@@ -623,7 +729,9 @@ export default function VideoCall({ booking, role, onClose }) {
                 aria-label={muted ? 'Unmute microphone' : 'Mute microphone'}
                 title={muted ? 'Unmute' : 'Mute'}
                 aria-pressed={muted}
-                onClick={() => toggle('audio')}
+                onClick={() => {
+                  return toggle('audio');
+                }}
               >
                 {muted ? <MicOff size={20} /> : <Mic size={20} />}
               </button>
@@ -631,7 +739,9 @@ export default function VideoCall({ booking, role, onClose }) {
                 aria-label={cameraOff ? 'Turn camera on' : 'Turn camera off'}
                 title={cameraOff ? 'Camera on' : 'Camera off'}
                 aria-pressed={cameraOff}
-                onClick={() => toggle('video')}
+                onClick={() => {
+                  return toggle('video');
+                }}
               >
                 {cameraOff ? <VideoOff size={20} /> : <Video size={20} />}
               </button>

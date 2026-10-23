@@ -1,20 +1,22 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHealthHandler } from '../src/health.js';
-const response = () => ({
-  code: 200,
-  set() {
-    return this;
-  },
-  status(code) {
-    this.code = code;
-    return this;
-  },
-  json(body) {
-    this.body = body;
-    return this;
-  },
-});
+const response = () => {
+  return {
+    code: 200,
+    set() {
+      return this;
+    },
+    status(code) {
+      this.code = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
+};
 test('health waits for the connection instead of reporting a cold start as disconnected', async () => {
   let state = 'connecting',
     release;
@@ -22,7 +24,9 @@ test('health waits for the connection instead of reporting a cold start as disco
     release = resolve;
   });
   const manager = {
-    status: () => ({ configured: true, state, issue: null }),
+    status: () => {
+      return { configured: true, state, issue: null };
+    },
     connect: async () => {
       await ready;
       state = 'connected';
@@ -39,11 +43,13 @@ test('health waits for the connection instead of reporting a cold start as disco
 });
 test('failed connection reports a degraded health response and safe failure category', async () => {
   const manager = {
-    status: () => ({
-      configured: true,
-      state: 'disconnected',
-      issue: 'authentication_failed',
-    }),
+    status: () => {
+      return {
+        configured: true,
+        state: 'disconnected',
+        issue: 'authentication_failed',
+      };
+    },
     connect: async () => {
       throw new Error('hidden details');
     },

@@ -72,7 +72,9 @@ export default function ApprovalsView({ onChange, detailId }) {
         `Approved ${name}! They can now log in to their Influencer Dashboard.`,
       );
       await refreshAfterAction();
-      setTimeout(() => setActionMessage(''), 4000);
+      setTimeout(() => {
+        return setActionMessage('');
+      }, 4000);
     } catch (err) {
       console.error('Approval failed:', err);
     }
@@ -80,7 +82,9 @@ export default function ApprovalsView({ onChange, detailId }) {
 
   // Handle Influencer Rejection
   const handleConfirmRejectInfluencer = async () => {
-    if (!rejectingItem) return;
+    if (!rejectingItem) {
+      return;
+    }
     try {
       await adminApi.influencers.updateStatus(
         rejectingItem.id,
@@ -90,7 +94,9 @@ export default function ApprovalsView({ onChange, detailId }) {
       setActionMessage(`Declined ${rejectingItem.name}.`);
       setRejectingItem(null);
       await refreshAfterAction();
-      setTimeout(() => setActionMessage(''), 4000);
+      setTimeout(() => {
+        return setActionMessage('');
+      }, 4000);
     } catch (err) {
       console.error('Rejection failed:', err);
     }
@@ -110,7 +116,9 @@ export default function ApprovalsView({ onChange, detailId }) {
           : `Revoked certificate verification for ${name}.`,
       );
       await refreshAfterAction();
-      setTimeout(() => setActionMessage(''), 4000);
+      setTimeout(() => {
+        return setActionMessage('');
+      }, 4000);
     } catch (err) {
       console.error('Certificate verification failed:', err);
     }
@@ -145,7 +153,9 @@ export default function ApprovalsView({ onChange, detailId }) {
 
   const confirmBlock = async (event) => {
     event.preventDefault();
-    if (!blockingItem || !blockReason.trim()) return;
+    if (!blockingItem || !blockReason.trim()) {
+      return;
+    }
     setBlocking(true);
     setBlockError('');
     try {
@@ -168,12 +178,13 @@ export default function ApprovalsView({ onChange, detailId }) {
     }
   };
 
-  const matchesSearch = (item) =>
-    [item.name, item.email, item.phone, item.specialization].some((value) =>
-      String(value || '')
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()),
+  const matchesSearch = (item) => {
+    return [item.name, item.email, item.phone, item.specialization].some(
+      (value) => {
+        return String(value || '').toLowerCase().includes(searchTerm.toLowerCase());
+      },
     );
+  };
   const creatorPagination = usePagination(
     influencers.filter(matchesSearch),
     `${statusFilter}:${searchTerm}`,
@@ -183,7 +194,9 @@ export default function ApprovalsView({ onChange, detailId }) {
     `${statusFilter}:${searchTerm}`,
   );
 
-  const inspected = influencers.find((item) => item.id === detailId);
+  const inspected = influencers.find((item) => {
+    return item.id === detailId;
+  });
   const renderInfluencerActions = (inf) => {
     const isPending = inf.status === 'pending_review';
     const isRejected = inf.status === 'rejected';
@@ -192,7 +205,9 @@ export default function ApprovalsView({ onChange, detailId }) {
         {isPending && (
           <>
             <button
-              onClick={() => handleApproveInfluencer(inf.id, inf.name)}
+              onClick={() => {
+                return handleApproveInfluencer(inf.id, inf.name);
+              }}
               className="px-4 py-2.5 rounded-xl font-normal text-xs text-white bg-emerald-600 hover:bg-emerald-500 shadow-md flex items-center gap-1.5 transition-all"
             >
               <CheckCircle className="w-4 h-4" />
@@ -200,7 +215,9 @@ export default function ApprovalsView({ onChange, detailId }) {
             </button>
 
             <button
-              onClick={() => setRejectingItem(inf)}
+              onClick={() => {
+                return setRejectingItem(inf);
+              }}
               className="px-4 py-2.5 rounded-xl font-normal text-xs text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all"
             >
               <XCircle className="w-4 h-4" />
@@ -211,7 +228,9 @@ export default function ApprovalsView({ onChange, detailId }) {
 
         {inf.status !== 'blocked' && (
           <button
-            onClick={() => openBlock(inf, 'influencer')}
+            onClick={() => {
+              return openBlock(inf, 'influencer');
+            }}
             title="Block influencer"
             aria-label={`Block ${inf.name}`}
             className="approval-text-button rounded-xl bg-rose-500/10 text-rose-400"
@@ -222,7 +241,9 @@ export default function ApprovalsView({ onChange, detailId }) {
         )}
         {inf.status === 'blocked' && (
           <button
-            onClick={() => handleApproveInfluencer(inf.id, inf.name)}
+            onClick={() => {
+              return handleApproveInfluencer(inf.id, inf.name);
+            }}
             title="Unblock influencer"
             aria-label={`Unblock ${inf.name}`}
             className="approval-text-button rounded-xl bg-emerald-600 text-white"
@@ -234,7 +255,9 @@ export default function ApprovalsView({ onChange, detailId }) {
 
         {isRejected && (
           <button
-            onClick={() => handleApproveInfluencer(inf.id, inf.name)}
+            onClick={() => {
+              return handleApproveInfluencer(inf.id, inf.name);
+            }}
             className="px-3.5 py-1.5 rounded-xl text-xs font-normal text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700"
           >
             Re-Approve
@@ -244,14 +267,18 @@ export default function ApprovalsView({ onChange, detailId }) {
           <>
             {inf.isVerified ? (
               <button
-                onClick={() => handleVerifyCertificate(inf.id, inf.name, false)}
+                onClick={() => {
+                  return handleVerifyCertificate(inf.id, inf.name, false);
+                }}
                 className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-[10px] font-normal"
               >
                 Revoke Blue Badge
               </button>
             ) : (
               <button
-                onClick={() => handleVerifyCertificate(inf.id, inf.name, true)}
+                onClick={() => {
+                  return handleVerifyCertificate(inf.id, inf.name, true);
+                }}
                 className="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-normal flex items-center gap-1 shadow-sm"
               >
                 <VerifiedBadge size="sm" />
@@ -263,14 +290,16 @@ export default function ApprovalsView({ onChange, detailId }) {
       </>
     );
   };
-  const renderInfluencerReview = (inf) => (
-    <div className="dashboard-card p-5 space-y-4">
-      <h3 className="font-semibold">Application and certificate review</h3>
-      <div className="approval-actions flex flex-wrap items-center gap-2">
-        {renderInfluencerActions(inf)}
+  const renderInfluencerReview = (inf) => {
+    return (
+      <div className="dashboard-card p-5 space-y-4">
+        <h3 className="font-semibold">Application and certificate review</h3>
+        <div className="approval-actions flex flex-wrap items-center gap-2">
+          {renderInfluencerActions(inf)}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (detailId && !loading && !inspected) {
     return (
@@ -342,14 +371,18 @@ export default function ApprovalsView({ onChange, detailId }) {
             aria-label="Search approvals"
             placeholder="Search name, email, phone..."
             value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
+            onChange={(event) => {
+              return setSearchTerm(event.target.value);
+            }}
           />
         </div>
         <label className="approval-status-filter ml-auto flex shrink-0 items-center gap-3 text-sm text-slate-300">
           Status:
           <select
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
+            onChange={(event) => {
+              return setStatusFilter(event.target.value);
+            }}
             className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white"
           >
             <option value="all">All statuses</option>
@@ -403,11 +436,13 @@ export default function ApprovalsView({ onChange, detailId }) {
                       'Rate',
                       'Status',
                       'Actions',
-                    ].map((label) => (
-                      <th scope="col" key={label}>
-                        {label}
-                      </th>
-                    ))}
+                    ].map((label) => {
+                      return (
+                        <th scope="col" key={label}>
+                          {label}
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
@@ -451,9 +486,9 @@ export default function ApprovalsView({ onChange, detailId }) {
                               className="user-view-button approval-icon-button"
                               title="View details"
                               aria-label={`View details for ${inf.name}`}
-                              onClick={() =>
-                                navigateAdminRecord('approvals', inf.id)
-                              }
+                              onClick={() => {
+                                return navigateAdminRecord('approvals', inf.id);
+                              }}
                             >
                               <Eye size={16} aria-hidden="true" />
                             </button>
@@ -465,10 +500,11 @@ export default function ApprovalsView({ onChange, detailId }) {
                               <div
                                 className="approval-action-menu-items"
                                 onClick={(event) => {
-                                  if (event.target.closest('button'))
+                                  if (event.target.closest('button')) {
                                     event.currentTarget.closest(
                                       'details',
                                     ).open = false;
+                                  }
                                 }}
                               >
                                 {renderInfluencerActions(inf)}
@@ -521,77 +557,86 @@ export default function ApprovalsView({ onChange, detailId }) {
                 </tr>
               </thead>
               <tbody>
-                {userPagination.items.map((u, index) => (
-                  <tr key={u.id}>
-                    <td className="record-serial-cell">
-                      {userPagination.start + index}
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 shrink-0 rounded-xl bg-indigo-500/20 text-indigo-400 font-semibold flex items-center justify-center text-sm"
-                          aria-hidden="true"
-                        >
-                          {u.name?.charAt(0) || 'U'}
+                {userPagination.items.map((u, index) => {
+                  return (
+                    <tr key={u.id}>
+                      <td className="record-serial-cell">
+                        {userPagination.start + index}
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-10 h-10 shrink-0 rounded-xl bg-indigo-500/20 text-indigo-400 font-semibold flex items-center justify-center text-sm"
+                            aria-hidden="true"
+                          >
+                            {u.name?.charAt(0) || 'U'}
+                          </div>
+                          <strong>{u.name}</strong>
                         </div>
-                        <strong>{u.name}</strong>
-                      </div>
-                    </td>
-                    <td>{u.email}</td>
-                    <td>{u.phone || '—'}</td>
-                    <td>
-                      {' '}
-                      <StatusBadge status={u.status} />
-                    </td>
-                    <td className="approval-blocking-remark">
-                      {u.status === 'blocked'
-                        ? u.statusReason || 'No remark recorded'
-                        : '—'}
-                    </td>
-                    <td>
-                      <div className="approval-user-actions">
+                      </td>
+                      <td>{u.email}</td>
+                      <td>{u.phone || '—'}</td>
+                      <td>
                         {' '}
-                        <button
-                          type="button"
-                          className="user-view-button approval-icon-button"
-                          title="View details"
-                          aria-label={`View details for ${u.name}`}
-                          onClick={() =>
-                            navigateAccountDetails({ ...u, role: 'user' })
-                          }
-                        >
-                          <Eye size={16} aria-hidden="true" />
-                        </button>
-                        {u.status !== 'blocked' && (
+                        <StatusBadge status={u.status} />
+                      </td>
+                      <td className="approval-blocking-remark">
+                        {u.status === 'blocked'
+                          ? u.statusReason || 'No remark recorded'
+                          : '—'}
+                      </td>
+                      <td>
+                        <div className="approval-user-actions">
+                          {' '}
                           <button
-                            onClick={() => openBlock(u, 'user')}
-                            disabled={updatingUser === u.id}
-                            className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold disabled:opacity-50"
+                            type="button"
+                            className="user-view-button approval-icon-button"
+                            title="View details"
+                            aria-label={`View details for ${u.name}`}
+                            onClick={() => {
+                              return navigateAccountDetails({
+                                ...u,
+                                role: 'user',
+                              });
+                            }}
                           >
-                            {updatingUser === u.id ? (
-                              <span>Saving…</span>
-                            ) : (
-                              'Block User'
-                            )}
+                            <Eye size={16} aria-hidden="true" />
                           </button>
-                        )}
-                        {u.status === 'blocked' && (
-                          <button
-                            onClick={() => handleUserStatus(u, 'approved')}
-                            disabled={updatingUser === u.id}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
-                          >
-                            {updatingUser === u.id ? (
-                              <span>Saving…</span>
-                            ) : (
-                              'Unblock User'
-                            )}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {u.status !== 'blocked' && (
+                            <button
+                              onClick={() => {
+                                return openBlock(u, 'user');
+                              }}
+                              disabled={updatingUser === u.id}
+                              className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold disabled:opacity-50"
+                            >
+                              {updatingUser === u.id ? (
+                                <span>Saving…</span>
+                              ) : (
+                                'Block User'
+                              )}
+                            </button>
+                          )}
+                          {u.status === 'blocked' && (
+                            <button
+                              onClick={() => {
+                                return handleUserStatus(u, 'approved');
+                              }}
+                              disabled={updatingUser === u.id}
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
+                            >
+                              {updatingUser === u.id ? (
+                                <span>Saving…</span>
+                              ) : (
+                                'Unblock User'
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -630,7 +675,9 @@ export default function ApprovalsView({ onChange, detailId }) {
               placeholder="Enter your reason for blocking"
               value={blockReason}
               disabled={blocking}
-              onChange={(event) => setBlockReason(event.target.value)}
+              onChange={(event) => {
+                return setBlockReason(event.target.value);
+              }}
               className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white"
             />
             <p className="text-xs text-slate-500 mt-1">
@@ -645,7 +692,9 @@ export default function ApprovalsView({ onChange, detailId }) {
               <button
                 type="button"
                 disabled={blocking}
-                onClick={() => setBlockingItem(null)}
+                onClick={() => {
+                  return setBlockingItem(null);
+                }}
                 className="text-xs text-slate-400 px-3 py-2"
               >
                 Cancel
@@ -678,14 +727,18 @@ export default function ApprovalsView({ onChange, detailId }) {
               rows={3}
               placeholder="Enter your reason for declining"
               value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
+              onChange={(e) => {
+                return setRejectReason(e.target.value);
+              }}
               className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-brand-purple mb-4"
             />
 
             <div className="flex items-center justify-end gap-2">
               <button
                 type="button"
-                onClick={() => setRejectingItem(null)}
+                onClick={() => {
+                  return setRejectingItem(null);
+                }}
                 className="px-4 py-2 rounded-xl text-xs text-slate-400 hover:text-white"
               >
                 Cancel

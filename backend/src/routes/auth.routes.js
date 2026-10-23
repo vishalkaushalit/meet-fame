@@ -12,7 +12,12 @@ import { requireSession } from '../middleware/session.js';
 import { updateOwnProfile } from '../profile.js';
 import { receiveProfileImage } from '../profileUpload.js';
 import { identityErrors } from '../accountIdentity.js';
-import { forgotPassword, verifyOtp, resetPassword, recoveryRateLimit } from '../passwordRecovery.js';
+import {
+  forgotPassword,
+  verifyOtp,
+  resetPassword,
+  recoveryRateLimit,
+} from '../passwordRecovery.js';
 import { normalizeAvailability } from '../../../shared/availability.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -23,38 +28,81 @@ import { uploadToStorage } from '../blobStorage.js';
 const router = express.Router();
 router.get('/bank-details', requireSession, getBankDetails);
 router.put('/bank-details', requireSession, saveBankDetails);
-router.put('/profile', requireSession, receiveProfileImage, handleProfileUpdate);
+router.put(
+  '/profile',
+  requireSession,
+  receiveProfileImage,
+  handleProfileUpdate,
+);
 async function handleProfileUpdate(req, res) {
-  try { await updateOwnProfile(req, res); }
-  catch { res.status(503).json({ error: 'Unable to save your profile. Please try again.' }); }
+  try {
+    await updateOwnProfile(req, res);
+  } catch {
+    res.status(503).json({
+      error: 'Unable to save your profile. Please try again.',
+    });
+  }
 }
-const recoveryHandler = (handler) => async (req, res) => {
-  try { await handler(req, res); }
-  catch { res.status(503).json({ error: 'Password recovery is temporarily unavailable. Please try again later.' }); }
+const recoveryHandler = (handler) => {
+  return async (req, res) => {
+    try {
+      await handler(req, res);
+    } catch {
+      res.status(503).json({
+        error:
+          'Password recovery is temporarily unavailable. Please try again later.',
+      });
+    }
+  };
 };
-router.post('/forgot-password', recoveryRateLimit, recoveryHandler(forgotPassword));
+router.post(
+  '/forgot-password',
+  recoveryRateLimit,
+  recoveryHandler(forgotPassword),
+);
 router.post('/verify-reset-otp', recoveryRateLimit, recoveryHandler(verifyOtp));
-router.post('/reset-password', recoveryRateLimit, recoveryHandler(resetPassword));
+router.post(
+  '/reset-password',
+  recoveryRateLimit,
+  recoveryHandler(resetPassword),
+);
 // Read at request time: server environment configuration loads after route imports.
-const getJwtSecret = () =>
-  process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
+const getJwtSecret = () => {
+  return process.env.JWT_SECRET || 'meetfame_secret_jwt_key_2026';
+};
 
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024, files: 2, fields: 15 },
   fileFilter: (_req, file, cb) => {
-    const issue = file.fieldname === 'introVideoFile'
-      ? introVideoError({ ...file, size: 1 })
-      : certificateError({ ...file, size: 0 });
-    cb(issue ? Object.assign(new Error(issue), { field: file.fieldname }) : null, !issue);
+    const issue =
+      file.fieldname === 'introVideoFile'
+        ? introVideoError({ ...file, size: 1 })
+        : certificateError({ ...file, size: 0 });
+    cb(
+      issue ? Object.assign(new Error(issue), { field: file.fieldname }) : null,
+      !issue,
+    );
   },
 });
 
 // Helper to sign JWT
 function generateToken(payload) {
-  const collection = { user: 'users', influencer: 'influencers', admin: 'admins' }[payload.role];
-  const account = collection && db.read()[collection]?.find((item) => item.id === payload.id);
-  return jwt.sign({ ...payload, sessionVersion: account?.sessionVersion || 0 }, getJwtSecret(), { expiresIn: '7d' });
+  const collection = {
+    user: 'users',
+    influencer: 'influencers',
+    admin: 'admins',
+  }[payload.role];
+  const account =
+    collection &&
+    db.read()[collection]?.find((item) => {
+      return item.id === payload.id;
+    });
+  return jwt.sign(
+    { ...payload, sessionVersion: account?.sessionVersion || 0 },
+    getJwtSecret(),
+    { expiresIn: '7d' },
+  );
 }
 
 // Videos upload directly to Blob to avoid the serverless request body limit.
@@ -64,31 +112,56 @@ router.post('/intro-video-upload', async (req, res) => {
       body: req.body,
       request: req,
       onBeforeGenerateToken: async (pathname) => {
-        if (!pathname.startsWith('introduction_video/intro-')) throw new Error('Invalid video path.');
-        return { allowedContentTypes: ['video/mp4', 'video/webm'], maximumSizeInBytes: 5 * 1024 * 1024, addRandomSuffix: true };
+        if (!pathname.startsWith('introduction_video/intro-')) {
+          throw new Error('Invalid video path.');
+        }
+        return {
+          allowedContentTypes: ['video/mp4', 'video/webm'],
+          maximumSizeInBytes: 5 * 1024 * 1024,
+          addRandomSuffix: true,
+        };
       },
       onUploadCompleted: async () => {},
     });
     res.json(result);
   } catch {
-    res.status(400).json({ error: 'Unable to upload introduction video.' });
+    res.status(400).json({
+      error: 'Unable to upload introduction video.',
+    });
   }
 });
 
 async function readIntroVideo(url) {
   const parsed = new URL(url);
-  if (parsed.protocol !== 'https:' || !/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/.test(parsed.hostname) || !parsed.pathname.startsWith('/introduction_video/intro-'))
+  if (
+    parsed.protocol !== 'https:' ||
+    !/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/.test(parsed.hostname) ||
+    !parsed.pathname.startsWith('/introduction_video/intro-')
+  ) {
     throw new Error('Invalid introduction video URL.');
-  const response = await fetch(parsed, { redirect: 'error', signal: AbortSignal.timeout(15000) });
-  if (!response.ok) throw new Error('Video unavailable.');
+  }
+  const response = await fetch(parsed, {
+    redirect: 'error',
+    signal: AbortSignal.timeout(15000),
+  });
+  if (!response.ok) {
+    throw new Error('Video unavailable.');
+  }
   const chunks = [];
   let size = 0;
   for await (const chunk of response.body) {
     size += chunk.length;
-    if (size > 5 * 1024 * 1024) throw new Error('Video exceeds 5 MB.');
+    if (size > 5 * 1024 * 1024) {
+      throw new Error('Video exceeds 5 MB.');
+    }
     chunks.push(chunk);
   }
-  return { buffer: Buffer.concat(chunks), size, mimetype: response.headers.get('content-type')?.split(';')[0], originalname: parsed.pathname };
+  return {
+    buffer: Buffer.concat(chunks),
+    size,
+    mimetype: response.headers.get('content-type')?.split(';')[0],
+    originalname: parsed.pathname,
+  };
 }
 
 /**
@@ -97,15 +170,25 @@ async function readIntroVideo(url) {
  */
 router.post(
   '/register-influencer',
-  (req, res, next) =>
-    upload.fields([{ name: 'certificateFile', maxCount: 1 }, { name: 'introVideoFile', maxCount: 1 }])(req, res, (error) => {
-      if (!error) return next();
-      const issue = error.code === 'LIMIT_FILE_SIZE'
-        ? 'Each upload must be 10 MB or smaller (video maximum: 5 MB).'
-        : error.message || 'Invalid upload.';
+  (req, res, next) => {
+    return upload.fields([
+      { name: 'certificateFile', maxCount: 1 },
+      { name: 'introVideoFile', maxCount: 1 },
+    ])(req, res, (error) => {
+      if (!error) {
+        return next();
+      }
+      const issue =
+        error.code === 'LIMIT_FILE_SIZE'
+          ? 'Each upload must be 10 MB or smaller (video maximum: 5 MB).'
+          : error.message || 'Invalid upload.';
       const field = error.field || 'introVideoFile';
-      return res.status(400).json({ error: issue, fields: { [field]: issue } });
-    }),
+      return res.status(400).json({
+        error: issue,
+        fields: { [field]: issue },
+      });
+    });
+  },
   async (req, res) => {
     try {
       const {
@@ -124,33 +207,59 @@ router.post(
       const certificateFile = req.files?.certificateFile?.[0];
       let introVideoFile = req.files?.introVideoFile?.[0];
       try {
-        if (req.body.introVideoUrl) introVideoFile = await readIntroVideo(req.body.introVideoUrl);
+        if (req.body.introVideoUrl) {
+          introVideoFile = await readIntroVideo(req.body.introVideoUrl);
+        }
         if (introVideoFile && !introVideoError(introVideoFile)) {
-          const metadata = await parseBuffer(introVideoFile.buffer, { mimeType: introVideoFile.mimetype }, { duration: true });
+          const metadata = await parseBuffer(
+            introVideoFile.buffer,
+            { mimeType: introVideoFile.mimetype },
+            { duration: true },
+          );
           const duration = Math.max(
             metadata.format.containerDuration || 0,
             metadata.format.duration || 0,
-            ...(metadata.format.trackInfo || []).map((track) => track.duration || 0),
+            ...(metadata.format.trackInfo || []).map((track) => {
+              return track.duration || 0;
+            }),
           );
-          if (!metadata.format.hasVideo || !Number.isFinite(duration) || duration <= 0 || duration > 15)
-            throw new Error('Introduction video must be 15 seconds or shorter.');
+          if (
+            !metadata.format.hasVideo ||
+            !Number.isFinite(duration) ||
+            duration <= 0 ||
+            duration > 15
+          ) {
+            throw new Error(
+              'Introduction video must be 15 seconds or shorter.',
+            );
+          }
         }
       } catch {
         const issue = 'Upload a valid video, up to 5 MB and 15 seconds long.';
-        return res.status(400).json({ error: issue, fields: { introVideoFile: issue } });
+        return res.status(400).json({
+          error: issue,
+          fields: { introVideoFile: issue },
+        });
       }
       const fields = registrationErrors(
         { ...req.body, certificateFile, introVideoFile },
         'influencer',
       );
-      if (Object.keys(fields).length)
-        return res
-          .status(400)
-          .json({ error: Object.values(fields)[0], fields });
+      if (Object.keys(fields).length) {
+        return res.status(400).json({
+          error: Object.values(fields)[0],
+          fields,
+        });
+      }
 
       const data = db.read();
       const duplicates = identityErrors(data, { email, phone });
-      if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
+      if (Object.keys(duplicates).length) {
+        return res.status(409).json({
+          error: Object.values(duplicates)[0],
+          fields: duplicates,
+        });
+      }
 
       let parsedAvailability = {};
       try {
@@ -167,7 +276,9 @@ router.post(
         fileUrl = await uploadToStorage(certificateFile, 'cert');
       }
 
-      const introVideoUrl = req.body.introVideoUrl || await uploadToStorage(introVideoFile, 'intro');
+      const introVideoUrl =
+        req.body.introVideoUrl ||
+        (await uploadToStorage(introVideoFile, 'intro'));
 
       const certData = {
         title: certificateTitle || 'Specialization Certificate',
@@ -198,7 +309,8 @@ router.post(
         avatar: `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80`,
         status: 'pending_review', // Important: initially under review
         isVerified: false,
-        certificateStatus: certificateFile || certificateTitle ? 'pending' : 'none',
+        certificateStatus:
+          certificateFile || certificateTitle ? 'pending' : 'none',
         certification: certificateFile || certificateTitle ? certData : null,
         availability: normalizeAvailability(parsedAvailability),
         createdAt: new Date().toISOString(),
@@ -223,7 +335,9 @@ router.post(
       });
     } catch (err) {
       console.error('Error registering influencer:', err);
-      return res.status(500).json({ error: 'Failed to register influencer' });
+      return res.status(500).json({
+        error: 'Failed to register influencer',
+      });
     }
   },
 );
@@ -236,12 +350,21 @@ router.post('/register-user', (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     const fields = registrationErrors(req.body, 'user');
-    if (Object.keys(fields).length)
-      return res.status(400).json({ error: Object.values(fields)[0], fields });
+    if (Object.keys(fields).length) {
+      return res.status(400).json({
+        error: Object.values(fields)[0],
+        fields,
+      });
+    }
 
     const data = db.read();
     const duplicates = identityErrors(data, { email, phone });
-    if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
+    if (Object.keys(duplicates).length) {
+      return res.status(409).json({
+        error: Object.values(duplicates)[0],
+        fields: duplicates,
+      });
+    }
 
     const salt = bcrypt.genSaltSync(10);
     const newUser = {
@@ -281,7 +404,9 @@ router.post('/register-user', (req, res) => {
     });
   } catch (err) {
     console.error('Error registering user:', err);
-    return res.status(500).json({ error: 'Failed to register user' });
+    return res.status(500).json({
+      error: 'Failed to register user',
+    });
   }
 });
 
@@ -292,14 +417,19 @@ router.post('/register-admin', (req, res) => {
   try {
     const { name, email, phone, password } = req.body;
     if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ error: 'Name, email, and password are required' });
+      return res.status(400).json({
+        error: 'Name, email, and password are required',
+      });
     }
 
     const data = db.read();
     const duplicates = identityErrors(data, { email, phone });
-    if (Object.keys(duplicates).length) return res.status(409).json({ error: Object.values(duplicates)[0], fields: duplicates });
+    if (Object.keys(duplicates).length) {
+      return res.status(409).json({
+        error: Object.values(duplicates)[0],
+        fields: duplicates,
+      });
+    }
 
     const salt = bcrypt.genSaltSync(10);
     const newAdmin = {
@@ -331,7 +461,9 @@ router.post('/register-admin', (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to register admin' });
+    return res.status(500).json({
+      error: 'Failed to register admin',
+    });
   }
 });
 
@@ -342,7 +474,9 @@ router.post('/login', (req, res) => {
   try {
     const { email, password, role } = req.body;
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({
+        error: 'Email and password are required',
+      });
     }
 
     const data = db.read();
@@ -350,18 +484,20 @@ router.post('/login', (req, res) => {
 
     // Check Influencer Login
     if (targetRole === 'influencer') {
-      const influencer = data.influencers.find(
-        (i) => i.email.trim().toLowerCase() === email.trim().toLowerCase(),
-      );
+      const influencer = data.influencers.find((i) => {
+        return i.email.trim().toLowerCase() === email.trim().toLowerCase();
+      });
       if (!influencer) {
-        return res
-          .status(401)
-          .json({ error: 'No influencer account found with this email' });
+        return res.status(401).json({
+          error: 'No influencer account found with this email',
+        });
       }
 
       const match = bcrypt.compareSync(password, influencer.password);
       if (!match) {
-        return res.status(401).json({ error: 'Invalid password' });
+        return res.status(401).json({
+          error: 'Invalid password',
+        });
       }
 
       // Prompt rule: "When the admin approves the influencer request only then the influencer will be active for login otherwise a popup is shown that the account is under selected status by the admin"
@@ -415,18 +551,20 @@ router.post('/login', (req, res) => {
 
     // Check User Login
     if (targetRole === 'user') {
-      const user = data.users.find(
-        (u) => u.email.trim().toLowerCase() === email.trim().toLowerCase(),
-      );
+      const user = data.users.find((u) => {
+        return u.email.trim().toLowerCase() === email.trim().toLowerCase();
+      });
       if (!user) {
-        return res
-          .status(401)
-          .json({ error: 'No user account found with this email' });
+        return res.status(401).json({
+          error: 'No user account found with this email',
+        });
       }
 
       const match = bcrypt.compareSync(password, user.password);
       if (!match) {
-        return res.status(401).json({ error: 'Invalid password' });
+        return res.status(401).json({
+          error: 'Invalid password',
+        });
       }
 
       if (['blocked', 'rejected'].includes(user.status)) {
@@ -447,7 +585,11 @@ router.post('/login', (req, res) => {
       if (user.status === 'pending_review') {
         user.status = 'approved';
         user.statusReason = '';
-        if (!db.write(data)) return res.status(503).json({ error: 'Unable to activate your account. Please try again.' });
+        if (!db.write(data)) {
+          return res.status(503).json({
+            error: 'Unable to activate your account. Please try again.',
+          });
+        }
       }
 
       const token = generateToken({
@@ -465,16 +607,20 @@ router.post('/login', (req, res) => {
 
     // Check Admin Login
     if (targetRole === 'admin') {
-      const admin = data.admins.find(
-        (a) => a.email.trim().toLowerCase() === email.trim().toLowerCase(),
-      );
+      const admin = data.admins.find((a) => {
+        return a.email.trim().toLowerCase() === email.trim().toLowerCase();
+      });
       if (!admin) {
-        return res.status(401).json({ error: 'Admin credentials not found' });
+        return res.status(401).json({
+          error: 'Admin credentials not found',
+        });
       }
 
       const match = bcrypt.compareSync(password, admin.password);
       if (!match) {
-        return res.status(401).json({ error: 'Invalid admin credentials' });
+        return res.status(401).json({
+          error: 'Invalid admin credentials',
+        });
       }
 
       const token = generateToken({
@@ -495,7 +641,9 @@ router.post('/login', (req, res) => {
     });
   } catch (err) {
     console.error('Login error:', err);
-    return res.status(500).json({ error: 'Internal login error' });
+    return res.status(500).json({
+      error: 'Internal login error',
+    });
   }
 });
 
@@ -505,7 +653,9 @@ router.post('/login', (req, res) => {
 router.get('/me', (req, res) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({
+      error: 'Unauthorized',
+    });
   }
 
   const token = authHeader.split(' ')[1];
@@ -515,23 +665,35 @@ router.get('/me', (req, res) => {
     let account = null;
 
     if (decoded.role === 'admin') {
-      account = data.admins.find((a) => a.id === decoded.id);
+      account = data.admins.find((a) => {
+        return a.id === decoded.id;
+      });
     } else if (decoded.role === 'influencer') {
-      account = data.influencers.find((i) => i.id === decoded.id);
+      account = data.influencers.find((i) => {
+        return i.id === decoded.id;
+      });
     } else if (decoded.role === 'user') {
-      account = data.users.find((u) => u.id === decoded.id);
+      account = data.users.find((u) => {
+        return u.id === decoded.id;
+      });
     }
 
     if (!account) {
-      return res.status(404).json({ error: 'Account not found' });
+      return res.status(404).json({
+        error: 'Account not found',
+      });
     }
 
-    if ((decoded.sessionVersion || 0) !== (account.sessionVersion || 0))
-      return res.status(401).json({ error: 'Your password changed. Please sign in again.' });
+    if ((decoded.sessionVersion || 0) !== (account.sessionVersion || 0)) {
+      return res.status(401).json({
+        error: 'Your password changed. Please sign in again.',
+      });
+    }
 
     if (
       ['user', 'influencer'].includes(decoded.role) &&
-      (['blocked', 'rejected'].includes(account.status) || (decoded.role === 'influencer' && account.status === 'pending_review'))
+      (['blocked', 'rejected'].includes(account.status) ||
+        (decoded.role === 'influencer' && account.status === 'pending_review'))
     ) {
       return res.status(403).json({
         error: 'Account access is restricted.',
@@ -542,7 +704,9 @@ router.get('/me', (req, res) => {
     const { password: _, ...safeAccount } = account;
     return res.json({ user: safeAccount });
   } catch {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.status(401).json({
+      error: 'Invalid or expired token',
+    });
   }
 });
 

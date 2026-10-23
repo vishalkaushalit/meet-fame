@@ -48,9 +48,7 @@ async function syncToAtlas() {
 
     // Sync Users in Atlas
     for (const u of dbData.users || []) {
-      await db
-        .collection('users')
-        .updateOne(
+      await db.collection('users').updateOne(
           { email: u.email },
           { $set: { avatar: u.avatar, name: u.name, status: u.status } },
           { upsert: true },

@@ -43,15 +43,33 @@ import {
 } from 'lucide-react';
 import './dashboard.css';
 
-const BillingView = lazy(() => import('../../../shared/BillingView'));
-const AnnouncementsIndex = lazy(() => import('./AnnouncementsIndex'));
-const ApprovalsView = lazy(() => import('./ApprovalsView'));
-const AnnouncementsView = lazy(() => import('./AnnouncementsView'));
-const AccountDetailsPage = lazy(() => import('./AccountDetailsPage'));
-const AdminEditProfile = lazy(() => import('./AdminEditProfile'));
-const SlotsInspectorView = lazy(() => import('./SlotsInspectorView'));
-const BookingsView = lazy(() => import('./BookingsView'));
-const ConversationsView = lazy(() => import('./ConversationsView'));
+const BillingView = lazy(() => {
+  return import('../../../shared/BillingView');
+});
+const AnnouncementsIndex = lazy(() => {
+  return import('./AnnouncementsIndex');
+});
+const ApprovalsView = lazy(() => {
+  return import('./ApprovalsView');
+});
+const AnnouncementsView = lazy(() => {
+  return import('./AnnouncementsView');
+});
+const AccountDetailsPage = lazy(() => {
+  return import('./AccountDetailsPage');
+});
+const AdminEditProfile = lazy(() => {
+  return import('./AdminEditProfile');
+});
+const SlotsInspectorView = lazy(() => {
+  return import('./SlotsInspectorView');
+});
+const BookingsView = lazy(() => {
+  return import('./BookingsView');
+});
+const ConversationsView = lazy(() => {
+  return import('./ConversationsView');
+});
 
 const navigation = [
   {
@@ -108,10 +126,13 @@ export default function AdminDashboard({
   const profileMenu = useRef(null);
   const profileTrigger = useRef(null);
   useEffect(() => {
-    if (!profileMenuOpen) return;
+    if (!profileMenuOpen) {
+      return;
+    }
     const outsideClick = (event) => {
-      if (!profileMenu.current?.contains(event.target))
+      if (!profileMenu.current?.contains(event.target)) {
         setProfileMenuOpen(false);
+      }
     };
     const escape = (event) => {
       if (event.key === 'Escape') {
@@ -138,16 +159,23 @@ export default function AdminDashboard({
   const load = useCallback(async () => {
     const request = ++refreshRequest.current;
     setRefreshing(true);
-    setBillingRevision((value) => value + 1);
+    setBillingRevision((value) => {
+      return value + 1;
+    });
     try {
       const [overview, result] = await Promise.allSettled([
         adminApi.stats.getOverview(),
         adminApi.bookings.getAll(),
       ]);
-      if (request !== refreshRequest.current) return;
-      if (overview.status === 'fulfilled') setStats(overview.value);
-      if (result.status === 'fulfilled')
+      if (request !== refreshRequest.current) {
+        return;
+      }
+      if (overview.status === 'fulfilled') {
+        setStats(overview.value);
+      }
+      if (result.status === 'fulfilled') {
         setBookings(result.value.bookings || []);
+      }
       if (overview.status === 'fulfilled' && result.status === 'fulfilled') {
         setUpdated(new Date());
         setError('');
@@ -161,12 +189,16 @@ export default function AdminDashboard({
         'Unable to refresh dashboard data. Check your connection and try again.',
       );
     } finally {
-      if (request === refreshRequest.current) setRefreshing(false);
+      if (request === refreshRequest.current) {
+        setRefreshing(false);
+      }
     }
   }, []);
   useEffect(() => {
     const timer = setInterval(load, 30000);
-    return () => clearInterval(timer);
+    return () => {
+      return clearInterval(timer);
+    };
   }, [load]);
   // Load live counts immediately on every page, including direct links.
   useEffect(() => {
@@ -195,7 +227,9 @@ export default function AdminDashboard({
     },
   };
   const current = actionPages[activeTab] ||
-    navigation.find((item) => item.id === navigationTab) || {
+    navigation.find((item) => {
+      return item.id === navigationTab;
+    }) || {
       label: 'Account details',
       description: 'Profile, credentials, and availability.',
     };
@@ -252,12 +286,21 @@ export default function AdminDashboard({
         month: 'short',
         day: 'numeric',
       }),
-      count: bookings.filter((booking) => booking.date === key).length,
+      count: bookings.filter((booking) => {
+        return booking.date === key;
+      }).length,
     };
   });
   const maximum = Math.max(
     4,
-    Math.ceil(Math.max(0, ...activity.map((day) => day.count)) / 4) * 4,
+    Math.ceil(
+      Math.max(
+        0,
+        ...activity.map((day) => {
+          return day.count;
+        }),
+      ) / 4,
+    ) * 4,
   );
   const statuses = ['confirmed', 'completed', 'cancelled'];
 
@@ -267,7 +310,9 @@ export default function AdminDashboard({
         <button
           className="sidebar-scrim"
           aria-label="Close navigation"
-          onClick={() => setMobileOpen(false)}
+          onClick={() => {
+            return setMobileOpen(false);
+          }}
         />
       )}
       <aside className={`dashboard-sidebar ${mobileOpen ? 'is-open' : ''}`}>
@@ -276,7 +321,9 @@ export default function AdminDashboard({
           <button
             className="mobile-close"
             aria-label="Close navigation"
-            onClick={() => setMobileOpen(false)}
+            onClick={() => {
+              return setMobileOpen(false);
+            }}
           >
             <X size={20} />
           </button>
@@ -292,29 +339,32 @@ export default function AdminDashboard({
           </div>
           <p className="nav-caption">WORKSPACE</p>
           <nav aria-label="Dashboard navigation">
-            {navigation.map((item) => (
-              <a
-                key={item.id}
-                href={adminPath(item.id)}
-                onClick={(event) => {
-                  if (
-                    event.button !== 0 ||
-                    event.metaKey ||
-                    event.ctrlKey ||
-                    event.shiftKey ||
-                    event.altKey
-                  )
-                    return;
-                  event.preventDefault();
-                  navigate(item.id);
-                }}
-                className={`nav-item ${navigationTab === item.id ? 'selected' : ''}`}
-                aria-current={navigationTab === item.id ? 'page' : undefined}
-              >
-                <item.icon size={19} />
-                <span>{item.label}</span>
-              </a>
-            ))}
+            {navigation.map((item) => {
+              return (
+                <a
+                  key={item.id}
+                  href={adminPath(item.id)}
+                  onClick={(event) => {
+                    if (
+                      event.button !== 0 ||
+                      event.metaKey ||
+                      event.ctrlKey ||
+                      event.shiftKey ||
+                      event.altKey
+                    ) {
+                      return;
+                    }
+                    event.preventDefault();
+                    navigate(item.id);
+                  }}
+                  className={`nav-item ${navigationTab === item.id ? 'selected' : ''}`}
+                  aria-current={navigationTab === item.id ? 'page' : undefined}
+                >
+                  <item.icon size={19} />
+                  <span>{item.label}</span>
+                </a>
+              );
+            })}
           </nav>
           <div className="sidebar-bottom">
             <div className="workspace-note">
@@ -343,7 +393,9 @@ export default function AdminDashboard({
             <button
               className="mobile-menu"
               aria-label="Open navigation"
-              onClick={() => setMobileOpen(true)}
+              onClick={() => {
+                return setMobileOpen(true);
+              }}
             >
               <Menu size={21} />
             </button>
@@ -357,8 +409,9 @@ export default function AdminDashboard({
               className="admin-profile-menu"
               ref={profileMenu}
               onBlur={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget))
+                if (!event.currentTarget.contains(event.relatedTarget)) {
                   setProfileMenuOpen(false);
+                }
               }}
             >
               <button
@@ -368,7 +421,11 @@ export default function AdminDashboard({
                 aria-label="Admin account options"
                 aria-expanded={profileMenuOpen}
                 aria-controls="admin-profile-options"
-                onClick={() => setProfileMenuOpen((open) => !open)}
+                onClick={() => {
+                  return setProfileMenuOpen((open) => {
+                    return !open;
+                  });
+                }}
               >
                 <span className="profile-avatar">{initials(admin?.name)}</span>
                 <div>
@@ -428,15 +485,18 @@ export default function AdminDashboard({
                 aria-label="Go back"
                 title="Back"
                 onClick={() => {
-                  if (recordDetails) navigateAdmin(recordDetails.page);
-                  else if (
+                  if (recordDetails) {
+                    navigateAdmin(recordDetails.page);
+                  } else if (
                     detailsAccount ||
                     ['edit-profile', 'add-announcement'].includes(activeTab)
-                  )
+                  ) {
                     navigateAdmin(accountDetailsParent());
-                  else if (window.history.state?.adminNavigation)
+                  } else if (window.history.state?.adminNavigation) {
                     window.history.back();
-                  else navigateAdmin('overview', { replace: true });
+                  } else {
+                    navigateAdmin('overview', { replace: true });
+                  }
                 }}
               >
                 <ArrowLeft size={18} aria-hidden="true" />
@@ -514,7 +574,9 @@ export default function AdminDashboard({
                 {activeTab === 'edit-profile' && (
                   <AdminEditProfile
                     admin={admin}
-                    onClose={() => navigateAdmin(accountDetailsParent())}
+                    onClose={() => {
+                      return navigateAdmin(accountDetailsParent());
+                    }}
                     onSaved={(user) => {
                       onProfileUpdated(user);
                       setProfileNotice('Profile updated successfully.');

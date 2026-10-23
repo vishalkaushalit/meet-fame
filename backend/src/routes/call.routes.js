@@ -7,56 +7,76 @@ import { bookingWindow } from '../../../shared/bookingTime.js';
 const router = express.Router();
 router.use(requireSession);
 router.use('/:bookingId', (req, res, next) => {
-  const booking = db
-    .read()
-    .bookings.find((item) => item.id === req.params.bookingId);
-  if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+  const booking = db.read().bookings.find((item) => {
+    return item.id === req.params.bookingId;
+  });
+  if (!booking) {
+    return res.status(404).json({
+      error: 'Booking not found.',
+    });
+  }
   const allowed =
     (req.session.role === 'user' && booking.userId === req.session.id) ||
     (req.session.role === 'influencer' &&
       booking.influencerId === req.session.id);
-  if (!allowed)
-    return res
-      .status(403)
-      .json({ error: 'Only the booked participants may join this call.' });
-  if (booking.status !== 'confirmed' || booking.meetingType !== 'video')
-    return res
-      .status(409)
-      .json({ error: 'Calls require a confirmed video booking.' });
+  if (!allowed) {
+    return res.status(403).json({
+      error: 'Only the booked participants may join this call.',
+    });
+  }
+  if (booking.status !== 'confirmed' || booking.meetingType !== 'video') {
+    return res.status(409).json({
+      error: 'Calls require a confirmed video booking.',
+    });
+  }
   // Allow cleanup after the slot ends; all other signaling requires an active slot.
   if (req.path !== '/leave') {
     const window = bookingWindow(booking);
-    if (!window)
+    if (!window) {
       return res.status(409).json({
         error: 'This booking has an invalid schedule. Please contact support.',
       });
+    }
     const now = Date.now();
-    if (now < window.start)
+    if (now < window.start) {
       return res.status(403).json({
         error: `You can join only during your booked slot: ${booking.date}, ${booking.slotLabel || booking.slot} IST.`,
       });
-    if (now >= window.end)
-      return res.status(403).json({ error: 'Your booked session has ended.' });
+    }
+    if (now >= window.end) {
+      return res.status(403).json({
+        error: 'Your booked session has ended.',
+      });
+    }
     req.callWindow = window;
   }
   next();
 });
-const peerRole = (role) => (role === 'user' ? 'influencer' : 'user');
-const active = (member) => member && Date.now() - member.seen < 45000;
-const wrap = (fn) => async (req, res) => {
-  try {
-    await fn(req, res);
-  } catch (error) {
-    res.status(error.status || 503).json({ error: error.message });
-  }
+const peerRole = (role) => {
+  return role === 'user' ? 'influencer' : 'user';
+};
+const active = (member) => {
+  return member && Date.now() - member.seen < 45000;
+};
+const wrap = (fn) => {
+  return async (req, res) => {
+    try {
+      await fn(req, res);
+    } catch (error) {
+      res.status(error.status || 503).json({
+        error: error.message,
+      });
+    }
+  };
 };
 const fail = (message, status = 409) => {
   throw Object.assign(new Error(message), { status });
 };
 const member = (state, req) => {
   const self = state.members[req.session.role];
-  if (!self || self.id !== req.body.sessionId)
+  if (!self || self.id !== req.body.sessionId) {
     fail('This call session ended or was opened in another tab.');
+  }
   self.seen = Date.now();
   return self;
 };
@@ -66,10 +86,11 @@ router.post(
     const sessionId = randomUUID();
     await mutateRoom(req.params.bookingId, (state) => {
       const existing = state.members[req.session.role];
-      if (active(existing))
+      if (active(existing)) {
         fail(
           'You already have an active call for this booking. Leave it first or wait 45 seconds.',
         );
+      }
       state.members[req.session.role] = { id: sessionId, seen: Date.now() };
       state.signals = [];
     });
@@ -78,12 +99,15 @@ router.post(
       process.env.TURN_URL &&
       process.env.TURN_USERNAME &&
       process.env.TURN_CREDENTIAL
-    )
+    ) {
       iceServers.push({
-        urls: process.env.TURN_URL.split(',').map((url) => url.trim()),
+        urls: process.env.TURN_URL.split(',').map((url) => {
+          return url.trim();
+        }),
         username: process.env.TURN_USERNAME,
         credential: process.env.TURN_CREDENTIAL,
       });
+    }
     res.json({
       sessionId,
       iceServers,
@@ -100,11 +124,12 @@ router.post(
       const peer = state.members[peerRole(req.session.role)];
       return {
         peerId: active(peer) ? peer.id : null,
-        signals: state.signals.filter(
-          (signal) =>
+        signals: state.signals.filter((signal) => {
+          return (
             signal.to === self.id &&
-            signal.sequence > (Number(req.body.after) || 0),
-        ),
+            signal.sequence > (Number(req.body.after) || 0)
+          );
+        }),
         sequence: state.sequence,
       };
     });
@@ -119,18 +144,25 @@ router.post(
       !['offer', 'answer', 'candidate'].includes(type) ||
       !payload ||
       JSON.stringify(payload).length > 100000
-    )
-      return res.status(400).json({ error: 'Invalid call signal.' });
+    ) {
+      return res.status(400).json({
+        error: 'Invalid call signal.',
+      });
+    }
     if (
       (type === 'offer' && req.session.role !== 'user') ||
       (type === 'answer' && req.session.role !== 'influencer')
-    )
-      return res.status(400).json({ error: 'Invalid negotiation role.' });
+    ) {
+      return res.status(400).json({
+        error: 'Invalid negotiation role.',
+      });
+    }
     await mutateRoom(req.params.bookingId, (state) => {
       const self = member(state, req),
         peer = state.members[peerRole(req.session.role)];
-      if (!active(peer) || peer.id !== to)
+      if (!active(peer) || peer.id !== to) {
         fail('The other participant has left.');
+      }
       state.signals.push({
         sequence: ++state.sequence,
         from: self.id,
@@ -147,8 +179,9 @@ router.post(
   '/:bookingId/leave',
   wrap(async (req, res) => {
     await mutateRoom(req.params.bookingId, (state) => {
-      if (state.members[req.session.role]?.id === req.body.sessionId)
+      if (state.members[req.session.role]?.id === req.body.sessionId) {
         delete state.members[req.session.role];
+      }
     });
     res.json({ success: true });
   }),

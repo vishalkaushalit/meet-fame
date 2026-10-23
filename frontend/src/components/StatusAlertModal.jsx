@@ -5,7 +5,9 @@ import { Clock, AlertTriangle, ShieldCheck, X } from 'lucide-react';
 export default function StatusAlertModal() {
   const { statusAlert, setStatusAlert } = useAuth();
 
-  if (!statusAlert) return null;
+  if (!statusAlert) {
+    return null;
+  }
 
   const isPending = statusAlert.status === 'pending_review';
 
@@ -21,7 +23,9 @@ export default function StatusAlertModal() {
         />
 
         <button
-          onClick={() => setStatusAlert(null)}
+          onClick={() => {
+            return setStatusAlert(null);
+          }}
           className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition-colors"
         >
           <X className="w-5 h-5" />
@@ -88,7 +92,9 @@ export default function StatusAlertModal() {
 
         {/* Action Button */}
         <button
-          onClick={() => setStatusAlert(null)}
+          onClick={() => {
+            return setStatusAlert(null);
+          }}
           className="w-full py-3 px-6 rounded-xl font-semibold text-white bg-gradient-to-r from-brand-indigo via-brand-purple to-brand-coral hover:opacity-95 transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.99]"
         >
           Understood

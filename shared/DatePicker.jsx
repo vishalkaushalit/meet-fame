@@ -3,10 +3,15 @@ import { createPortal } from 'react-dom';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatDate } from './dateFormat';
 import './date-picker.css';
-const today = () => new Date(Date.now() + 19800000).toISOString().slice(0, 10);
-const keyOf = (date) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-const parse = (value) => new Date(`${value}T12:00:00`);
+const today = () => {
+  return new Date(Date.now() + 19800000).toISOString().slice(0, 10);
+};
+const keyOf = (date) => {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+const parse = (value) => {
+  return new Date(`${value}T12:00:00`);
+};
 export default function DatePicker({
   value = '',
   onChange,
@@ -20,31 +25,38 @@ export default function DatePicker({
 }) {
   const uid = useId();
   const inputId = id || uid;
-  const spacingClasses = className
-    .split(/\s+/)
-    .filter((name) => /^(?:[\w-]+:)*m[trblxy]?-/.test(name));
-  const inputClasses = className
-    .split(/\s+/)
-    .filter((name) => !spacingClasses.includes(name))
-    .join(' ');
+  const spacingClasses = className.split(/\s+/).filter((name) => {
+    return /^(?:[\w-]+:)*m[trblxy]?-/.test(name);
+  });
+  const inputClasses = className.split(/\s+/).filter((name) => {
+      return !spacingClasses.includes(name);
+    }).join(' ');
   const root = useRef(null),
     popup = useRef(null),
     input = useRef(null);
   const [open, setOpen] = useState(false);
-  const [month, setMonth] = useState(() => parse(value || today()));
+  const [month, setMonth] = useState(() => {
+    return parse(value || today());
+  });
   const [position, setPosition] = useState({ top: 0, left: 0 });
-  const allowed = (key) => (!min || key >= min) && (!max || key <= max);
+  const allowed = (key) => {
+    return (!min || key >= min) && (!max || key <= max);
+  };
   const close = () => {
     setOpen(false);
     input.current?.focus();
   };
   const show = () => {
-    if (disabled) return;
+    if (disabled) {
+      return;
+    }
     setMonth(parse(value || (min && today() < min ? min : today())));
     setOpen(true);
   };
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     const place = () => {
       const rect = root.current.getBoundingClientRect();
       const height = popup.current?.offsetHeight || 350;
@@ -63,17 +75,16 @@ export default function DatePicker({
       if (
         !root.current?.contains(event.target) &&
         !popup.current?.contains(event.target)
-      )
+      ) {
         setOpen(false);
+      }
     };
     document.addEventListener('pointerdown', outside);
     window.addEventListener('resize', place);
     window.addEventListener('scroll', place, true);
-    popup.current
-      ?.querySelector(
+    popup.current?.querySelector(
         '[data-selected="true"]:not(:disabled), [data-today="true"]:not(:disabled), .date-picker-day:not(:disabled)',
-      )
-      ?.focus();
+      )?.focus();
     return () => {
       document.removeEventListener('pointerdown', outside);
       window.removeEventListener('resize', place);
@@ -82,17 +93,16 @@ export default function DatePicker({
   }, [open]);
   const start = new Date(month.getFullYear(), month.getMonth(), 1);
   const offset = (start.getDay() + 6) % 7;
-  const days = Array.from(
-    { length: 42 },
-    (_, index) =>
-      new Date(month.getFullYear(), month.getMonth(), index - offset + 1),
-  );
+  const days = Array.from({ length: 42 }, (_, index) => {
+    return new Date(month.getFullYear(), month.getMonth(), index - offset + 1);
+  });
   const select = (key) => {
     onChange?.({ target: { value: key } });
     close();
   };
-  const move = (delta) =>
-    setMonth(new Date(month.getFullYear(), month.getMonth() + delta, 1));
+  const move = (delta) => {
+    return setMonth(new Date(month.getFullYear(), month.getMonth() + delta, 1));
+  };
   return (
     <span
       className={`date-picker-field ${spacingClasses.join(' ')}`}
@@ -115,7 +125,9 @@ export default function DatePicker({
         aria-controls={open ? `${uid}-calendar` : undefined}
         onChange={() => {}}
         onClick={show}
-        onInvalid={() => show()}
+        onInvalid={() => {
+          return show();
+        }}
         onKeyDown={(event) => {
           if (['Enter', ' ', 'ArrowDown'].includes(event.key)) {
             event.preventDefault();
@@ -130,7 +142,9 @@ export default function DatePicker({
         aria-label={
           ariaLabel ? `Choose ${ariaLabel.toLowerCase()}` : 'Choose date'
         }
-        onClick={() => (open ? close() : show())}
+        onClick={() => {
+          return open ? close() : show();
+        }}
       >
         <Calendar size={18} aria-hidden="true" />
       </button>
@@ -155,7 +169,9 @@ export default function DatePicker({
               <button
                 type="button"
                 aria-label="Previous month"
-                onClick={() => move(-1)}
+                onClick={() => {
+                  return move(-1);
+                }}
               >
                 <ChevronLeft size={18} />
               </button>
@@ -168,17 +184,21 @@ export default function DatePicker({
               <button
                 type="button"
                 aria-label="Next month"
-                onClick={() => move(1)}
+                onClick={() => {
+                  return move(1);
+                }}
               >
                 <ChevronRight size={18} />
               </button>
             </div>
             <div className="date-picker-grid">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
-                <span className="date-picker-weekday" key={day}>
-                  {day}
-                </span>
-              ))}
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => {
+                return (
+                  <span className="date-picker-weekday" key={day}>
+                    {day}
+                  </span>
+                );
+              })}
               {days.map((date) => {
                 const key = keyOf(date);
                 return (
@@ -191,7 +211,9 @@ export default function DatePicker({
                     data-today={key === today()}
                     aria-label={formatDate(key)}
                     aria-pressed={key === value}
-                    onClick={() => select(key)}
+                    onClick={() => {
+                      return select(key);
+                    }}
                     onKeyDown={(event) => {
                       const delta = {
                         ArrowLeft: -1,
@@ -199,17 +221,19 @@ export default function DatePicker({
                         ArrowUp: -7,
                         ArrowDown: 7,
                       }[event.key];
-                      if (!delta) return;
+                      if (!delta) {
+                        return;
+                      }
                       event.preventDefault();
                       const next = new Date(date);
                       next.setDate(next.getDate() + delta);
-                      const index = days.findIndex(
-                        (item) => keyOf(item) === keyOf(next),
-                      );
-                      if (index >= 0)
-                        popup.current
-                          .querySelectorAll('.date-picker-day')
+                      const index = days.findIndex((item) => {
+                        return keyOf(item) === keyOf(next);
+                      });
+                      if (index >= 0) {
+                        popup.current.querySelectorAll('.date-picker-day')
                           [index]?.focus();
+                      }
                     }}
                   >
                     {date.getDate()}
@@ -221,12 +245,19 @@ export default function DatePicker({
               <button
                 type="button"
                 disabled={!allowed(today())}
-                onClick={() => select(today())}
+                onClick={() => {
+                  return select(today());
+                }}
               >
                 Today
               </button>
               {!required && (
-                <button type="button" onClick={() => select('')}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    return select('');
+                  }}
+                >
                   Clear
                 </button>
               )}

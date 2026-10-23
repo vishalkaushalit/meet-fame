@@ -10,12 +10,18 @@ export default function HeaderProfileMenu({ user, onLogout }) {
   const trigger = useRef(null);
   const id = useId();
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     const outside = (event) => {
-      if (!root.current?.contains(event.target)) setOpen(false);
+      if (!root.current?.contains(event.target)) {
+        setOpen(false);
+      }
     };
     document.addEventListener('pointerdown', outside);
-    return () => document.removeEventListener('pointerdown', outside);
+    return () => {
+      return document.removeEventListener('pointerdown', outside);
+    };
   }, [open]);
   const go = (path) => {
     setOpen(false);
@@ -26,13 +32,19 @@ export default function HeaderProfileMenu({ user, onLogout }) {
       ref={root}
       className="header-profile-menu"
       onPointerEnter={(event) => {
-        if (event.pointerType === 'mouse') setOpen(true);
+        if (event.pointerType === 'mouse') {
+          setOpen(true);
+        }
       }}
       onPointerLeave={(event) => {
-        if (event.pointerType === 'mouse') setOpen(false);
+        if (event.pointerType === 'mouse') {
+          setOpen(false);
+        }
       }}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setOpen(false);
+        }
       }}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
@@ -46,7 +58,11 @@ export default function HeaderProfileMenu({ user, onLogout }) {
         ref={trigger}
         type="button"
         className="header-profile-trigger"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          return setOpen((value) => {
+            return !value;
+          });
+        }}
         aria-expanded={open}
         aria-controls={id}
         aria-label="Account options"
@@ -70,11 +86,21 @@ export default function HeaderProfileMenu({ user, onLogout }) {
       {open && (
         <div className="header-profile-dropdown" id={id}>
           <div className="header-profile-options" aria-label="Account options">
-            <button type="button" onClick={() => go('/')}>
+            <button
+              type="button"
+              onClick={() => {
+                return go('/');
+              }}
+            >
               <LayoutDashboard size={17} aria-hidden="true" />
               Dashboard
             </button>
-            <button type="button" onClick={() => go('/profile')}>
+            <button
+              type="button"
+              onClick={() => {
+                return go('/profile');
+              }}
+            >
               <UserRound size={17} aria-hidden="true" />
               My Profile
             </button>

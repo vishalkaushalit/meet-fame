@@ -32,12 +32,17 @@ export default function PasswordRecovery({
     };
   }, [step]);
   useEffect(() => {
-    if (!resendSeconds) return;
-    const timer = setTimeout(
-      () => setResendSeconds((value) => value - 1),
-      1000,
-    );
-    return () => clearTimeout(timer);
+    if (!resendSeconds) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      return setResendSeconds((value) => {
+        return value - 1;
+      });
+    }, 1000);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [resendSeconds]);
   const sendCode = async () => {
     const result = await requestReset({ role, email: email.trim() });
@@ -49,7 +54,9 @@ export default function PasswordRecovery({
     setResendSeconds(60);
   };
   const resend = async () => {
-    if (busy || resendSeconds) return;
+    if (busy || resendSeconds) {
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -62,7 +69,9 @@ export default function PasswordRecovery({
   };
   const submit = async (event) => {
     event.preventDefault();
-    if (busy) return;
+    if (busy) {
+      return;
+    }
     setError('');
     if (step === 'password' && password !== confirmation) {
       setError('Passwords do not match.');
@@ -89,7 +98,9 @@ export default function PasswordRecovery({
         setNotice('');
         setTestCode('');
         setOtp('');
-      } else await sendCode();
+      } else {
+        await sendCode();
+      }
     } catch (err) {
       setError(
         err.message || 'Unable to complete the request. Please try again.',
@@ -173,9 +184,11 @@ export default function PasswordRecovery({
                     maxLength={6}
                     required
                     value={otp}
-                    onChange={(event) =>
-                      setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))
-                    }
+                    onChange={(event) => {
+                      return setOtp(
+                        event.target.value.replace(/\D/g, '').slice(0, 6),
+                      );
+                    }}
                     placeholder={
                       testCode ? '4-digit test code' : 'Enter your OTP'
                     }
@@ -192,7 +205,9 @@ export default function PasswordRecovery({
                     required
                     minLength={8}
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    onChange={(event) => {
+                      return setPassword(event.target.value);
+                    }}
                   />
                   <small>Use at least 8 characters.</small>
                   <label htmlFor="recovery-confirm">Confirm new password</label>
@@ -203,7 +218,9 @@ export default function PasswordRecovery({
                     required
                     minLength={8}
                     value={confirmation}
-                    onChange={(event) => setConfirmation(event.target.value)}
+                    onChange={(event) => {
+                      return setConfirmation(event.target.value);
+                    }}
                   />
                 </>
               )}

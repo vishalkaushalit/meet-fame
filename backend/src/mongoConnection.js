@@ -2,7 +2,9 @@ import mongoose from 'mongoose';
 
 export function createConnectionManager(
   driver,
-  getUri = () => process.env.MONGODB_URI,
+  getUri = () => {
+    return process.env.MONGODB_URI;
+  },
 ) {
   let connecting = null;
   let lastFailure = null;
@@ -19,13 +21,15 @@ export function createConnectionManager(
     if (
       error.name === 'MongoParseError' ||
       error.name === 'MongoInvalidArgumentError'
-    )
+    ) {
       return 'invalid_configuration';
+    }
     if (
       [18, 8000].includes(error.code) ||
       /authentication failed|bad auth/i.test(error.message || '')
-    )
+    ) {
       return 'authentication_failed';
+    }
     if (
       [
         'MongoServerSelectionError',
@@ -33,14 +37,19 @@ export function createConnectionManager(
         'MongoNetworkError',
       ].includes(error.name) ||
       ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes(error.code)
-    )
+    ) {
       return 'network_unreachable';
+    }
     return 'connection_failed';
   };
   return {
     async connect() {
-      if (driver.connection.readyState === 1) return;
-      if (connecting) return connecting;
+      if (driver.connection.readyState === 1) {
+        return;
+      }
+      if (connecting) {
+        return connecting;
+      }
       const uri = configuredUri();
       if (!/^mongodb(?:\+srv)?:\/\//.test(uri)) {
         lastFailure = uri ? 'invalid_configuration' : 'missing_configuration';
@@ -50,9 +59,9 @@ export function createConnectionManager(
       }
       connecting = (async () => {
         try {
-          if (driver.connection.readyState === 2)
+          if (driver.connection.readyState === 2) {
             await driver.connection.asPromise();
-          else
+          } else {
             await driver.connect(uri, {
               serverSelectionTimeoutMS: 10000,
               connectTimeoutMS: 10000,
@@ -62,6 +71,7 @@ export function createConnectionManager(
               minPoolSize: 0,
               maxIdleTimeMS: 60000,
             });
+          }
           lastFailure = null;
         } catch (error) {
           lastFailure = classify(error);

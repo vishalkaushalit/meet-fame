@@ -1,7 +1,9 @@
 const initialized = new WeakSet();
 
 export function initializeDatePickers(documentRoot = document) {
-  if (initialized.has(documentRoot)) return;
+  if (initialized.has(documentRoot)) {
+    return;
+  }
   initialized.add(documentRoot);
   documentRoot.addEventListener('click', (event) => {
     const input = event.target;
@@ -11,8 +13,9 @@ export function initializeDatePickers(documentRoot = document) {
       input.disabled ||
       input.readOnly ||
       typeof input.showPicker !== 'function'
-    )
+    ) {
       return;
+    }
     try {
       input.showPicker();
     } catch {

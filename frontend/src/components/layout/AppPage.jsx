@@ -1,11 +1,21 @@
 import React, { lazy } from 'react';
 import { navigate } from '../../authRoutes';
 
-const LandingPage = lazy(() => import('../LandingPage'));
-const InfluencerPanel = lazy(() => import('../InfluencerPanel'));
-const UserPanel = lazy(() => import('../UserPanel'));
-const BookingPage = lazy(() => import('../BookingPage'));
-const ProfilePage = lazy(() => import('../ProfilePage'));
+const LandingPage = lazy(() => {
+  return import('../LandingPage');
+});
+const InfluencerPanel = lazy(() => {
+  return import('../InfluencerPanel');
+});
+const UserPanel = lazy(() => {
+  return import('../UserPanel');
+});
+const BookingPage = lazy(() => {
+  return import('../BookingPage');
+});
+const ProfilePage = lazy(() => {
+  return import('../ProfilePage');
+});
 
 // Keep page selection explicit. Authentication redirects live in App.jsx.
 export default function AppPage({
@@ -28,7 +38,9 @@ export default function AppPage({
       <BookingPage
         key={bookingRoute[1]}
         influencerId={bookingRoute[1]}
-        onClose={() => navigate('/')}
+        onClose={() => {
+          return navigate('/');
+        }}
         onLogin={onBookingLogin}
       />
     );

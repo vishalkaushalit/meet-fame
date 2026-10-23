@@ -10,13 +10,17 @@ router.get('/:conversationId', (req, res) => {
   try {
     const { conversationId } = req.params;
     const data = db.read();
-    const messages = data.messages
-      .filter((m) => m.conversationId === conversationId)
-      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    const messages = data.messages.filter((m) => {
+        return m.conversationId === conversationId;
+      }).sort((a, b) => {
+        return new Date(a.timestamp) - new Date(b.timestamp);
+      });
 
     return res.json({ messages });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch messages' });
+    return res.status(500).json({
+      error: 'Failed to fetch messages',
+    });
   }
 });
 
@@ -37,7 +41,9 @@ router.post('/send', (req, res) => {
     } = req.body;
 
     if (!senderId || !text) {
-      return res.status(400).json({ error: 'Sender and text are required' });
+      return res.status(400).json({
+        error: 'Sender and text are required',
+      });
     }
 
     const convId = conversationId || `${userId}_${influencerId}`;
@@ -59,9 +65,14 @@ router.post('/send', (req, res) => {
     data.messages.push(newMsg);
     db.write(data);
 
-    return res.status(201).json({ success: true, message: newMsg });
+    return res.status(201).json({
+      success: true,
+      message: newMsg,
+    });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to send message' });
+    return res.status(500).json({
+      error: 'Failed to send message',
+    });
   }
 });
 

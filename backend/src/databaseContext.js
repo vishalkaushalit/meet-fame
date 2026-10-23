@@ -12,13 +12,21 @@ export function createDatabaseMiddleware(store) {
       res.json = (body) => {
         const finish = async () => {
           try {
-            if (context.dirty && (res.statusCode < 400 || req.persistDatabaseOnError === true))
+            if (
+              context.dirty &&
+              (res.statusCode < 400 || req.persistDatabaseOnError === true)
+            ) {
               await store.commit(snapshot, context.state);
+            }
             if (req.afterDatabaseCommit && res.statusCode < 400) {
-              try { await req.afterDatabaseCommit(); }
-              catch {
+              try {
+                await req.afterDatabaseCommit();
+              } catch {
                 res.status(503);
-                return json({ error: 'Password recovery email could not be sent. Please try again in a minute.' });
+                return json({
+                  error:
+                    'Password recovery email could not be sent. Please try again in a minute.',
+                });
               }
             }
             json(body);

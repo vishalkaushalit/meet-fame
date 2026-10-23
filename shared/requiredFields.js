@@ -4,7 +4,9 @@ export function initializeRequiredFields(documentRoot = document) {
     for (const field of documentRoot.querySelectorAll(
       'input[required], select[required], textarea[required], [aria-required="true"]',
     )) {
-      for (const label of field.labels || []) requiredLabels.add(label);
+      for (const label of field.labels || []) {
+        requiredLabels.add(label);
+      }
     }
     for (const label of documentRoot.querySelectorAll('label')) {
       const star = label.querySelector('.required-field-star');
@@ -12,15 +14,18 @@ export function initializeRequiredFields(documentRoot = document) {
         star?.remove();
         continue;
       }
-      if (star) continue;
+      if (star) {
+        continue;
+      }
       const walker = documentRoot.createTreeWalker(label, NodeFilter.SHOW_TEXT);
       let text;
       while ((text = walker.nextNode())) {
         if (
           !text.textContent.trim() ||
           text.parentElement.closest('select, button, .required-field-star')
-        )
+        ) {
           continue;
+        }
         const marker = documentRoot.createElement('span');
         marker.className = 'required-field-star';
         marker.textContent = ' *';
@@ -38,5 +43,7 @@ export function initializeRequiredFields(documentRoot = document) {
     attributeFilter: ['required', 'aria-required', 'for', 'id'],
   });
   update();
-  return () => observer.disconnect();
+  return () => {
+    return observer.disconnect();
+  };
 }

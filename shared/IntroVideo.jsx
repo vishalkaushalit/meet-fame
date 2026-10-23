@@ -15,13 +15,21 @@ export default function IntroVideo({
   const [volumeOpen, setVolumeOpen] = useState(false);
   const [playbackVisible, setPlaybackVisible] = useState(false);
   useEffect(() => {
-    if (!playing || !playbackVisible) return;
-    const timer = setTimeout(() => setPlaybackVisible(false), 2500);
-    return () => clearTimeout(timer);
+    if (!playing || !playbackVisible) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      return setPlaybackVisible(false);
+    }, 2500);
+    return () => {
+      return clearTimeout(timer);
+    };
   }, [playing, playbackVisible]);
   const togglePlayback = async () => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      return;
+    }
     if (!video.paused) {
       video.pause();
       return;
@@ -36,7 +44,9 @@ export default function IntroVideo({
     }
   };
   const [failed, setFailed] = useState(false);
-  if (!influencer.introVideoUrl) return null;
+  if (!influencer.introVideoUrl) {
+    return null;
+  }
   const apiBase =
     providedApiBase ||
     import.meta.env.VITE_API_BASE_URL ||
@@ -63,13 +73,19 @@ export default function IntroVideo({
           preload={card ? 'none' : 'auto'}
           src={src}
           poster={card ? influencer.avatar : undefined}
-          onPlay={() => setPlaying(true)}
-          onPause={() => setPlaying(false)}
+          onPlay={() => {
+            return setPlaying(true);
+          }}
+          onPause={() => {
+            return setPlaying(false);
+          }}
           onEnded={() => {
             setPlaying(false);
             setStarted(false);
           }}
-          onError={() => setFailed(true)}
+          onError={() => {
+            return setFailed(true);
+          }}
           onVolumeChange={(e) => {
             setVolume(e.currentTarget.volume);
             setMuted(e.currentTarget.muted);
@@ -120,14 +136,20 @@ export default function IntroVideo({
             <button
               type="button"
               aria-label="Show playback control"
-              onClick={() => setPlaybackVisible((visible) => !visible)}
+              onClick={() => {
+                return setPlaybackVisible((visible) => {
+                  return !visible;
+                });
+              }}
               className="absolute inset-0 h-full w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-purple"
             />
             <button
               type="button"
               onClick={togglePlayback}
               aria-label={playing ? 'Pause video' : 'Play video'}
-              onFocus={() => setPlaybackVisible(true)}
+              onFocus={() => {
+                return setPlaybackVisible(true);
+              }}
               className={`intro-play-control absolute left-1/2 top-1/2 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-white/15 text-white shadow-lg backdrop-blur-md transition-opacity focus-visible:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${!playing || playbackVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
             >
               {playing ? (
@@ -147,8 +169,9 @@ export default function IntroVideo({
             <div
               className="intro-volume-anchor relative ml-auto flex items-center gap-2"
               onBlur={(e) => {
-                if (!e.currentTarget.contains(e.relatedTarget))
+                if (!e.currentTarget.contains(e.relatedTarget)) {
                   setVolumeOpen(false);
+                }
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
@@ -161,7 +184,11 @@ export default function IntroVideo({
                 type="button"
                 aria-label="Adjust video volume"
                 aria-expanded={volumeOpen}
-                onClick={() => setVolumeOpen((open) => !open)}
+                onClick={() => {
+                  return setVolumeOpen((open) => {
+                    return !open;
+                  });
+                }}
                 className="intro-volume-button rounded-full p-2 hover:bg-white/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
               >
                 {muted || volume === 0 ? (
@@ -183,7 +210,9 @@ export default function IntroVideo({
                     aria-valuetext={`${Math.round((muted ? 0 : volume) * 100)} percent`}
                     onChange={(e) => {
                       const video = videoRef.current;
-                      if (!video) return;
+                      if (!video) {
+                        return;
+                      }
                       const nextVolume = Number(e.target.value);
                       setVolume(nextVolume);
                       setMuted(false);

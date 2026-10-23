@@ -6,17 +6,19 @@ export default function useFeaturedInfluencers(enabled) {
   const [influencers, setInfluencers] = useState([]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      return;
+    }
     let active = true;
 
-    api.influencers
-      .getAll()
-      .then((result) => {
-        if (active) setInfluencers(result.influencers || []);
-      })
-      .catch((error) => {
-        if (active)
+    api.influencers.getAll().then((result) => {
+        if (active) {
+          setInfluencers(result.influencers || []);
+        }
+      }).catch((error) => {
+        if (active) {
           console.error('Failed to load featured influencers:', error);
+        }
       });
 
     return () => {

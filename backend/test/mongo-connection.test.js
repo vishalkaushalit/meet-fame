@@ -10,10 +10,9 @@ test('reuses an established connection and bounds idle serverless pools', async 
       driver.connection.readyState = 1;
     },
   };
-  const manager = createConnectionManager(
-    driver,
-    () => 'mongodb://database.example/test',
-  );
+  const manager = createConnectionManager(driver, () => {
+    return 'mongodb://database.example/test';
+  });
   await manager.connect();
   await manager.connect();
   assert.equal(calls.length, 1);
@@ -28,17 +27,17 @@ test('failed startup connection retries on the next request and shares concurren
     async connect(uri) {
       attempts++;
       await Promise.resolve();
-      if (attempts === 1)
+      if (attempts === 1) {
         throw Object.assign(new Error('network unavailable'), {
           name: 'MongoServerSelectionError',
         });
+      }
       driver.connection.readyState = 1;
     },
   };
-  const manager = createConnectionManager(
-    driver,
-    () => 'mongodb://database.example/test',
-  );
+  const manager = createConnectionManager(driver, () => {
+    return 'mongodb://database.example/test';
+  });
   await assert.rejects(manager.connect());
   assert.equal(manager.status().issue, 'network_unreachable');
   await Promise.all([manager.connect(), manager.connect(), manager.connect()]);
@@ -54,18 +53,21 @@ test('configuration and authentication failures are classified without exposing 
       throw Object.assign(new Error('bad auth secret-password'), { code: 18 });
     },
   };
-  const manager = createConnectionManager(
-    driver,
-    () => ' "mongodb://user:secret-password@database.example/test" ',
-  );
+  const manager = createConnectionManager(driver, () => {
+    return ' "mongodb://user:secret-password@database.example/test" ';
+  });
   await assert.rejects(manager.connect());
   assert.equal(used, 'mongodb://user:secret-password@database.example/test');
   assert.equal(manager.status().issue, 'authentication_failed');
   assert.ok(!JSON.stringify(manager.status()).includes('secret-password'));
-  const missing = createConnectionManager(driver, () => undefined);
+  const missing = createConnectionManager(driver, () => {
+    return undefined;
+  });
   await assert.rejects(missing.connect());
   assert.equal(missing.status().issue, 'missing_configuration');
-  const invalid = createConnectionManager(driver, () => 'not-a-uri');
+  const invalid = createConnectionManager(driver, () => {
+    return 'not-a-uri';
+  });
   await assert.rejects(invalid.connect());
   assert.equal(invalid.status().issue, 'invalid_configuration');
 });

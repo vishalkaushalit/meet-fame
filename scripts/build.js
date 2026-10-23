@@ -13,7 +13,9 @@ function run(cmd, cwd = rootDir) {
 }
 
 function copyDirRecursive(src, dest) {
-  if (!fs.existsSync(src)) return;
+  if (!fs.existsSync(src)) {
+    return;
+  }
   fs.mkdirSync(dest, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
 

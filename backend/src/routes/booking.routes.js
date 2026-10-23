@@ -1,6 +1,15 @@
 import express from 'express';
-import { recordTransaction, backfillTransactions, visibleTransactions } from '../transactions.js';
-import { PaymentError, paymentConfig, razorpayRequest, verifySignature } from '../razorpay.js';
+import {
+  recordTransaction,
+  backfillTransactions,
+  visibleTransactions,
+} from '../transactions.js';
+import {
+  PaymentError,
+  paymentConfig,
+  razorpayRequest,
+  verifySignature,
+} from '../razorpay.js';
 import { notifyNewBooking, ensureMeetingReminders } from '../notifications.js';
 import { requireSession } from '../middleware/session.js';
 import { bookingWindow } from '../../../shared/bookingTime.js';
@@ -20,15 +29,19 @@ router.get('/slots', (req, res) => {
   try {
     const { influencerId, date } = req.query;
     if (!influencerId || !date) {
-      return res
-        .status(400)
-        .json({ error: 'influencerId and date (YYYY-MM-DD) are required' });
+      return res.status(400).json({
+        error: 'influencerId and date (YYYY-MM-DD) are required',
+      });
     }
 
     const data = db.read();
-    const influencer = data.influencers.find((i) => i.id === influencerId);
+    const influencer = data.influencers.find((i) => {
+      return i.id === influencerId;
+    });
     if (!influencer) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
     const dayOfWeek = getDayNameFromDate(date);
@@ -39,20 +52,27 @@ router.get('/slots', (req, res) => {
     const generatedSlots = generateDaySlots(dayRanges);
 
     // Find all active bookings for this influencer on this date
-    const bookedOnDate = data.bookings.filter(
-      (b) =>
+    const bookedOnDate = data.bookings.filter((b) => {
+      return (
         b.influencerId === influencerId &&
         b.date === date &&
-        b.status !== 'cancelled',
+        b.status !== 'cancelled'
+      );
+    });
+    const bookedSlotIds = new Set(
+      bookedOnDate.map((b) => {
+        return b.slot;
+      }),
     );
-    const bookedSlotIds = new Set(bookedOnDate.map((b) => b.slot));
 
     const now = Date.now();
     const slotsWithBookingStatus = generatedSlots.map((slot) => {
       const window = bookingWindow({ date, slot: slot.slotId });
       const isBooked = bookedSlotIds.has(slot.slotId);
       const existingBooking = isBooked
-        ? bookedOnDate.find((b) => b.slot === slot.slotId)
+        ? bookedOnDate.find((b) => {
+            return b.slot === slot.slotId;
+          })
         : null;
       return {
         slot: slot.slotId,
@@ -73,14 +93,16 @@ router.get('/slots', (req, res) => {
       date,
       dayOfWeek,
       totalSlots: slotsWithBookingStatus.length,
-      availableSlotsCount: slotsWithBookingStatus.filter(
-        (s) => !s.isBooked && !s.isPast,
-      ).length,
+      availableSlotsCount: slotsWithBookingStatus.filter((s) => {
+        return !s.isBooked && !s.isPast;
+      }).length,
       slots: slotsWithBookingStatus,
     });
   } catch (err) {
     console.error('Error fetching slots:', err);
-    return res.status(500).json({ error: 'Failed to fetch slots' });
+    return res.status(500).json({
+      error: 'Failed to fetch slots',
+    });
   }
 });
 
@@ -93,10 +115,11 @@ async function createBooking(req, res) {
     const { influencerId, userId, date, slot, slotLabel, topic, meetingType } =
       req.body;
 
-    if (req.session.role !== 'user' || req.session.id !== userId)
-      return res
-        .status(403)
-        .json({ error: 'You can only book for your own account.' });
+    if (req.session.role !== 'user' || req.session.id !== userId) {
+      return res.status(403).json({
+        error: 'You can only book for your own account.',
+      });
+    }
 
     if (!influencerId || !userId || !date || !slot) {
       return res.status(400).json({
@@ -106,51 +129,82 @@ async function createBooking(req, res) {
     }
 
     const data = db.read();
-    const influencer = data.influencers.find((i) => i.id === influencerId);
+    const influencer = data.influencers.find((i) => {
+      return i.id === influencerId;
+    });
     if (!influencer) {
-      return res.status(404).json({ error: 'Influencer not found' });
+      return res.status(404).json({
+        error: 'Influencer not found',
+      });
     }
 
-    const user = data.users.find((u) => u.id === userId);
+    const user = data.users.find((u) => {
+      return u.id === userId;
+    });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({
+        error: 'User not found',
+      });
     }
 
-    const prior = data.bookings.find((b) => b.paymentId && b.paymentId === req.body.payment?.razorpay_payment_id);
+    const prior = data.bookings.find((b) => {
+      return (
+        b.paymentId && b.paymentId === req.body.payment?.razorpay_payment_id
+      );
+    });
     if (prior) {
       const proof = req.body.payment;
-      if (prior.userId !== userId || prior.paymentOrderId !== proof.razorpay_order_id ||
-          !verifySignature(proof.razorpay_order_id, proof.razorpay_payment_id, proof.razorpay_signature, paymentConfig().secret))
-        return res.status(403).json({ error: 'Invalid payment proof.' });
+      if (
+        prior.userId !== userId ||
+        prior.paymentOrderId !== proof.razorpay_order_id ||
+        !verifySignature(
+          proof.razorpay_order_id,
+          proof.razorpay_payment_id,
+          proof.razorpay_signature,
+          paymentConfig().secret,
+        )
+      ) {
+        return res.status(403).json({
+          error: 'Invalid payment proof.',
+        });
+      }
       return res.json({ success: true, booking: prior });
     }
 
     const window = bookingWindow({ date, slot });
-    if (!window)
-      return res
-        .status(400)
-        .json({ error: 'Invalid booking date or time slot.' });
-    if (window.start <= Date.now())
+    if (!window) {
+      return res.status(400).json({
+        error: 'Invalid booking date or time slot.',
+      });
+    }
+    if (window.start <= Date.now()) {
       return res.status(409).json({
         error:
           'This time slot has already started. Please select a future slot (IST).',
       });
+    }
     const configuredSlots = generateDaySlots(
       influencer.availability?.[getDayNameFromDate(date)] || [],
     );
-    if (!configuredSlots.some((item) => item.slotId === slot))
-      return res
-        .status(400)
-        .json({ error: 'This slot is not in the influencer schedule.' });
+    if (
+      !configuredSlots.some((item) => {
+        return item.slotId === slot;
+      })
+    ) {
+      return res.status(400).json({
+        error: 'This slot is not in the influencer schedule.',
+      });
+    }
 
     // Double check slot availability on this date
-    const existingBooking = data.bookings.find(
-      (b) =>
+    const existingBooking = data.bookings.find((b) => {
+      return (
         b.influencerId === influencerId &&
         b.date === date &&
         b.slot === slot &&
-        b.status !== 'cancelled',
-    );
+        b.status !== 'cancelled'
+      );
+    });
 
     if (existingBooking && !req.body.payment) {
       return res.status(409).json({
@@ -165,52 +219,135 @@ async function createBooking(req, res) {
     let amount = req.createPaymentOrder
       ? Math.round(Number(influencer.hourlyRate || 150) * 100)
       : 1; // Verification uses the persisted provider order quote below.
-    if (!Number.isSafeInteger(amount) || amount <= 0)
-      return res.status(400).json({ error: 'Invalid session price.' });
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+      return res.status(400).json({
+        error: 'Invalid session price.',
+      });
+    }
     if (req.createPaymentOrder) {
       const order = await razorpayRequest('orders', {
-        amount, currency,
-        notes: { userId, influencerId, date, slot, basePrice: String(influencer.hourlyRate || 150) },
+        amount,
+        currency,
+        notes: {
+          userId,
+          influencerId,
+          date,
+          slot,
+          basePrice: String(influencer.hourlyRate || 150),
+        },
       });
       const ledger = db.read();
       recordTransaction(ledger, {
-        orderId: order.id, userId, userName: user.name,
-        influencerId, influencerName: influencer.name, date, slot,
-        amount, currency, status: 'pending',
+        orderId: order.id,
+        userId,
+        userName: user.name,
+        influencerId,
+        influencerName: influencer.name,
+        date,
+        slot,
+        amount,
+        currency,
+        status: 'pending',
       });
-      if (!db.write(ledger)) return res.status(500).json({ error: 'Unable to save payment order. Please retry.' });
+      if (!db.write(ledger)) {
+        return res.status(500).json({
+          error: 'Unable to save payment order. Please retry.',
+        });
+      }
       return res.json({ orderId: order.id, key, amount, currency });
     }
     const payment = req.body.payment || {};
-    if (!/^order_[a-zA-Z0-9]+$/.test(payment.razorpay_order_id || '') ||
-        !/^pay_[a-zA-Z0-9]+$/.test(payment.razorpay_payment_id || '') ||
-        !verifySignature(payment.razorpay_order_id, payment.razorpay_payment_id, payment.razorpay_signature, secret))
-      return res.status(400).json({ error: 'A verified Razorpay payment is required.' });
+    if (
+      !/^order_[a-zA-Z0-9]+$/.test(payment.razorpay_order_id || '') ||
+      !/^pay_[a-zA-Z0-9]+$/.test(payment.razorpay_payment_id || '') ||
+      !verifySignature(
+        payment.razorpay_order_id,
+        payment.razorpay_payment_id,
+        payment.razorpay_signature,
+        secret,
+      )
+    ) {
+      return res.status(400).json({
+        error: 'A verified Razorpay payment is required.',
+      });
+    }
     const order = await razorpayRequest(`orders/${payment.razorpay_order_id}`);
     amount = order.amount;
     // Previously issued INR orders can still complete verification.
     currency = order.currency;
-    if (!Number.isSafeInteger(amount) || amount <= 0 || !['USD', 'INR'].includes(currency) ||
-        Object.entries({ userId, influencerId, date, slot }).some(([key, value]) => order.notes?.[key] !== value))
-      return res.status(400).json({ error: 'Payment does not match this booking.' });
-    const paid = await razorpayRequest(`payments/${payment.razorpay_payment_id}`);
-    if (paid.order_id !== order.id || paid.amount !== amount || paid.currency !== currency || paid.status !== 'captured')
-      return res.status(409).json({ error: 'Payment is not captured yet. Please retry verification.' });
+    if (
+      !Number.isSafeInteger(amount) ||
+      amount <= 0 ||
+      !['USD', 'INR'].includes(currency) ||
+      Object.entries({ userId, influencerId, date, slot }).some(
+        ([key, value]) => {
+          return order.notes?.[key] !== value;
+        },
+      )
+    ) {
+      return res.status(400).json({
+        error: 'Payment does not match this booking.',
+      });
+    }
+    const paid = await razorpayRequest(
+      `payments/${payment.razorpay_payment_id}`,
+    );
+    if (
+      paid.order_id !== order.id ||
+      paid.amount !== amount ||
+      paid.currency !== currency ||
+      paid.status !== 'captured'
+    ) {
+      return res.status(409).json({
+        error: 'Payment is not captured yet. Please retry verification.',
+      });
+    }
     // MongoDB commit also enforces slot uniqueness against concurrent requests.
     const current = db.read();
-    const completed = current.bookings.find((b) => b.paymentId === paid.id);
-    if (completed) return res.json({ success: true, booking: completed });
-    if (current.bookings.some((b) => b.influencerId === influencerId && b.date === date && b.slot === slot && b.status !== 'cancelled')) {
-      const refund = await razorpayRequest(`payments/${paid.id}/refund`, { amount });
+    const completed = current.bookings.find((b) => {
+      return b.paymentId === paid.id;
+    });
+    if (completed) {
+      return res.json({ success: true, booking: completed });
+    }
+    if (
+      current.bookings.some((b) => {
+        return (
+          b.influencerId === influencerId &&
+          b.date === date &&
+          b.slot === slot &&
+          b.status !== 'cancelled'
+        );
+      })
+    ) {
+      const refund = await razorpayRequest(`payments/${paid.id}/refund`, {
+        amount,
+      });
       recordTransaction(current, {
-        orderId: order.id, paymentId: paid.id, refundId: refund.id,
-        userId, userName: user.name, influencerId, influencerName: influencer.name,
-        date, slot, amount, currency,
+        orderId: order.id,
+        paymentId: paid.id,
+        refundId: refund.id,
+        userId,
+        userName: user.name,
+        influencerId,
+        influencerName: influencer.name,
+        date,
+        slot,
+        amount,
+        currency,
         status: refund.status === 'processed' ? 'refunded' : 'refund_pending',
       });
-      if (!db.write(current)) return res.status(500).json({ error: 'Refund requested but unable to save its record. Please contact support.' });
+      if (!db.write(current)) {
+        return res.status(500).json({
+          error:
+            'Refund requested but unable to save its record. Please contact support.',
+        });
+      }
       req.persistDatabaseOnError = true; // Save the refund ledger even though booking conflicts.
-      return res.status(409).json({ error: 'This slot was just booked. Your payment refund has been requested. Please choose another slot.' });
+      return res.status(409).json({
+        error:
+          'This slot was just booked. Your payment refund has been requested. Please choose another slot.',
+      });
     }
     Object.assign(data, current);
 
@@ -241,9 +378,18 @@ async function createBooking(req, res) {
 
     data.bookings.push(newBooking);
     recordTransaction(data, {
-      orderId: order.id, paymentId: paid.id, bookingId: newBooking.id,
-      userId, userName: user.name, influencerId, influencerName: influencer.name,
-      date, slot, amount, currency, status: 'paid',
+      orderId: order.id,
+      paymentId: paid.id,
+      bookingId: newBooking.id,
+      userId,
+      userName: user.name,
+      influencerId,
+      influencerName: influencer.name,
+      date,
+      slot,
+      amount,
+      currency,
+      status: 'paid',
     });
     notifyNewBooking(data, newBooking);
     ensureMeetingReminders(data);
@@ -263,8 +409,11 @@ async function createBooking(req, res) {
       timestamp: new Date().toISOString(),
     });
 
-    if (!db.write(data))
-      return res.status(500).json({ error: 'Unable to save booking.' });
+    if (!db.write(data)) {
+      return res.status(500).json({
+        error: 'Unable to save booking.',
+      });
+    }
 
     return res.status(201).json({
       success: true,
@@ -272,10 +421,19 @@ async function createBooking(req, res) {
       booking: newBooking,
     });
   } catch (err) {
-    if (err instanceof PaymentError)
-      return res.status(err.status).json({ error: err.message, code: err.code });
-    console.error('Error creating booking:', { name: err.name, code: err.code });
-    return res.status(500).json({ error: 'Failed to create booking' });
+    if (err instanceof PaymentError) {
+      return res.status(err.status).json({
+        error: err.message,
+        code: err.code,
+      });
+    }
+    console.error('Error creating booking:', {
+      name: err.name,
+      code: err.code,
+    });
+    return res.status(500).json({
+      error: 'Failed to create booking',
+    });
   }
 }
 
@@ -286,11 +444,17 @@ router.post('/payment-order', requireSession, (req, res) => {
 router.post('/', requireSession, createBooking);
 
 router.get('/transactions', requireSession, (req, res) => {
-  if (!['admin', 'user'].includes(req.session.role))
-    return res.status(403).json({ error: 'Billing is available to users and administrators.' });
+  if (!['admin', 'user'].includes(req.session.role)) {
+    return res.status(403).json({
+      error: 'Billing is available to users and administrators.',
+    });
+  }
   const data = db.read();
-  if (backfillTransactions(data) && !db.write(data))
-    return res.status(500).json({ error: 'Unable to load transaction history.' });
+  if (backfillTransactions(data) && !db.write(data)) {
+    return res.status(500).json({
+      error: 'Unable to load transaction history.',
+    });
+  }
   return res.json({ transactions: visibleTransactions(data, req.session) });
 });
 
@@ -304,23 +468,33 @@ router.get('/my-bookings', (req, res) => {
     let bookings = [];
 
     if (userId) {
-      bookings = data.bookings.filter((b) => b.userId === userId);
+      bookings = data.bookings.filter((b) => {
+        return b.userId === userId;
+      });
     } else if (influencerId) {
-      bookings = data.bookings.filter((b) => b.influencerId === influencerId);
+      bookings = data.bookings.filter((b) => {
+        return b.influencerId === influencerId;
+      });
     } else {
-      return res
-        .status(400)
-        .json({ error: 'Please provide either userId or influencerId' });
+      return res.status(400).json({
+        error: 'Please provide either userId or influencerId',
+      });
     }
 
     // My Bookings in both portals includes only verified paid sessions.
-    bookings = bookings.filter((booking) => booking.paymentStatus === 'paid');
+    bookings = bookings.filter((booking) => {
+      return booking.paymentStatus === 'paid';
+    });
 
     // Sort newest date first
-    bookings.sort((a, b) => new Date(b.date) - new Date(a.date));
+    bookings.sort((a, b) => {
+      return new Date(b.date) - new Date(a.date);
+    });
     return res.json({ bookings });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch bookings' });
+    return res.status(500).json({
+      error: 'Failed to fetch bookings',
+    });
   }
 });
 
@@ -331,9 +505,13 @@ router.put('/:id/status', requireSession, (req, res) => {
   try {
     const { status } = req.body;
     const data = db.read();
-    const idx = data.bookings.findIndex((b) => b.id === req.params.id);
+    const idx = data.bookings.findIndex((b) => {
+      return b.id === req.params.id;
+    });
     if (idx === -1) {
-      return res.status(404).json({ error: 'Booking not found' });
+      return res.status(404).json({
+        error: 'Booking not found',
+      });
     }
 
     const booking = data.bookings[idx];
@@ -344,10 +522,16 @@ router.put('/:id/status', requireSession, (req, res) => {
         req.session.role === 'influencer' &&
         req.session.id === booking.influencerId
       )
-    )
-      return res.status(403).json({ error: 'You cannot update this booking.' });
-    if (!['confirmed', 'completed', 'cancelled'].includes(status))
-      return res.status(400).json({ error: 'Invalid booking status.' });
+    ) {
+      return res.status(403).json({
+        error: 'You cannot update this booking.',
+      });
+    }
+    if (!['confirmed', 'completed', 'cancelled'].includes(status)) {
+      return res.status(400).json({
+        error: 'Invalid booking status.',
+      });
+    }
     if (booking.status !== status) {
       booking.status = status;
     }
@@ -355,7 +539,9 @@ router.put('/:id/status', requireSession, (req, res) => {
 
     return res.json({ success: true, booking: data.bookings[idx] });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to update booking status' });
+    return res.status(500).json({
+      error: 'Failed to update booking status',
+    });
   }
 });
 

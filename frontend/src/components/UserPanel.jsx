@@ -20,10 +20,13 @@ export default function UserPanel({
   const [billingHeaderTarget, setBillingHeaderTarget] = useState(null);
   const [activeTab, setActiveTab] = useState('browse'); // 'browse' | 'my-bookings'
   useEffect(() => {
-    const showBookings = () => setActiveTab('my-bookings');
+    const showBookings = () => {
+      return setActiveTab('my-bookings');
+    };
     window.addEventListener('meetfame-show-bookings', showBookings);
-    return () =>
-      window.removeEventListener('meetfame-show-bookings', showBookings);
+    return () => {
+      return window.removeEventListener('meetfame-show-bookings', showBookings);
+    };
   }, []);
   const [influencers, setInfluencers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -49,11 +52,17 @@ export default function UserPanel({
           selectedCategory,
           debouncedSearchQuery,
         );
-        if (active) setInfluencers(res.influencers || []);
+        if (active) {
+          setInfluencers(res.influencers || []);
+        }
       } catch (err) {
-        if (active) console.error('Failed to fetch influencers:', err);
+        if (active) {
+          console.error('Failed to fetch influencers:', err);
+        }
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
     loadInfluencers();
@@ -113,7 +122,9 @@ export default function UserPanel({
             <button
               data-app-tab="true"
               data-active={activeTab === 'browse'}
-              onClick={() => setActiveTab('browse')}
+              onClick={() => {
+                return setActiveTab('browse');
+              }}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                 activeTab === 'browse'
                   ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
@@ -127,7 +138,9 @@ export default function UserPanel({
             <button
               data-app-tab="true"
               data-active={activeTab === 'my-bookings'}
-              onClick={() => setActiveTab('my-bookings')}
+              onClick={() => {
+                return setActiveTab('my-bookings');
+              }}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                 activeTab === 'my-bookings'
                   ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
@@ -140,7 +153,9 @@ export default function UserPanel({
             <button
               data-app-tab="true"
               data-active={activeTab === 'billing'}
-              onClick={() => setActiveTab('billing')}
+              onClick={() => {
+                return setActiveTab('billing');
+              }}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${activeTab === 'billing' ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
             >
               <DollarSign className="w-4 h-4" />
@@ -173,7 +188,9 @@ export default function UserPanel({
                     type="text"
                     aria-label="Search influencers"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {
+                      return setSearchQuery(e.target.value);
+                    }}
                     placeholder="Search by name, expertise, or keyword..."
                     className="w-full bg-slate-900 border border-slate-700/80 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-purple"
                   />
@@ -183,13 +200,17 @@ export default function UserPanel({
                 <FilterSelect
                   label="Filter by category"
                   value={selectedCategory}
-                  onChange={(event) => setSelectedCategory(event.target.value)}
+                  onChange={(event) => {
+                    return setSelectedCategory(event.target.value);
+                  }}
                 >
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category === 'All' ? 'All categories' : category}
-                    </option>
-                  ))}
+                  {categories.map((category) => {
+                    return (
+                      <option key={category} value={category}>
+                        {category === 'All' ? 'All categories' : category}
+                      </option>
+                    );
+                  })}
                 </FilterSelect>
               </div>
             </div>

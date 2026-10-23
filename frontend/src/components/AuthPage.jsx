@@ -54,7 +54,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
   ];
   const stepHeading = useRef(null);
   useEffect(() => {
-    if (isInfluencerSignup) stepHeading.current?.focus();
+    if (isInfluencerSignup) {
+      stepHeading.current?.focus();
+    }
   }, [step, isInfluencerSignup]);
 
   // Form states
@@ -87,7 +89,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading) {
+      return;
+    }
     setError('');
     if (isRegister) {
       const allErrors = registrationErrors(
@@ -108,18 +112,20 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
       const errors =
         isInfluencerSignup && step < 2
           ? Object.fromEntries(
-              Object.entries(allErrors).filter(
-                ([field]) => registrationStep(field) === step,
-              ),
+              Object.entries(allErrors).filter(([field]) => {
+                return registrationStep(field) === step;
+              }),
             )
           : allErrors;
       setFieldErrors(errors);
       const first = Object.keys(errors)[0];
       if (first) {
-        if (isInfluencerSignup) setStep(registrationStep(first));
-        requestAnimationFrame(() =>
-          document.getElementById(`auth-${first}`)?.focus(),
-        );
+        if (isInfluencerSignup) {
+          setStep(registrationStep(first));
+        }
+        requestAnimationFrame(() => {
+          return document.getElementById(`auth-${first}`)?.focus();
+        });
         return;
       }
       if (isInfluencerSignup && step < 2) {
@@ -173,8 +179,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
       setError(err.message || err.error || 'Authentication failed');
       if (err.fields) {
         setFieldErrors(err.fields);
-        if (isInfluencerSignup)
+        if (isInfluencerSignup) {
           setStep(registrationStep(Object.keys(err.fields)[0]));
+        }
       }
     } finally {
       setLoading(false);
@@ -278,16 +285,18 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
           {isInfluencerSignup && (
             <>
               <ol className="signup-steps" aria-label="Registration progress">
-                {steps.map((label, index) => (
-                  <li
-                    key={label}
-                    className={index <= step ? 'is-active' : ''}
-                    aria-current={index === step ? 'step' : undefined}
-                  >
-                    <span>{index + 1}</span>
-                    <strong>{label}</strong>
-                  </li>
-                ))}
+                {steps.map((label, index) => {
+                  return (
+                    <li
+                      key={label}
+                      className={index <= step ? 'is-active' : ''}
+                      aria-current={index === step ? 'step' : undefined}
+                    >
+                      <span>{index + 1}</span>
+                      <strong>{label}</strong>
+                    </li>
+                  );
+                })}
               </ol>
               <h2 className="sr-only" ref={stepHeading} tabIndex={-1}>
                 Step {step + 1} of {steps.length}: {steps[step]}
@@ -336,7 +345,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         fieldErrors.name ? 'auth-name-error' : undefined
                       }
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        return setName(e.target.value);
+                      }}
                       placeholder="Enter your full name"
                       className="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                     />
@@ -373,7 +384,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       fieldErrors.email ? 'auth-email-error' : undefined
                     }
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => {
+                      return setEmail(e.target.value);
+                    }}
                     placeholder="Enter your email address"
                     className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   />
@@ -442,13 +455,19 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                       fieldErrors.password ? 'auth-password-error' : undefined
                     }
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => {
+                      return setPassword(e.target.value);
+                    }}
                     placeholder="Enter your password"
                     className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-10 pr-12 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword((visible) => !visible)}
+                    onClick={() => {
+                      return setShowPassword((visible) => {
+                        return !visible;
+                      });
+                    }}
                     aria-label={
                       showPassword ? 'Hide password' : 'Show password'
                     }
@@ -516,14 +535,18 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                             : undefined
                         }
                         value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                        onChange={(e) => {
+                          return setCategory(e.target.value);
+                        }}
                         className="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                       >
-                        {categories.map((c) => (
-                          <option key={c} value={c} className="bg-slate-900">
-                            {c}
-                          </option>
-                        ))}
+                        {categories.map((c) => {
+                          return (
+                            <option key={c} value={c} className="bg-slate-900">
+                              {c}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
 
@@ -560,7 +583,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                               : undefined
                           }
                           value={hourlyRate}
-                          onChange={(e) => setHourlyRate(e.target.value)}
+                          onChange={(e) => {
+                            return setHourlyRate(e.target.value);
+                          }}
                           className="w-full bg-slate-950/70 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                         />
                       </div>
@@ -595,7 +620,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                           : undefined
                       }
                       value={specialization}
-                      onChange={(e) => setSpecialization(e.target.value)}
+                      onChange={(e) => {
+                        return setSpecialization(e.target.value);
+                      }}
                       placeholder="Enter your area of expertise"
                       className="w-full bg-slate-950/70 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-purple"
                     />
@@ -674,9 +701,10 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                                 !Number.isFinite(duration) ||
                                 duration <= 0 ||
                                 duration > 15
-                              )
+                              ) {
                                 issue =
                                   'Introduction video must be 15 seconds or shorter.';
+                              }
                             } catch {
                               issue =
                                 'Unable to read this video. Choose a valid MP4 or WebM.';
@@ -684,12 +712,18 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                               URL.revokeObjectURL(url);
                             }
                           }
-                          if (input.files?.[0] !== file) return;
-                          if (!issue) setIntroVideoFile(file);
-                          setFieldErrors((current) => ({
-                            ...current,
-                            introVideoFile: issue,
-                          }));
+                          if (input.files?.[0] !== file) {
+                            return;
+                          }
+                          if (!issue) {
+                            setIntroVideoFile(file);
+                          }
+                          setFieldErrors((current) => {
+                            return {
+                              ...current,
+                              introVideoFile: issue,
+                            };
+                          });
                         }}
                       />
                     </label>
@@ -743,7 +777,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                             : undefined
                         }
                         value={certificateTitle}
-                        onChange={(e) => setCertificateTitle(e.target.value)}
+                        onChange={(e) => {
+                          return setCertificateTitle(e.target.value);
+                        }}
                         placeholder="Enter your certificate name"
                         className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white mb-2 focus:outline-none focus:border-brand-purple"
                       />
@@ -769,12 +805,16 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                             onChange={(e) => {
                               const file = e.target.files[0] || null;
                               const issue = certificateError(file);
-                              setFieldErrors((prev) => ({
-                                ...prev,
-                                certificateFile: issue,
-                              }));
+                              setFieldErrors((prev) => {
+                                return {
+                                  ...prev,
+                                  certificateFile: issue,
+                                };
+                              });
                               setCertificateFile(issue ? null : file);
-                              if (issue) e.target.value = '';
+                              if (issue) {
+                                e.target.value = '';
+                              }
                             }}
                           />
                         </label>
@@ -790,7 +830,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
                         {certificateFile && (
                           <button
                             type="button"
-                            onClick={() => setCertificateFile(null)}
+                            onClick={() => {
+                              return setCertificateFile(null);
+                            }}
                             className="text-xs text-rose-400 hover:underline"
                           >
                             Remove
@@ -878,7 +920,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
             <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
                 type="button"
-                onClick={() => handleDemoLogin('alex@example.com', 'user')}
+                onClick={() => {
+                  return handleDemoLogin('alex@example.com', 'user');
+                }}
                 className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
               >
                 <div className="font-semibold text-white text-[11px]">
@@ -891,9 +935,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
 
               <button
                 type="button"
-                onClick={() =>
-                  handleDemoLogin('marcus@techcreator.io', 'influencer')
-                }
+                onClick={() => {
+                  return handleDemoLogin('marcus@techcreator.io', 'influencer');
+                }}
                 className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
               >
                 <div className="font-semibold text-white text-[11px]">
@@ -906,9 +950,9 @@ export default function AuthPage({ role = 'user', tab = 'login' }) {
 
               <button
                 type="button"
-                onClick={() =>
-                  handleDemoLogin('kavita@angelvc.in', 'influencer')
-                }
+                onClick={() => {
+                  return handleDemoLogin('kavita@angelvc.in', 'influencer');
+                }}
                 className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-left border border-slate-800 transition-colors"
                 title="Click to see Under Review Popup"
               >

@@ -10,7 +10,7 @@ function randomFor(seed) {
   };
 }
 function SocialIcon({ type }) {
-  if (type === 'instagram')
+  if (type === 'instagram') {
     return (
       <>
         <rect x="3" y="3" width="18" height="18" rx="5" />
@@ -18,14 +18,16 @@ function SocialIcon({ type }) {
         <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
       </>
     );
-  if (type === 'youtube')
+  }
+  if (type === 'youtube') {
     return (
       <>
         <rect x="2" y="5" width="20" height="14" rx="4" />
         <path d="m10 9 6 3-6 3Z" fill="currentColor" stroke="none" />
       </>
     );
-  if (type === 'facebook')
+  }
+  if (type === 'facebook') {
     return (
       <path
         d="M14 22v-9h3l.5-4H14V7c0-1 .5-2 2-2h2V1h-3c-4 0-6 2-6 6v2H6v4h3v9"
@@ -33,6 +35,7 @@ function SocialIcon({ type }) {
         stroke="none"
       />
     );
+  }
   return <path d="M14 3v12a4 4 0 1 1-4-4M14 3c0 4 3 6 6 6" strokeWidth="3" />;
 }
 export default function AuthSocialBackground({ page = false }) {
@@ -41,26 +44,31 @@ export default function AuthSocialBackground({ page = false }) {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   useEffect(() => {
     const element = layer.current;
-    if (!element) return;
+    if (!element) {
+      return;
+    }
     const observer = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
       const height = Math.round(entry.contentRect.height);
-      setDimensions((previous) =>
-        previous.width === width && previous.height === height
+      setDimensions((previous) => {
+        return previous.width === width && previous.height === height
           ? previous
-          : { width, height },
-      );
+          : { width, height };
+      });
     });
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      return observer.disconnect();
+    };
   }, []);
   const placements = useMemo(() => {
     const { width, height } = dimensions;
-    if (!width || !height) return [];
-    const seed = [...id].reduce(
-      (value, letter) => Math.imul(value, 31) + letter.charCodeAt(0),
-      173,
-    );
+    if (!width || !height) {
+      return [];
+    }
+    const seed = [...id].reduce((value, letter) => {
+      return Math.imul(value, 31) + letter.charCodeAt(0);
+    }, 173);
     const random = randomFor(seed);
     const columns = Math.max(1, Math.ceil(width / 250));
     const rows = Math.max(1, Math.ceil(height / 240));
@@ -97,32 +105,34 @@ export default function AuthSocialBackground({ page = false }) {
       aria-hidden="true"
     >
       {placements.map(
-        ({ type, left, top, size, rotation, delay, duration }, index) => (
-          <span
-            key={index}
-            className={`auth-social-icon auth-social-${type}`}
-            style={{
-              left,
-              top,
-              width: size,
-              height: size,
-              '--social-rotation': rotation,
-              animationDelay: delay,
-              animationDuration: duration,
-            }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+        ({ type, left, top, size, rotation, delay, duration }, index) => {
+          return (
+            <span
+              key={index}
+              className={`auth-social-icon auth-social-${type}`}
+              style={{
+                left,
+                top,
+                width: size,
+                height: size,
+                '--social-rotation': rotation,
+                animationDelay: delay,
+                animationDuration: duration,
+              }}
             >
-              <SocialIcon type={type} />
-            </svg>
-          </span>
-        ),
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <SocialIcon type={type} />
+              </svg>
+            </span>
+          );
+        },
       )}
     </div>
   );

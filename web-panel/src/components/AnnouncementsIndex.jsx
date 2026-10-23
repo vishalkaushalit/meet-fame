@@ -22,55 +22,67 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    adminApi.announcements
-      .getAll()
-      .then((result) => {
+    adminApi.announcements.getAll().then((result) => {
         if (active) {
           setItems(result.announcements || []);
           setError('');
         }
-      })
-      .catch((err) => {
-        if (active) setError(err.message);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+      }).catch((err) => {
+        if (active) {
+          setError(err.message);
+        }
+      }).finally(() => {
+        if (active) {
+          setLoading(false);
+        }
       });
     return () => {
       active = false;
     };
   }, [revision, detailId, edit]);
   const pagination = usePagination(
-    items.filter((item) =>
-      `${item.title} ${item.message}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-    ),
+    items.filter((item) => {
+      return `${item.title} ${item.message}`.toLowerCase().includes(search.toLowerCase());
+    }),
     search,
   );
-  const selected = items.find((item) => item.id === detailId);
-  const status = (item) =>
-    item.expiresAt && Date.now() >= Date.parse(item.expiresAt)
+  const selected = items.find((item) => {
+    return item.id === detailId;
+  });
+  const status = (item) => {
+    return item.expiresAt && Date.now() >= Date.parse(item.expiresAt)
       ? 'expired'
       : item.activeFrom && Date.now() < Date.parse(item.activeFrom)
         ? 'scheduled'
         : 'active';
-  const audience = (value) =>
-    value === 'all'
+  };
+  const audience = (value) => {
+    return value === 'all'
       ? 'Users and influencers'
       : value === 'user'
         ? 'Users'
         : 'Influencers';
+  };
   const remove = async (item) => {
-    if (deleting) return;
+    if (deleting) {
+      return;
+    }
     setError('');
     setDeleting(item.id);
     try {
       await adminApi.announcements.remove(item.id);
       setDeleteTarget(null);
-      setItems((current) => current.filter((entry) => entry.id !== item.id));
-      setRevision((value) => value + 1);
-      if (detailId === item.id) navigateAdmin('announcements');
+      setItems((current) => {
+        return current.filter((entry) => {
+          return entry.id !== item.id;
+        });
+      });
+      setRevision((value) => {
+        return value + 1;
+      });
+      if (detailId === item.id) {
+        navigateAdmin('announcements');
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -113,7 +125,9 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
           type="button"
           className="dashboard-button announcement-confirm-delete"
           disabled={Boolean(deleting)}
-          onClick={() => remove(deleteTarget)}
+          onClick={() => {
+            return remove(deleteTarget);
+          }}
         >
           <Trash2 size={16} aria-hidden="true" />
           {deleting ? 'Deleting…' : 'Confirm delete'}
@@ -121,12 +135,16 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
       </div>
     </div>
   );
-  if (loading) return <p role="status">Loading announcements…</p>;
-  if (detailId && !selected)
+  if (loading) {
+    return <p role="status">Loading announcements…</p>;
+  }
+  if (detailId && !selected) {
     return <p role="alert">{error || 'Announcement not found.'}</p>;
-  if (selected && edit)
+  }
+  if (selected && edit) {
     return <AnnouncementsView key={selected.id} announcement={selected} />;
-  if (selected)
+  }
+  if (selected) {
     return (
       <section className="dashboard-card p-6 space-y-5">
         <div className="flex items-center justify-between gap-4">
@@ -137,11 +155,11 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
               className="user-view-button"
               title="Edit announcement"
               aria-label="Edit announcement"
-              onClick={() =>
-                navigateAdminRecord('announcements', selected.id, {
+              onClick={() => {
+                return navigateAdminRecord('announcements', selected.id, {
                   edit: true,
-                })
-              }
+                });
+              }}
             >
               <Pencil size={18} />
             </button>
@@ -151,7 +169,9 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
               aria-label="Delete announcement"
               title="Delete announcement"
               disabled={deleting === selected.id}
-              onClick={() => setDeleteTarget(selected)}
+              onClick={() => {
+                return setDeleteTarget(selected);
+              }}
             >
               <Trash2 size={18} aria-hidden="true" />
             </button>
@@ -177,16 +197,19 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
               'Updated',
               formatDateTime(selected.updatedAt || selected.createdAt),
             ],
-          ].map(([label, value]) => (
-            <div key={label}>
-              <dt>{label}</dt>
-              <dd>{value}</dd>
-            </div>
-          ))}
+          ].map(([label, value]) => {
+            return (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            );
+          })}
         </dl>
         <p className="whitespace-pre-wrap break-words">{selected.message}</p>
       </section>
     );
+  }
   return (
     <div className="space-y-6">
       {deleteConfirmation}
@@ -197,12 +220,16 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
             aria-label="Search announcements"
             placeholder="Search announcements..."
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) => {
+              return setSearch(event.target.value);
+            }}
           />
         </div>
         <button
           className="dashboard-button button-primary"
-          onClick={() => navigateAdminAction('add-announcement')}
+          onClick={() => {
+            return navigateAdminAction('add-announcement');
+          }}
         >
           Add announcement
         </button>
@@ -234,59 +261,63 @@ export default function AnnouncementsIndex({ detailId, edit = false }) {
                 'Expiry',
                 'Status',
                 'Actions',
-              ].map((label) => (
-                <th key={label}>{label}</th>
-              ))}
+              ].map((label) => {
+                return <th key={label}>{label}</th>;
+              })}
             </tr>
           </thead>
           <tbody>
-            {pagination.items.map((item, index) => (
-              <tr key={item.id}>
-                <td>{pagination.start + index}</td>
-                <td>{item.title}</td>
-                <td>{audience(item.audience)}</td>
-                <td>{formatDate(item.createdAt)}</td>
-                <td>{formatDate(item.activeFrom || item.createdAt)}</td>
-                <td>
-                  {item.expiresAt ? formatDate(item.expiresAt) : 'No expiry'}
-                </td>
-                <td>
-                  <StatusBadge status={status(item)} />
-                </td>
-                <td>
-                  <div className="account-icon-actions announcement-actions">
-                    <button
-                      className="user-view-button"
-                      aria-label={`View ${item.title}`}
-                      onClick={() =>
-                        navigateAdminRecord('announcements', item.id)
-                      }
-                    >
-                      <Eye size={16} />
-                    </button>
-                    <button
-                      className="user-view-button"
-                      aria-label={`Edit ${item.title}`}
-                      onClick={() =>
-                        navigateAdminRecord('announcements', item.id, {
-                          edit: true,
-                        })
-                      }
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      className="announcement-delete-action"
-                      disabled={deleting === item.id}
-                      aria-label={`Delete ${item.title}`}
-                      onClick={() => setDeleteTarget(item)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {pagination.items.map((item, index) => {
+              return (
+                <tr key={item.id}>
+                  <td>{pagination.start + index}</td>
+                  <td>{item.title}</td>
+                  <td>{audience(item.audience)}</td>
+                  <td>{formatDate(item.createdAt)}</td>
+                  <td>{formatDate(item.activeFrom || item.createdAt)}</td>
+                  <td>
+                    {item.expiresAt ? formatDate(item.expiresAt) : 'No expiry'}
+                  </td>
+                  <td>
+                    <StatusBadge status={status(item)} />
+                  </td>
+                  <td>
+                    <div className="account-icon-actions announcement-actions">
+                      <button
+                        className="user-view-button"
+                        aria-label={`View ${item.title}`}
+                        onClick={() => {
+                          return navigateAdminRecord('announcements', item.id);
+                        }}
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button
+                        className="user-view-button"
+                        aria-label={`Edit ${item.title}`}
+                        onClick={() => {
+                          return navigateAdminRecord('announcements', item.id, {
+                            edit: true,
+                          });
+                        }}
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        className="announcement-delete-action"
+                        disabled={deleting === item.id}
+                        aria-label={`Delete ${item.title}`}
+                        onClick={() => {
+                          return setDeleteTarget(item);
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
             {!pagination.total && (
               <tr>
                 <td colSpan={8}>No announcements found.</td>

@@ -4,9 +4,13 @@ import { getTheme, setTheme } from '@shared/theme.js';
 export default function ThemeToggle() {
   const [theme, updateTheme] = useState(getTheme);
   useEffect(() => {
-    const sync = () => updateTheme(getTheme());
+    const sync = () => {
+      return updateTheme(getTheme());
+    };
     window.addEventListener('meetfame-theme-change', sync);
-    return () => window.removeEventListener('meetfame-theme-change', sync);
+    return () => {
+      return window.removeEventListener('meetfame-theme-change', sync);
+    };
   }, []);
   const label = `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`;
   return (
@@ -15,7 +19,9 @@ export default function ThemeToggle() {
       className="theme-toggle"
       title={label}
       aria-label={label}
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => {
+        return setTheme(theme === 'dark' ? 'light' : 'dark');
+      }}
     >
       {theme === 'dark' ? <Sun size={19} /> : <Moon size={19} />}
     </button>

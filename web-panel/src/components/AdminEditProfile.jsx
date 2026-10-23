@@ -12,7 +12,9 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
   const [error, setError] = useState('');
   const submit = async (event) => {
     event.preventDefault();
-    if (saving) return;
+    if (saving) {
+      return;
+    }
     if (phoneError(phone)) {
       setError(phoneError(phone));
       return;
@@ -49,7 +51,9 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             maxLength={100}
             value={name}
             disabled={saving}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              return setName(event.target.value);
+            }}
             className={field}
           />
         </label>
@@ -63,7 +67,9 @@ export default function AdminEditProfile({ admin, onClose, onSaved }) {
             maxLength={254}
             value={email}
             disabled={saving}
-            onChange={(event) => setEmail(event.target.value)}
+            onChange={(event) => {
+              return setEmail(event.target.value);
+            }}
             className={field}
           />
         </label>

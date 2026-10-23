@@ -1,19 +1,36 @@
 import { randomUUID } from 'node:crypto';
 import { bookingWindow } from '../../shared/bookingTime.js';
 export function activeAnnouncements(data, session, now = Date.now()) {
-  if (!['user', 'influencer'].includes(session.role)) return [];
+  if (!['user', 'influencer'].includes(session.role)) {
+    return [];
+  }
   return (data.announcements || [])
-    .filter(item => (item.audience === 'all' || item.audience === session.role)
-      && Date.parse(item.activeFrom || item.createdAt) <= now
-      && (!item.expiresAt || Date.parse(item.expiresAt) > now))
-    .sort((a, b) => Date.parse(b.activeFrom || b.createdAt) - Date.parse(a.activeFrom || a.createdAt))
-    .map(({ id, title, message, activeFrom, expiresAt, createdAt }) => ({ id, title, message, activeFrom, expiresAt, createdAt }));
+    .filter((item) => {
+      return (
+        (item.audience === 'all' || item.audience === session.role) &&
+        Date.parse(item.activeFrom || item.createdAt) <= now &&
+        (!item.expiresAt || Date.parse(item.expiresAt) > now)
+      );
+    }).sort((a, b) => {
+      return (
+        Date.parse(b.activeFrom || b.createdAt) -
+        Date.parse(a.activeFrom || a.createdAt)
+      );
+    }).map(({ id, title, message, activeFrom, expiresAt, createdAt }) => {
+      return { id, title, message, activeFrom, expiresAt, createdAt };
+    });
 }
 
 export function notifyNewBooking(data, booking) {
   data.notifications ||= [];
   const key = `booking:${booking.id}`;
-  if (data.notifications.some((item) => item.key === key)) return;
+  if (
+    data.notifications.some((item) => {
+      return item.key === key;
+    })
+  ) {
+    return;
+  }
   data.notifications.push({
     id: randomUUID(),
     key,
@@ -33,14 +50,21 @@ export function ensureMeetingReminders(data, now = Date.now()) {
   let changed = false;
   for (const booking of data.bookings) {
     const window = bookingWindow(booking);
-    if (booking.status !== 'confirmed' || !window || now >= window.end)
+    if (booking.status !== 'confirmed' || !window || now >= window.end) {
       continue;
+    }
     for (const [role, id, name] of [
       ['user', booking.userId, booking.influencerName],
       ['influencer', booking.influencerId, booking.userName],
     ]) {
       const key = `reminder:${booking.id}:${window.start}:${role}`;
-      if (data.notifications.some((item) => item.key === key)) continue;
+      if (
+        data.notifications.some((item) => {
+          return item.key === key;
+        })
+      ) {
+        continue;
+      }
       data.notifications.push({
         id: randomUUID(),
         key,
@@ -63,48 +87,67 @@ export function ensureMeetingReminders(data, now = Date.now()) {
 }
 
 export function notificationFeed(data, session, now = Date.now()) {
-  const own = (data.notifications || []).filter(
-    (item) =>
+  const own = (data.notifications || []).filter((item) => {
+    return (
       item.recipientId === session.id &&
       item.recipientRole === session.role &&
-      ['booking', 'reminder', 'update'].includes(item.kind),
-  );
+      ['booking', 'reminder', 'update'].includes(item.kind)
+    );
+  });
   for (const announcement of activeAnnouncements(data, session, now)) {
-    const existing = own.find(item => item.announcementId === announcement.id);
+    const existing = own.find((item) => {
+      return item.announcementId === announcement.id;
+    });
     if (existing) {
-      existing.createdAt = announcement.createdAt || existing.createdAt || announcement.activeFrom;
+      existing.createdAt =
+        announcement.createdAt || existing.createdAt || announcement.activeFrom;
       continue;
     }
     own.push({
       id: `announcement:${announcement.id}:${session.role}:${session.id}`,
       announcementId: announcement.id,
-      kind: 'update', recipientId: session.id, recipientRole: session.role,
-      title: announcement.title, message: announcement.message,
+      kind: 'update',
+      recipientId: session.id,
+      recipientRole: session.role,
+      title: announcement.title,
+      message: announcement.message,
       createdAt: announcement.createdAt || announcement.activeFrom,
-      expiresAt: announcement.expiresAt ? Date.parse(announcement.expiresAt) : null,
+      expiresAt: announcement.expiresAt
+        ? Date.parse(announcement.expiresAt)
+        : null,
       readAt: null,
     });
   }
   const valid = own.filter((item) => {
-    if (item.kind !== 'reminder') return !item.expiresAt || now < item.expiresAt;
-    const booking = data.bookings.find(
-      (booking) => booking.id === item.bookingId,
-    );
+    if (item.kind !== 'reminder') {
+      return !item.expiresAt || now < item.expiresAt;
+    }
+    const booking = data.bookings.find((booking) => {
+      return booking.id === item.bookingId;
+    });
     return (
       booking?.status === 'confirmed' &&
       bookingWindow(booking)?.start === item.startsAt &&
       now < item.expiresAt
     );
   });
-  const visible = valid
-    .filter((item) => !item.dueAt || item.dueAt <= now)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const visible = valid.filter((item) => {
+      return !item.dueAt || item.dueAt <= now;
+    }).sort((a, b) => {
+      return b.createdAt.localeCompare(a.createdAt);
+    });
   const nextDueAt = Math.min(
-    ...valid.filter((item) => item.dueAt > now).map((item) => item.dueAt),
+    ...valid.filter((item) => {
+        return item.dueAt > now;
+      }).map((item) => {
+        return item.dueAt;
+      }),
   );
   return {
     notifications: visible,
-    unreadCount: visible.filter((item) => !item.readAt).length,
+    unreadCount: visible.filter((item) => {
+      return !item.readAt;
+    }).length,
     serverNow: now,
     nextDueAt: Number.isFinite(nextDueAt) ? nextDueAt : null,
   };

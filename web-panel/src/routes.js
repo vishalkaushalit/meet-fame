@@ -17,14 +17,24 @@ export function adminPath(page, base = import.meta.env?.BASE_URL || '/') {
 }
 export function matchAdminPage(path, base = import.meta.env?.BASE_URL || '/') {
   const prefix = base.endsWith('/') ? base : base + '/';
-  if (path === prefix || path === prefix.slice(0, -1)) return 'login';
-  if (!path.startsWith(prefix)) return null;
+  if (path === prefix || path === prefix.slice(0, -1)) {
+    return 'login';
+  }
+  if (!path.startsWith(prefix)) {
+    return null;
+  }
   const slug = path.slice(prefix.length).replace(/\/+$/, '');
-  if (matchAccountDetails(path, base)) return 'account-details';
+  if (matchAccountDetails(path, base)) {
+    return 'account-details';
+  }
   const record = matchAdminRecord(path, base);
-  if (record) return record.page;
+  if (record) {
+    return record.page;
+  }
   return (
-    Object.keys(adminPages).find((page) => adminPages[page] === slug) || null
+    Object.keys(adminPages).find((page) => {
+      return adminPages[page] === slug;
+    }) || null
   );
 }
 export function matchAdminRecord(
@@ -32,7 +42,9 @@ export function matchAdminRecord(
   base = import.meta.env?.BASE_URL || '/',
 ) {
   const prefix = base.endsWith('/') ? base : base + '/';
-  if (!path.startsWith(prefix)) return null;
+  if (!path.startsWith(prefix)) {
+    return null;
+  }
   const announcement = /^announcements\/(?!new\/?$)([^/]+)(\/edit)?\/?$/.exec(
     path.slice(prefix.length),
   );
@@ -51,7 +63,9 @@ export function matchAdminRecord(
     /^(bookings|conversations|approvals\/influencers)\/([^/]+)\/?$/.exec(
       path.slice(prefix.length),
     );
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
   try {
     return {
       page: match[1] === 'approvals/influencers' ? 'approvals' : match[1],
@@ -86,11 +100,15 @@ export function matchAccountDetails(
   base = import.meta.env?.BASE_URL || '/',
 ) {
   const prefix = base.endsWith('/') ? base : base + '/';
-  if (!path.startsWith(prefix)) return null;
+  if (!path.startsWith(prefix)) {
+    return null;
+  }
   const match = /^accounts\/(admin|user|influencer)\/([^/]+)\/?$/.exec(
     path.slice(prefix.length),
   );
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
   try {
     return { role: match[1], id: decodeURIComponent(match[2]) };
   } catch {
@@ -119,7 +137,9 @@ export function accountDetailsParent(
     search === undefined
       ? state?.from
       : new URLSearchParams(search).get('from');
-  if (Object.hasOwn(adminPages, from)) return from;
+  if (Object.hasOwn(adminPages, from)) {
+    return from;
+  }
   return matchAdminPage(globalThis.window?.location.pathname || '') ===
     'add-announcement'
     ? 'announcements'
@@ -128,7 +148,9 @@ export function accountDetailsParent(
 
 export function cleanAdminReturnUrl() {
   const url = new URL(window.location.href);
-  if (!url.searchParams.has('from')) return;
+  if (!url.searchParams.has('from')) {
+    return;
+  }
   const from = accountDetailsParent(url.search);
   url.searchParams.delete('from');
   window.history.replaceState(

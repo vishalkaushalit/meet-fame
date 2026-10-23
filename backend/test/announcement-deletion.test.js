@@ -10,20 +10,45 @@ test('Mongo commit deletes removed announcements and their notifications with ve
   const methods = [];
   const deleted = [];
   for (const [name, Model] of Object.entries(persistenceModels)) {
-    originals[name] = new Map(); state[name] = [];
+    originals[name] = new Map();
+    state[name] = [];
     if (['announcements', 'notifications'].includes(name)) {
-      originals[name].set('removed', { _id: `${name}-id`, version: 2, value: { id: 'removed' } });
+      originals[name].set('removed', {
+        _id: `${name}-id`,
+        version: 2,
+        value: { id: 'removed' },
+      });
       methods.push([Model, Model.deleteOne]);
-      Model.deleteOne = async (filter) => { deleted.push([name, filter]); return { deletedCount: 1 }; };
+      Model.deleteOne = async (filter) => {
+        deleted.push([name, filter]);
+        return { deletedCount: 1 };
+      };
     }
   }
-  mongoose.startSession = async () => ({ withTransaction: async (run) => run(), endSession: async () => {} });
+  mongoose.startSession = async () => {
+    return {
+      withTransaction: async (run) => {
+        return run();
+      },
+      endSession: async () => {},
+    };
+  };
   try {
     await mongoStore.commit({ originals }, state);
     assert.equal(deleted.length, 2);
-    assert.deepEqual(deleted.map(([name, filter]) => [name, filter._version]), [['announcements', 2], ['notifications', 2]]);
+    assert.deepEqual(
+      deleted.map(([name, filter]) => {
+        return [name, filter._version];
+      }),
+      [
+        ['announcements', 2],
+        ['notifications', 2],
+      ],
+    );
   } finally {
     mongoose.startSession = start;
-    for (const [Model, method] of methods) Model.deleteOne = method;
+    for (const [Model, method] of methods) {
+      Model.deleteOne = method;
+    }
   }
 });

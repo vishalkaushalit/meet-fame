@@ -17,14 +17,18 @@ export function dayRanges(day) {
 }
 export function normalizeAvailability(availability = {}) {
   return Object.fromEntries(
-    WEEK_DAYS.map((day) => [
-      day,
-      {
-        ranges: dayRanges(availability?.[day]).map((range) => ({
-          start: range.start,
-          end: range.end,
-        })),
-      },
-    ]),
+    WEEK_DAYS.map((day) => {
+      return [
+        day,
+        {
+          ranges: dayRanges(availability?.[day]).map((range) => {
+            return {
+              start: range.start,
+              end: range.end,
+            };
+          }),
+        },
+      ];
+    }),
   );
 }

@@ -57,7 +57,9 @@ export default function AvailabilityPanel({
               <button
                 key={d}
                 type="button"
-                onClick={() => setActiveDay(d)}
+                onClick={() => {
+                  return setActiveDay(d);
+                }}
                 className={`px-4 py-3 rounded-2xl font-semibold capitalize text-xs transition-all whitespace-nowrap border text-left min-w-[120px] ${
                   activeDay === d
                     ? 'bg-slate-800 border-brand-purple text-white shadow-lg'
@@ -89,7 +91,9 @@ export default function AvailabilityPanel({
             </h4>
             <button
               type="button"
-              onClick={() => handleAddRange(activeDay)}
+              onClick={() => {
+                return handleAddRange(activeDay);
+              }}
               className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white flex items-center gap-1.5 transition-colors border border-slate-700"
             >
               <Plus className="w-3.5 h-3.5 text-brand-coral" />
@@ -104,53 +108,62 @@ export default function AvailabilityPanel({
             </div>
           ) : (
             <div className="space-y-3">
-              {dayRanges(availability[activeDay]).map((range, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800"
-                >
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-slate-400" />
-                    <span className="text-xs text-slate-400">
-                      Available from:
-                    </span>
-                    <input
-                      type="time"
-                      value={range.start}
-                      onChange={(e) =>
-                        handleRangeChange(
-                          activeDay,
-                          idx,
-                          'start',
-                          e.target.value,
-                        )
-                      }
-                      className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-400">until:</span>
-                    <input
-                      type="time"
-                      value={range.end}
-                      onChange={(e) =>
-                        handleRangeChange(activeDay, idx, 'end', e.target.value)
-                      }
-                      className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveRange(activeDay, idx)}
-                    className="ml-auto text-xs text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 flex items-center gap-1"
+              {dayRanges(availability[activeDay]).map((range, idx) => {
+                return (
+                  <div
+                    key={idx}
+                    className="flex flex-wrap items-center gap-3 p-3 rounded-xl bg-slate-900 border border-slate-800"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Remove</span>
-                  </button>
-                </div>
-              ))}
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-slate-400" />
+                      <span className="text-xs text-slate-400">
+                        Available from:
+                      </span>
+                      <input
+                        type="time"
+                        value={range.start}
+                        onChange={(e) => {
+                          return handleRangeChange(
+                            activeDay,
+                            idx,
+                            'start',
+                            e.target.value,
+                          );
+                        }}
+                        className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400">until:</span>
+                      <input
+                        type="time"
+                        value={range.end}
+                        onChange={(e) => {
+                          return handleRangeChange(
+                            activeDay,
+                            idx,
+                            'end',
+                            e.target.value,
+                          );
+                        }}
+                        className="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-mono"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        return handleRemoveRange(activeDay, idx);
+                      }}
+                      className="ml-auto text-xs text-rose-400 hover:text-rose-300 p-1.5 rounded hover:bg-rose-500/10 flex items-center gap-1"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove</span>
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -168,17 +181,19 @@ export default function AvailabilityPanel({
 
           {generatedSlots[activeDay]?.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {generatedSlots[activeDay]?.map((s) => (
-                <div
-                  key={s.slotId}
-                  className="px-3 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-mono font-medium flex items-center gap-2 shadow-sm"
-                >
-                  <Clock className="w-3.5 h-3.5 text-brand-purple" />
-                  <span>
-                    {s.label} ({s.slotId})
-                  </span>
-                </div>
-              ))}
+              {generatedSlots[activeDay]?.map((s) => {
+                return (
+                  <div
+                    key={s.slotId}
+                    className="px-3 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 text-xs font-mono font-medium flex items-center gap-2 shadow-sm"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-brand-purple" />
+                    <span>
+                      {s.label} ({s.slotId})
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <p className="text-xs text-slate-500 italic">

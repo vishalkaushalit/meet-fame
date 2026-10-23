@@ -17,12 +17,16 @@ export async function mutateRoom(id, update) {
         : { members: {}, signals: [], sequence: 0 };
     const result = update(state);
     localRooms.set(id, { state, expiresAt: Date.now() + 7200000 });
-    for (const [key, room] of localRooms)
-      if (room.expiresAt < Date.now()) localRooms.delete(key);
+    for (const [key, room] of localRooms) {
+      if (room.expiresAt < Date.now()) {
+        localRooms.delete(key);
+      }
+    }
     return result;
   }
-  if (mongoose.connection.readyState !== 1)
+  if (mongoose.connection.readyState !== 1) {
     throw new Error('Video signaling requires a connected MongoDB database.');
+  }
   try {
     await Room.updateOne(
       { _id: id },
@@ -37,7 +41,9 @@ export async function mutateRoom(id, update) {
     );
   } catch (error) {
     // Both participants can create the room at the same instant.
-    if (error.code !== 11000) throw error;
+    if (error.code !== 11000) {
+      throw error;
+    }
   }
   for (let attempt = 0; attempt < 8; attempt++) {
     const room = await Room.findById(id).lean();
@@ -53,7 +59,9 @@ export async function mutateRoom(id, update) {
         $inc: { version: 1 },
       },
     );
-    if (saved.modifiedCount) return result;
+    if (saved.modifiedCount) {
+      return result;
+    }
   }
   throw new Error('Call room is busy. Please retry.');
 }

@@ -8,17 +8,23 @@ import { ExternalLink, FileCheck } from 'lucide-react';
 import { adminApi } from '../api';
 import { API_BASE } from '../api/endpoints';
 
-const text = (value) =>
-  value === undefined || value === null || value === ''
+const text = (value) => {
+  return value === undefined || value === null || value === ''
     ? 'Not provided'
     : String(value);
-const label = (value) => text(value).replaceAll('_', ' ');
-const date = (value) =>
-  value && !Number.isNaN(Date.parse(value))
+};
+const label = (value) => {
+  return text(value).replaceAll('_', ' ');
+};
+const date = (value) => {
+  return value && !Number.isNaN(Date.parse(value))
     ? formatDateTime(value)
     : 'Not provided';
+};
 const safeLink = (value) => {
-  if (typeof value !== 'string') return null;
+  if (typeof value !== 'string') {
+    return null;
+  }
   try {
     const url = new URL(value, window.location.origin);
     return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
@@ -37,16 +43,16 @@ export default function AccountDetailsPage({ account }) {
     let active = true;
     setDetails(null);
     setError('');
-    adminApi.accounts
-      .getDetails(account.role, account.id)
-      .then((result) => {
-        if (active) setDetails(result.account);
-      })
-      .catch((err) => {
-        if (active)
+    adminApi.accounts.getDetails(account.role, account.id).then((result) => {
+        if (active) {
+          setDetails(result.account);
+        }
+      }).catch((err) => {
+        if (active) {
           setError(
             err.error || 'Unable to load account details. Please try again.',
           );
+        }
       });
     return () => {
       active = false;
@@ -99,7 +105,13 @@ export default function AccountDetailsPage({ account }) {
         {error ? (
           <div role="alert" className="account-details-error">
             <p>{error}</p>
-            <button onClick={() => setRetry((value) => value + 1)}>
+            <button
+              onClick={() => {
+                return setRetry((value) => {
+                  return value + 1;
+                });
+              }}
+            >
               Retry
             </button>
           </div>
@@ -108,26 +120,30 @@ export default function AccountDetailsPage({ account }) {
         ) : (
           <>
             <dl className="account-details-fields">
-              {fields.map(([title, value]) => (
-                <div key={title}>
-                  <dt>{title}</dt>
-                  <dd>
-                    {title === 'Certificate status' ? (
-                      <StatusBadge status={details.certificateStatus} />
-                    ) : title === 'Status' ? (
-                      <StatusBadge status={details.status} />
-                    ) : title === 'Verified' ? (
-                      <StatusBadge
-                        status={details.isVerified ? 'verified' : 'unverified'}
-                      >
-                        {value}
-                      </StatusBadge>
-                    ) : (
-                      text(value)
-                    )}
-                  </dd>
-                </div>
-              ))}
+              {fields.map(([title, value]) => {
+                return (
+                  <div key={title}>
+                    <dt>{title}</dt>
+                    <dd>
+                      {title === 'Certificate status' ? (
+                        <StatusBadge status={details.certificateStatus} />
+                      ) : title === 'Status' ? (
+                        <StatusBadge status={details.status} />
+                      ) : title === 'Verified' ? (
+                        <StatusBadge
+                          status={
+                            details.isVerified ? 'verified' : 'unverified'
+                          }
+                        >
+                          {value}
+                        </StatusBadge>
+                      ) : (
+                        text(value)
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
             </dl>
             {details.statusReason && (
               <section>
@@ -174,29 +190,33 @@ export default function AccountDetailsPage({ account }) {
                         'friday',
                         'saturday',
                         'sunday',
-                      ].map((day) => (
-                        <div key={day}>
-                          <dt className="capitalize">{day}</dt>
-                          <dd className="account-availability-badges">
-                            {dayRanges(details.availability?.[day]).length ? (
-                              dayRanges(details.availability?.[day]).map(
-                                (range, index) => (
-                                  <span
-                                    key={`${range.start}-${range.end}-${index}`}
-                                    className="account-time-badge"
-                                  >
-                                    {range.start}–{range.end}
-                                  </span>
-                                ),
-                              )
-                            ) : (
-                              <span className="account-time-unavailable">
-                                Unavailable
-                              </span>
-                            )}
-                          </dd>
-                        </div>
-                      ))}
+                      ].map((day) => {
+                        return (
+                          <div key={day}>
+                            <dt className="capitalize">{day}</dt>
+                            <dd className="account-availability-badges">
+                              {dayRanges(details.availability?.[day]).length ? (
+                                dayRanges(details.availability?.[day]).map(
+                                  (range, index) => {
+                                    return (
+                                      <span
+                                        key={`${range.start}-${range.end}-${index}`}
+                                        className="account-time-badge"
+                                      >
+                                        {range.start}–{range.end}
+                                      </span>
+                                    );
+                                  },
+                                )
+                              ) : (
+                                <span className="account-time-unavailable">
+                                  Unavailable
+                                </span>
+                              )}
+                            </dd>
+                          </div>
+                        );
+                      })}
                     </dl>
                   </section>
                 </div>

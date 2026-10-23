@@ -25,11 +25,12 @@ export default function BookingModal({
 }) {
   const { user } = useAuth();
 
-  const indiaDate = (days = 0) =>
-    new Date(Date.now() + 19800000 + days * 86400000)
-      .toISOString()
-      .slice(0, 10);
-  const [date, setDate] = useState(() => indiaDate(1));
+  const indiaDate = (days = 0) => {
+    return new Date(Date.now() + 19800000 + days * 86400000).toISOString().slice(0, 10);
+  };
+  const [date, setDate] = useState(() => {
+    return indiaDate(1);
+  });
   const weekday = date
     ? new Date(`${date}T12:00:00+05:30`).toLocaleDateString('en-IN', {
         weekday: 'long',
@@ -41,9 +42,17 @@ export default function BookingModal({
   const [clock, setClock] = useState(null);
   const [tick, setTick] = useState(0);
   useEffect(() => {
-    if (!isOpen) return;
-    const timer = setInterval(() => setTick((value) => value + 1), 1000);
-    return () => clearInterval(timer);
+    if (!isOpen) {
+      return;
+    }
+    const timer = setInterval(() => {
+      return setTick((value) => {
+        return value + 1;
+      });
+    }, 1000);
+    return () => {
+      return clearInterval(timer);
+    };
   }, [isOpen]);
   const serverTime = clock
     ? clock.serverNow + (performance.now() - clock.receivedAt)
@@ -68,7 +77,9 @@ export default function BookingModal({
     }
   });
   const retryPayment = async () => {
-    if (!pendingPayment || pendingPayment.userId !== user?.id) return;
+    if (!pendingPayment || pendingPayment.userId !== user?.id) {
+      return;
+    }
     setSubmitting(true);
     setError('');
     try {
@@ -90,7 +101,9 @@ export default function BookingModal({
 
   // Fetch slots whenever influencer or date changes
   useEffect(() => {
-    if (!influencer?.id || !date || !isOpen) return;
+    if (!influencer?.id || !date || !isOpen) {
+      return;
+    }
 
     let active = true;
     async function loadSlots() {
@@ -100,21 +113,29 @@ export default function BookingModal({
       setError('');
       try {
         const res = await api.bookings.getSlots(influencer.id, date);
-        if (!active) return;
+        if (!active) {
+          return;
+        }
         setClock({
           serverNow: res.serverNow || Date.now(),
           receivedAt: performance.now(),
         });
         setSlotsData(res);
         // Find first available slot
-        const firstAvailable = res.slots?.find((s) => !s.isBooked && !s.isPast);
+        const firstAvailable = res.slots?.find((s) => {
+          return !s.isBooked && !s.isPast;
+        });
         setSelectedSlot(firstAvailable ? firstAvailable.slot : '');
       } catch (err) {
-        if (!active) return;
+        if (!active) {
+          return;
+        }
         console.error('Error fetching slots:', err);
         setError('Failed to load slots for this date');
       } finally {
-        if (active) setLoadingSlots(false);
+        if (active) {
+          setLoadingSlots(false);
+        }
       }
     }
 
@@ -125,16 +146,21 @@ export default function BookingModal({
   }, [influencer?.id, date, isOpen]);
 
   useEffect(() => {
-    if (!slotsData || !selectedSlot) return;
+    if (!slotsData || !selectedSlot) {
+      return;
+    }
     if (
-      !visibleSlots.some(
-        (slot) => slot.slot === selectedSlot && !slot.isBooked && !slot.isPast,
-      )
-    )
+      !visibleSlots.some((slot) => {
+        return slot.slot === selectedSlot && !slot.isBooked && !slot.isPast;
+      })
+    ) {
       setSelectedSlot('');
+    }
   }, [tick, slotsData, selectedSlot, date]);
 
-  if (!isOpen || !influencer) return null;
+  if (!isOpen || !influencer) {
+    return null;
+  }
 
   const handleBook = async (e) => {
     e.preventDefault();
@@ -144,9 +170,9 @@ export default function BookingModal({
     }
     if (
       !selectedSlot ||
-      !visibleSlots.some(
-        (slot) => slot.slot === selectedSlot && !slot.isBooked && !slot.isPast,
-      )
+      !visibleSlots.some((slot) => {
+        return slot.slot === selectedSlot && !slot.isBooked && !slot.isPast;
+      })
     ) {
       setError('Please select an available 1-hour time slot.');
       return;
@@ -155,7 +181,9 @@ export default function BookingModal({
     setSubmitting(true);
     setError('');
 
-    const chosen = slotsData?.slots?.find((s) => s.slot === selectedSlot);
+    const chosen = slotsData?.slots?.find((s) => {
+      return s.slot === selectedSlot;
+    });
 
     try {
       const bookingData = {
@@ -193,7 +221,9 @@ export default function BookingModal({
       setPendingPayment(null);
 
       setSuccess(true);
-      if (onBookingSuccess) onBookingSuccess();
+      if (onBookingSuccess) {
+        onBookingSuccess();
+      }
       setTimeout(() => {
         setSuccess(false);
         onClose();
@@ -351,7 +381,11 @@ export default function BookingModal({
                     </span>
                     <span className="text-[11px] text-slate-400">
                       {slotsData
-                        ? `${visibleSlots.filter((slot) => !slot.isBooked && !slot.isPast).length} of ${visibleSlots.length} available · IST`
+                        ? `${
+                            visibleSlots.filter((slot) => {
+                              return !slot.isBooked && !slot.isPast;
+                            }).length
+                          } of ${visibleSlots.length} available · IST`
                         : ''}
                     </span>
                   </label>
@@ -371,31 +405,35 @@ export default function BookingModal({
                       {/* The Dropdown with Booked Slots Disabled (as specified in prompt) */}
                       <select
                         value={selectedSlot}
-                        onChange={(e) => setSelectedSlot(e.target.value)}
+                        onChange={(e) => {
+                          return setSelectedSlot(e.target.value);
+                        }}
                         className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-brand-purple mb-3"
                       >
                         <option value="" disabled>
                           -- Select a 1-Hour Time Slot --
                         </option>
-                        {visibleSlots.map((slotItem) => (
-                          <option
-                            key={slotItem.slot}
-                            value={slotItem.slot}
-                            disabled={slotItem.isBooked || slotItem.isPast}
-                            className={
-                              slotItem.isBooked || slotItem.isPast
-                                ? 'bg-slate-900 text-slate-500 line-through'
-                                : 'bg-slate-900 text-white'
-                            }
-                          >
-                            {slotItem.label}{' '}
-                            {slotItem.isBooked
-                              ? '— [Already Booked]'
-                              : slotItem.isPast
-                                ? '— [Past]'
-                                : '— [Available]'}
-                          </option>
-                        ))}
+                        {visibleSlots.map((slotItem) => {
+                          return (
+                            <option
+                              key={slotItem.slot}
+                              value={slotItem.slot}
+                              disabled={slotItem.isBooked || slotItem.isPast}
+                              className={
+                                slotItem.isBooked || slotItem.isPast
+                                  ? 'bg-slate-900 text-slate-500 line-through'
+                                  : 'bg-slate-900 text-white'
+                              }
+                            >
+                              {slotItem.label}{' '}
+                              {slotItem.isBooked
+                                ? '— [Already Booked]'
+                                : slotItem.isPast
+                                  ? '— [Past]'
+                                  : '— [Available]'}
+                            </option>
+                          );
+                        })}
                       </select>
 
                       {/* Interactive Visual Slots Grid */}
@@ -407,7 +445,9 @@ export default function BookingModal({
                               key={s.slot}
                               type="button"
                               disabled={s.isBooked || s.isPast}
-                              onClick={() => setSelectedSlot(s.slot)}
+                              onClick={() => {
+                                return setSelectedSlot(s.slot);
+                              }}
                               aria-pressed={isSelected}
                               className={`booking-time-slot ${s.isBooked ? 'is-booked' : s.isPast ? 'is-past' : 'is-available'}`}
                             >

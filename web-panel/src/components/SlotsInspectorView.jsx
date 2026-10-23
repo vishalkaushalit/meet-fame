@@ -20,18 +20,21 @@ import {
 } from '../../../shared/availabilityCalendar';
 import './availability-calendar.css';
 
-const dateLabel = (date, options) =>
-  new Intl.DateTimeFormat('en-US', { timeZone: 'UTC', ...options }).format(
-    new Date(`${date}T00:00:00Z`),
-  );
-const timeLabel = (minutes) =>
-  `${Math.floor(minutes / 60) % 12 || 12}${minutes % 60 ? ':' + String(minutes % 60).padStart(2, '0') : ''} ${minutes >= 720 ? 'PM' : 'AM'}`;
+const dateLabel = (date, options) => {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: 'UTC',
+    ...options,
+  }).format(new Date(`${date}T00:00:00Z`));
+};
+const timeLabel = (minutes) => {
+  return `${Math.floor(minutes / 60) % 12 || 12}${minutes % 60 ? ':' + String(minutes % 60).padStart(2, '0') : ''} ${minutes >= 720 ? 'PM' : 'AM'}`;
+};
 export default function SlotsInspectorView() {
   const [influencers, setInfluencers] = useState([]);
   const [creatorId, setCreatorId] = useState('');
-  const [date, setDate] = useState(() =>
-    new Date(Date.now() + 19800000).toISOString().slice(0, 10),
-  );
+  const [date, setDate] = useState(() => {
+    return new Date(Date.now() + 19800000).toISOString().slice(0, 10);
+  });
   const [mode, setMode] = useState('week');
   const [selectedView, setSelectedView] = useState('week');
   const [overview, setOverview] = useState(null);
@@ -45,71 +48,93 @@ export default function SlotsInspectorView() {
     let active = true;
     setListLoading(true);
     setListError('');
-    adminApi.influencers
-      .getAll()
-      .then((result) => {
-        if (!active) return;
+    adminApi.influencers.getAll().then((result) => {
+        if (!active) {
+          return;
+        }
         const records = result.influencers || [];
         setInfluencers(records);
-        setCreatorId((current) =>
-          records.some((item) => item.id === current)
+        setCreatorId((current) => {
+          return records.some((item) => {
+            return item.id === current;
+          })
             ? current
-            : records[0]?.id || '',
-        );
-      })
-      .catch(() => {
-        if (active)
+            : records[0]?.id || '';
+        });
+      }).catch(() => {
+        if (active) {
           setListError('Unable to load influencers. Please try again.');
-      })
-      .finally(() => {
-        if (active) setListLoading(false);
+        }
+      }).finally(() => {
+        if (active) {
+          setListLoading(false);
+        }
       });
     return () => {
       active = false;
     };
   }, [reload]);
   useEffect(() => {
-    if (!creatorId) return;
+    if (!creatorId) {
+      return;
+    }
     let active = true;
     setLoading(true);
     setError('');
     setOverview(null);
     setSelection(null);
-    adminApi.influencers
-      .getSlotsOverview(creatorId, date)
-      .then((result) => {
-        if (active) setOverview(result);
-      })
-      .catch(() => {
-        if (active) setError('Unable to load the schedule. Please try again.');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
+    adminApi.influencers.getSlotsOverview(creatorId, date).then((result) => {
+        if (active) {
+          setOverview(result);
+        }
+      }).catch(() => {
+        if (active) {
+          setError('Unable to load the schedule. Please try again.');
+        }
+      }).finally(() => {
+        if (active) {
+          setLoading(false);
+        }
       });
     return () => {
       active = false;
     };
   }, [creatorId, date, reload]);
-  const creator = influencers.find((item) => item.id === creatorId);
+  const creator = influencers.find((item) => {
+    return item.id === creatorId;
+  });
   const week = calendarWeek(date);
   const columns = (
-    mode === 'week' ? week : week.filter((day) => day.date === date)
-  ).map((day) => ({ ...day, slots: calendarDaySlots(overview, day.date) }));
-  const allSlots = columns.flatMap((day) => day.slots);
+    mode === 'week'
+      ? week
+      : week.filter((day) => {
+          return day.date === date;
+        })
+  ).map((day) => {
+    return { ...day, slots: calendarDaySlots(overview, day.date) };
+  });
+  const allSlots = columns.flatMap((day) => {
+    return day.slots;
+  });
   const rows = calendarRows(allSlots);
   const selected = selection
-    ? allSlots.find(
-        (slot) =>
-          slot.date === selection.date && slot.slotId === selection.slotId,
-      )
-    : calendarDaySlots(overview, date).find((slot) => slot.booking) ||
-      calendarDaySlots(overview, date)[0];
+    ? allSlots.find((slot) => {
+        return slot.date === selection.date && slot.slotId === selection.slotId;
+      })
+    : calendarDaySlots(overview, date).find((slot) => {
+        return slot.booking;
+      }) || calendarDaySlots(overview, date)[0];
   const detailDate = selected?.date || date;
   const daySlots = calendarDaySlots(overview, detailDate);
-  const bookedCount = daySlots.filter((slot) => slot.booking).length;
+  const bookedCount = daySlots.filter((slot) => {
+    return slot.booking;
+  }).length;
   const recurring =
     overview?.weeklySlotPlan?.[
-      selected?.day || week.find((day) => day.date === date).day
+      selected?.day ||
+        week.find((day) => {
+          return day.date === date;
+        }).day
     ]?.ranges || [];
   const changeDate = (value) => {
     if (value) {
@@ -132,23 +157,31 @@ export default function SlotsInspectorView() {
                 setSelection(null);
               }}
             >
-              {influencers.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
+              {influencers.map((item) => {
+                return (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                );
+              })}
             </select>
           </label>
           <label>
             Date
             <DatePicker
               value={date}
-              onChange={(event) => changeDate(event.target.value)}
+              onChange={(event) => {
+                return changeDate(event.target.value);
+              }}
             />
           </label>
           <button
             type="button"
-            onClick={() => setReload((value) => value + 1)}
+            onClick={() => {
+              return setReload((value) => {
+                return value + 1;
+              });
+            }}
             aria-label="Refresh availability"
           >
             <RefreshCw size={17} />
@@ -159,11 +192,9 @@ export default function SlotsInspectorView() {
         <section className="availability-creator">
           <div className="availability-identity">
             <span className="availability-avatar">
-              {creator.name
-                ?.split(' ')
-                .map((word) => word[0])
-                .slice(0, 2)
-                .join('')}
+              {creator.name?.split(' ').map((word) => {
+                  return word[0];
+                }).slice(0, 2).join('')}
             </span>
             <div>
               <h3>
@@ -182,7 +213,14 @@ export default function SlotsInspectorView() {
       {listError || error ? (
         <div className="dashboard-error" role="alert">
           {listError || error}
-          <button type="button" onClick={() => setReload((value) => value + 1)}>
+          <button
+            type="button"
+            onClick={() => {
+              return setReload((value) => {
+                return value + 1;
+              });
+            }}
+          >
             Retry
           </button>
         </div>
@@ -213,11 +251,11 @@ export default function SlotsInspectorView() {
                   type="button"
                   className="calendar-arrow-button"
                   aria-label={`Previous ${mode}`}
-                  onClick={() =>
-                    changeDate(
+                  onClick={() => {
+                    return changeDate(
                       shiftCalendarDate(date, mode === 'week' ? -7 : -1),
-                    )
-                  }
+                    );
+                  }}
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -225,9 +263,11 @@ export default function SlotsInspectorView() {
                   type="button"
                   className="calendar-arrow-button"
                   aria-label={`Next ${mode}`}
-                  onClick={() =>
-                    changeDate(shiftCalendarDate(date, mode === 'week' ? 7 : 1))
-                  }
+                  onClick={() => {
+                    return changeDate(
+                      shiftCalendarDate(date, mode === 'week' ? 7 : 1),
+                    );
+                  }}
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -238,9 +278,7 @@ export default function SlotsInspectorView() {
                   onChange={(event) => {
                     if (event.target.value === 'today') {
                       changeDate(
-                        new Date(Date.now() + 19800000)
-                          .toISOString()
-                          .slice(0, 10),
+                        new Date(Date.now() + 19800000).toISOString().slice(0, 10),
                       );
                       setMode('day');
                       setSelectedView('today');
@@ -282,62 +320,72 @@ export default function SlotsInspectorView() {
                     <th scope="col">
                       <span className="sr-only">Time</span>
                     </th>
-                    {columns.map((day) => (
-                      <th scope="col" key={day.date}>
-                        <button
-                          type="button"
-                          aria-pressed={day.date === detailDate}
-                          onClick={() => changeDate(day.date)}
-                        >
-                          <span>
-                            {dateLabel(day.date, { weekday: 'short' })}
-                          </span>
-                          <strong>
-                            {dateLabel(day.date, { day: 'numeric' })}
-                          </strong>
-                        </button>
-                      </th>
-                    ))}
+                    {columns.map((day) => {
+                      return (
+                        <th scope="col" key={day.date}>
+                          <button
+                            type="button"
+                            aria-pressed={day.date === detailDate}
+                            onClick={() => {
+                              return changeDate(day.date);
+                            }}
+                          >
+                            <span>
+                              {dateLabel(day.date, { weekday: 'short' })}
+                            </span>
+                            <strong>
+                              {dateLabel(day.date, { day: 'numeric' })}
+                            </strong>
+                          </button>
+                        </th>
+                      );
+                    })}
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((minutes) => (
-                    <tr key={minutes}>
-                      <th scope="row">{timeLabel(minutes)}</th>
-                      {columns.map((day) => (
-                        <td key={day.date}>
-                          {day.slots
-                            .filter(
-                              (slot) =>
-                                calendarMinutes(slot.slotId) === minutes,
-                            )
-                            .map((slot) => (
-                              <button
-                                type="button"
-                                key={slot.slotId}
-                                className={`availability-slot ${slot.booking ? 'is-booked' : 'is-available'}`}
-                                aria-pressed={
-                                  selected?.date === slot.date &&
-                                  selected?.slotId === slot.slotId
-                                }
-                                aria-label={`${slot.booking ? 'Booked by ' + slot.booking.userName : 'Available'}: ${slot.label || slot.slotId}, ${slot.date} IST`}
-                                onClick={() =>
-                                  setSelection({
-                                    date: slot.date,
-                                    slotId: slot.slotId,
-                                  })
-                                }
-                              >
-                                {slot.booking
-                                  ? slot.booking.userName?.split(' ')[0] ||
-                                    'Booked'
-                                  : slot.slotId.split(' - ')[0]}
-                              </button>
-                            ))}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
+                  {rows.map((minutes) => {
+                    return (
+                      <tr key={minutes}>
+                        <th scope="row">{timeLabel(minutes)}</th>
+                        {columns.map((day) => {
+                          return (
+                            <td key={day.date}>
+                              {day.slots.filter((slot) => {
+                                  return (
+                                    calendarMinutes(slot.slotId) === minutes
+                                  );
+                                }).map((slot) => {
+                                  return (
+                                    <button
+                                      type="button"
+                                      key={slot.slotId}
+                                      className={`availability-slot ${slot.booking ? 'is-booked' : 'is-available'}`}
+                                      aria-pressed={
+                                        selected?.date === slot.date &&
+                                        selected?.slotId === slot.slotId
+                                      }
+                                      aria-label={`${slot.booking ? 'Booked by ' + slot.booking.userName : 'Available'}: ${slot.label || slot.slotId}, ${slot.date} IST`}
+                                      onClick={() => {
+                                        return setSelection({
+                                          date: slot.date,
+                                          slotId: slot.slotId,
+                                        });
+                                      }}
+                                    >
+                                      {slot.booking
+                                        ? slot.booking.userName?.split(
+                                            ' ',
+                                          )[0] || 'Booked'
+                                        : slot.slotId.split(' - ')[0]}
+                                    </button>
+                                  );
+                                })}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               {!rows.length && (
@@ -405,11 +453,13 @@ export default function SlotsInspectorView() {
                   <strong>{selected.day}</strong>
                   {recurring.length ? (
                     <div className="availability-time-badges">
-                      {recurring.map((range, index) => (
-                        <span className="availability-time-badge" key={index}>
-                          {range.start} – {range.end} IST
-                        </span>
-                      ))}
+                      {recurring.map((range, index) => {
+                        return (
+                          <span className="availability-time-badge" key={index}>
+                            {range.start} – {range.end} IST
+                          </span>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p>No recurring availability.</p>

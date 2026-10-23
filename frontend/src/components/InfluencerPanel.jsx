@@ -24,13 +24,16 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
   const [activeTab, setActiveTab] = useState('slots'); // 'slots' | 'bookings' | 'certificate' | 'profile'
   useEffect(() => {
-    const showBookings = () => setActiveTab('bookings');
+    const showBookings = () => {
+      return setActiveTab('bookings');
+    };
     window.addEventListener('meetfame-show-bookings', showBookings);
-    return () =>
-      window.removeEventListener('meetfame-show-bookings', showBookings);
+    return () => {
+      return window.removeEventListener('meetfame-show-bookings', showBookings);
+    };
   }, []);
-  const [availability, setAvailability] = useState(() =>
-    normalizeAvailability(
+  const [availability, setAvailability] = useState(() => {
+    return normalizeAvailability(
       user?.availability || {
         monday: [
           { start: '09:00', end: '12:00' },
@@ -43,8 +46,8 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
         saturday: [{ start: '10:00', end: '12:00' }],
         sunday: [],
       },
-    ),
-  );
+    );
+  });
 
   const [activeDay, setActiveDay] = useState('monday');
   const [generatedSlots, setGeneratedSlots] = useState({});
@@ -69,7 +72,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
   // Fetch full details and bookings
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      return;
+    }
 
     async function loadData() {
       try {
@@ -98,19 +103,27 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
 
   // Handle slot range modifications
   const handleAddRange = (day) => {
-    setAvailability((prev) => ({
-      ...prev,
-      [day]: {
-        ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }],
-      },
-    }));
+    setAvailability((prev) => {
+      return {
+        ...prev,
+        [day]: {
+          ranges: [...dayRanges(prev[day]), { start: '14:00', end: '17:00' }],
+        },
+      };
+    });
   };
 
   const handleRemoveRange = (day, idx) => {
-    setAvailability((prev) => ({
-      ...prev,
-      [day]: { ranges: dayRanges(prev[day]).filter((_, i) => i !== idx) },
-    }));
+    setAvailability((prev) => {
+      return {
+        ...prev,
+        [day]: {
+          ranges: dayRanges(prev[day]).filter((_, i) => {
+            return i !== idx;
+          }),
+        },
+      };
+    });
   };
 
   const handleRangeChange = (day, idx, field, val) => {
@@ -135,7 +148,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
       setSaveSuccess(
         'Availability updated! 1-hour slots re-generated successfully.',
       );
-      setTimeout(() => setSaveSuccess(''), 4000);
+      setTimeout(() => {
+        return setSaveSuccess('');
+      }, 4000);
     } catch (err) {
       console.error('Error saving slots:', err);
     } finally {
@@ -146,7 +161,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   // Certificate Upload
   const handleCertificateUpload = async (e) => {
     e.preventDefault();
-    if (!certTitle && !certFile) return;
+    if (!certTitle && !certFile) {
+      return;
+    }
 
     setCertUploading(true);
     setCertMessage('');
@@ -175,11 +192,12 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
   };
 
   // Stats calculation
-  const totalSlotsCount = Object.values(generatedSlots).reduce(
-    (sum, list) => sum + (list?.length || 0),
-    0,
-  );
-  const totalEarnings = bookings.reduce((sum, b) => sum + (b.price || 0), 0);
+  const totalSlotsCount = Object.values(generatedSlots).reduce((sum, list) => {
+    return sum + (list?.length || 0);
+  }, 0);
+  const totalEarnings = bookings.reduce((sum, b) => {
+    return sum + (b.price || 0);
+  }, 0);
 
   const bookingPagination = usePagination(bookings);
 
@@ -285,7 +303,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           <button
             role="tab"
             aria-selected={activeTab === 'slots'}
-            onClick={() => setActiveTab('slots')}
+            onClick={() => {
+              return setActiveTab('slots');
+            }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
               activeTab === 'slots'
                 ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
@@ -299,7 +319,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           <button
             role="tab"
             aria-selected={activeTab === 'bookings'}
-            onClick={() => setActiveTab('bookings')}
+            onClick={() => {
+              return setActiveTab('bookings');
+            }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
               activeTab === 'bookings'
                 ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
@@ -313,7 +335,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
           <button
             role="tab"
             aria-selected={activeTab === 'certificate'}
-            onClick={() => setActiveTab('certificate')}
+            onClick={() => {
+              return setActiveTab('certificate');
+            }}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
               activeTab === 'certificate'
                 ? 'bg-gradient-to-r from-brand-indigo to-brand-purple text-white shadow-md'
@@ -336,7 +360,9 @@ export default function InfluencerPanel({ onOpenChat, onJoinCall }) {
             type="button"
             role="tab"
             aria-selected={false}
-            onClick={() => navigate('/profile')}
+            onClick={() => {
+              return navigate('/profile');
+            }}
             className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white whitespace-nowrap"
           >
             My Profile

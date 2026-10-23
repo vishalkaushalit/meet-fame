@@ -9,8 +9,8 @@
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:web-panel": "npm --prefix web-panel run dev",
-    "format": "prettier --write \"frontend/src/**/*.{js,jsx}\" \"web-panel/src/**/*.{js,jsx}\" \"shared/**/*.{js,jsx}\"",
-    "format:check": "prettier --check \"frontend/src/**/*.{js,jsx}\" \"web-panel/src/**/*.{js,jsx}\" \"shared/**/*.{js,jsx}\""
+    "format": "node scripts/format-code.mjs",
+    "format:check": "node scripts/format-code.mjs --check"
   },
   "dependencies": {
     "@vercel/blob": "^0.27.1",

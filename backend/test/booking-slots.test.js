@@ -2,26 +2,31 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { db } from '../src/db.js';
 import bookings from '../src/routes/booking.routes.js';
-const response = () => ({
-  code: 200,
-  status(code) {
-    this.code = code;
-    return this;
-  },
-  json(body) {
-    this.body = body;
-    return this;
-  },
-});
-const handler = (path, method) =>
-  bookings.stack
-    .find((layer) => layer.route?.path === path && layer.route.methods[method])
-    .route.stack.at(-1).handle;
+const response = () => {
+  return {
+    code: 200,
+    status(code) {
+      this.code = code;
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
+};
+const handler = (path, method) => {
+  return bookings.stack.find((layer) => {
+      return layer.route?.path === path && layer.route.methods[method];
+    }).route.stack.at(-1).handle;
+};
 test('all slots are shown with past slots marked using IST and rejected on booking', () => {
   const read = db.read,
     write = db.write,
     now = Date.now;
-  Date.now = () => Date.parse('2026-10-19T12:30:00+05:30');
+  Date.now = () => {
+    return Date.parse('2026-10-19T12:30:00+05:30');
+  };
   const data = {
     influencers: [
       {
@@ -34,8 +39,12 @@ test('all slots are shown with past slots marked using IST and rejected on booki
     bookings: [],
     messages: [],
   };
-  db.read = () => data;
-  db.write = () => assert.fail('Invalid bookings must not write data');
+  db.read = () => {
+    return data;
+  };
+  db.write = () => {
+    return assert.fail('Invalid bookings must not write data');
+  };
   try {
     const res = response();
     handler('/slots', 'get')(
@@ -43,11 +52,15 @@ test('all slots are shown with past slots marked using IST and rejected on booki
       res,
     );
     assert.deepEqual(
-      res.body.slots.map((slot) => slot.slot),
+      res.body.slots.map((slot) => {
+        return slot.slot;
+      }),
       ['11:00 - 12:00', '12:00 - 13:00', '13:00 - 14:00', '14:00 - 15:00'],
     );
     assert.deepEqual(
-      res.body.slots.map((slot) => slot.isPast),
+      res.body.slots.map((slot) => {
+        return slot.isPast;
+      }),
       [true, true, false, false],
     );
     assert.equal(res.body.availableSlotsCount, 2);
@@ -65,7 +78,9 @@ test('all slots are shown with past slots marked using IST and rejected on booki
     };
     assert.equal(create('12:00 - 13:00').code, 409);
     assert.equal(create('17:00 - 18:00').code, 400);
-    Date.now = () => Date.parse('2026-10-19T13:00:00+05:30');
+    Date.now = () => {
+      return Date.parse('2026-10-19T13:00:00+05:30');
+    };
     assert.equal(create('13:00 - 14:00').code, 409);
   } finally {
     db.read = read;

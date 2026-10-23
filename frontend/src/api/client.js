@@ -4,5 +4,7 @@ import { API_BASE } from './endpoints';
 
 export const client = createApiClient(axios, {
   baseURL: API_BASE,
-  getToken: () => localStorage.getItem('meetfame_token'),
+  getToken: () => {
+    return localStorage.getItem('meetfame_token');
+  },
 });

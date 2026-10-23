@@ -5,9 +5,9 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(
-    () => localStorage.getItem('meetfame_token') || null,
-  );
+  const [token, setToken] = useState(() => {
+    return localStorage.getItem('meetfame_token') || null;
+  });
   const [loading, setLoading] = useState(true);
 
   // Status modal / popup state (for under-review or status alerts)
@@ -23,15 +23,21 @@ export function AuthProvider({ children }) {
       }
       try {
         const res = await api.auth.getMe();
-        if (active) setUser(res.user);
+        if (active) {
+          setUser(res.user);
+        }
       } catch (err) {
-        if (!active) return;
+        if (!active) {
+          return;
+        }
         console.warn('Session expired or invalid token:', err);
         localStorage.removeItem('meetfame_token');
         setToken(null);
         setUser(null);
       } finally {
-        if (active) setLoading(false);
+        if (active) {
+          setLoading(false);
+        }
       }
     }
     loadUser();
@@ -42,13 +48,17 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const syncSession = (event) => {
-      if (event.key !== 'meetfame_token' && event.key !== null) return;
+      if (event.key !== 'meetfame_token' && event.key !== null) {
+        return;
+      }
       window.dispatchEvent(new Event('meetfame-session-ending'));
       setUser(null);
       setToken(localStorage.getItem('meetfame_token'));
     };
     window.addEventListener('storage', syncSession);
-    return () => window.removeEventListener('storage', syncSession);
+    return () => {
+      return window.removeEventListener('storage', syncSession);
+    };
   }, []);
 
   const login = async (email, password, role) => {
@@ -116,7 +126,9 @@ export function AuthProvider({ children }) {
   };
 
   const updateUserProfile = (updated) => {
-    setUser((prev) => ({ ...prev, ...updated }));
+    setUser((prev) => {
+      return { ...prev, ...updated };
+    });
   };
 
   return (

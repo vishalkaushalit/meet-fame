@@ -7,47 +7,60 @@ import {
 } from '../src/notifications.js';
 import notificationRoutes from '../src/routes/notification.routes.js';
 import bookingRoutes from '../src/routes/booking.routes.js';
-const handler = (router, path, method) =>
-  router.stack
-    .find((layer) => layer.route?.path === path && layer.route.methods[method])
-    .route.stack.at(-1).handle;
-const response = () => ({
-  code: 200,
-  status(code) {
-    this.code = code;
-    return this;
-  },
-  set() {
-    return this;
-  },
-  json(body) {
-    this.body = body;
-    return this;
-  },
-});
-const start = Date.parse('2026-10-19T12:00:00+05:30');
-const makeData = () => ({
-  users: [{ id: 'u1', name: 'Client', email: 'client@example.com' }],
-  influencers: [
-    {
-      id: 'i1',
-      name: 'Creator',
-      hourlyRate: 100,
-      availability: { monday: { ranges: [{ start: '12:00', end: '13:00' }] } },
+const handler = (router, path, method) => {
+  return router.stack.find((layer) => {
+      return layer.route?.path === path && layer.route.methods[method];
+    }).route.stack.at(-1).handle;
+};
+const response = () => {
+  return {
+    code: 200,
+    status(code) {
+      this.code = code;
+      return this;
     },
-  ],
-  bookings: [],
-  messages: [],
-  notifications: [],
-});
+    set() {
+      return this;
+    },
+    json(body) {
+      this.body = body;
+      return this;
+    },
+  };
+};
+const start = Date.parse('2026-10-19T12:00:00+05:30');
+const makeData = () => {
+  return {
+    users: [{ id: 'u1', name: 'Client', email: 'client@example.com' }],
+    influencers: [
+      {
+        id: 'i1',
+        name: 'Creator',
+        hourlyRate: 100,
+        availability: {
+          monday: { ranges: [{ start: '12:00', end: '13:00' }] },
+        },
+      },
+    ],
+    bookings: [],
+    messages: [],
+    notifications: [],
+  };
+};
 test('booking alerts go to the influencer and reminders become visible exactly 15 minutes before for both roles', () => {
   const read = db.read,
     write = db.write,
     now = Date.now;
   const data = makeData();
-  db.read = () => data;
-  db.write = () => true;
-  Date.now = () => start - 3600000;
+  db.read = () => {
+    return data;
+  };
+  db.write = () => {
+    return true;
+  };
+  Date.now = () => {
+    return start - 3600000;
+  };
   try {
     const created = response();
     handler(
@@ -71,8 +84,7 @@ test('booking alerts go to the influencer and reminders become visible exactly 1
     assert.equal(created.code, 201);
     assert.equal(data.notifications.length, 3);
     assert.equal(
-      notificationFeed(data, { id: 'i1', role: 'influencer' }).notifications[0]
-        .title,
+      notificationFeed(data, { id: 'i1', role: 'influencer' }).notifications[0].title,
       'New session booked',
     );
     assert.equal(
@@ -93,7 +105,9 @@ test('booking alerts go to the influencer and reminders become visible exactly 1
     );
     assert.equal(
       notificationFeed(data, creator, start - 900000).notifications.filter(
-        (item) => item.kind === 'reminder',
+        (item) => {
+          return item.kind === 'reminder';
+        },
       ).length,
       1,
     );
@@ -106,8 +120,7 @@ test('booking alerts go to the influencer and reminders become visible exactly 1
       0,
     );
     assert.equal(
-      notificationFeed(data, { id: 'stranger', role: 'user' }, start - 900000)
-        .notifications.length,
+      notificationFeed(data, { id: 'stranger', role: 'user' }, start - 900000).notifications.length,
       0,
     );
     data.bookings[0].status = 'cancelled';
@@ -125,7 +138,9 @@ test('existing bookings get reminders once and read actions cannot alter another
   const read = db.read,
     write = db.write,
     now = Date.now;
-  Date.now = () => start - 600000;
+  Date.now = () => {
+    return start - 600000;
+  };
   const data = makeData();
   data.bookings.push({
     id: 'old',
@@ -137,8 +152,12 @@ test('existing bookings get reminders once and read actions cannot alter another
     userName: 'Client',
     influencerName: 'Creator',
   });
-  db.read = () => data;
-  db.write = () => true;
+  db.read = () => {
+    return data;
+  };
+  db.write = () => {
+    return true;
+  };
   try {
     const session = { id: 'u1', role: 'user' };
     const feed = response();

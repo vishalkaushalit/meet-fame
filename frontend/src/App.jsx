@@ -10,22 +10,36 @@ import Logo from './components/Logo';
 import LogoLoader from './components/LogoLoader';
 import { api } from './api';
 
-const AuthPage = lazy(() => import('./components/AuthPage'));
-const VideoCall = lazy(() => import('./components/VideoCall'));
-const ChatModal = lazy(() => import('./components/ChatModal'));
-const PasswordRecovery = lazy(() => import('../../shared/PasswordRecovery'));
+const AuthPage = lazy(() => {
+  return import('./components/AuthPage');
+});
+const VideoCall = lazy(() => {
+  return import('./components/VideoCall');
+});
+const ChatModal = lazy(() => {
+  return import('./components/ChatModal');
+});
+const PasswordRecovery = lazy(() => {
+  return import('../../shared/PasswordRecovery');
+});
 
 function AppContent() {
   const { user, role, logout, loading } = useAuth();
 
   // Modals state
   const [callBooking, setCallBooking] = useState(null);
-  const [path, setPath] = useState(() => window.location.pathname);
+  const [path, setPath] = useState(() => {
+    return window.location.pathname;
+  });
   const authRoute = matchAuthRoute(path);
   useEffect(() => {
-    const updatePath = () => setPath(window.location.pathname);
+    const updatePath = () => {
+      return setPath(window.location.pathname);
+    };
     window.addEventListener('popstate', updatePath);
-    return () => window.removeEventListener('popstate', updatePath);
+    return () => {
+      return window.removeEventListener('popstate', updatePath);
+    };
   }, []);
   const authTab = authRoute?.tab;
   useEffect(() => {
@@ -46,7 +60,9 @@ function AppContent() {
   const bookingRoute = /^\/book\/([^/]+)\/?$/.exec(path);
   const profileRoute = /^\/profile(?:\/edit)?\/?$/.test(path);
   useEffect(() => {
-    if (!loading && !user && profileRoute) navigate(authPath('user'));
+    if (!loading && !user && profileRoute) {
+      navigate(authPath('user'));
+    }
   }, [loading, user, profileRoute]);
 
   const [chatModalOpen, setChatModalOpen] = useState(false);
@@ -82,11 +98,13 @@ function AppContent() {
     setChatModalOpen(true);
   };
 
-  if (loading) return <LogoLoader />;
+  if (loading) {
+    return <LogoLoader />;
+  }
   if (
     authRoute &&
     ['forgot-password', 'reset-password'].includes(authRoute.tab)
-  )
+  ) {
     return (
       <PasswordRecovery
         header={
@@ -104,7 +122,8 @@ function AppContent() {
         loginUrl={authPath(authRoute.role)}
       />
     );
-  if (authRoute)
+  }
+  if (authRoute) {
     return (
       <AuthPage
         key={`${authRoute.role}:${authRoute.tab}`}
@@ -112,6 +131,7 @@ function AppContent() {
         tab={authRoute.tab}
       />
     );
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0F1D] text-slate-100 selection:bg-brand-purple selection:text-white flex flex-col">
@@ -151,7 +171,9 @@ function AppContent() {
           key={`${user.id}:${callBooking.id}`}
           booking={callBooking}
           role={role}
-          onClose={() => setCallBooking(null)}
+          onClose={() => {
+            return setCallBooking(null);
+          }}
         />
       )}
       {/* Modals & Dialogs */}
@@ -162,7 +184,9 @@ function AppContent() {
             isOpen={chatModalOpen}
             targetUser={chatTarget}
             targetRole={chatTargetRole}
-            onClose={() => setChatModalOpen(false)}
+            onClose={() => {
+              return setChatModalOpen(false);
+            }}
           />
         </Suspense>
       )}
