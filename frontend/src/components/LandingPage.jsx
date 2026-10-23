@@ -368,8 +368,8 @@ export default function LandingPage({
       </section>
 
       {/* FOOTER */}
-      <footer className="mt-auto py-12 border-t border-slate-800/80 bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="mt-auto py-4 border-t border-slate-800/80 bg-slate-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-3">
           <Logo size="sm" showTagline={true} />
 
           <div className="flex items-center gap-6 text-xs text-slate-400">
